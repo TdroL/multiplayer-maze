@@ -4,110 +4,44 @@
 	<meta charset="UTF-8">
 	<title>Client</title>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
-	<!--<script src="http://github.com/jquery/jquery-color/raw/master/jquery.color.js"></script>-->
-	<script src="client.js"></script>
-	<link href='http://fonts.googleapis.com/css?family=Cuprum&amp;subset=latin' rel='stylesheet' type='text/css' />
-	<style type="text/css">
-		/*
-		F2F5ED ~ bialy
-		FFC200 ~ zolty
-		FF5B00 ~ pomaranczowy
-		B80028 ~ czerwony (róż)
-		84002E ~ czerwony (wino)
-		4AC0F2 ~ niebieski
-		*/
-		* {
-			margin: 0;
-			padding: 0;
-		}
-		
-		html, body {
-			overflow: hidden;
-		}
-		
-		body {
-			background-color: #4AC0F2;
-			font-family: 'Cuprum', arial, serif;
-			font-size: 20px;
-			letter-spacing: 0.6px;
-			color: #FF5B00;
-		}
-		
-		hr {
-			border: none;
-			padding: 10px 0;
-		}
-		
-		h1 {
-			padding-bottom: 0.3em;
-		}
-		
-		h3 {
-			padding-bottom: 0.8em;
-		}
-		p {
-			padding-bottom: 1em;
-		}
-		
-		a {
-			text-decoration: none;
-			color: #B80028;
-			cursor: pointer;
-		}
-		
-		a:hover {
-			text-decoration: underline;
-		}
-		
-		#container {
-			background-color: #F2F5ED;
-			-webkit-border-radius: 10px;
-			-moz-border-radius: 10px;
-			border-radius: 10px;
-			padding: 10px;
-			margin: 10px auto;
-			width: 480px;
-			height: 480px;
-			-webkit-box-shadow: 0 0 5px #84002E;
-			-moz-box-shadow: 0 0 5px #84002E;
-			box-shadow: 0 0 5px #84002E;
-		}
-		
-		.tab {
-			display: table-cell;
-			width: 480px;
-			height: 480px;
-			vertical-align: middle;
-			text-align: center;
-		}		
-		
-		/* style ogólne */
-		.hide {
-			display: none;
-		}
-	</style>
+	<script src="scripts/base.js"></script>
+	<script>
+		config.base_url = '/multiplayer/';
+	</script>
+	<script src="scripts/io.js"></script>
+	<script src="scripts/net.js"></script>
+	<script src="scripts/ui.js"></script>
+	<script src="scripts/jquery.plugins.js"></script>
+	<script src="scripts/player.js"></script>
+	<script src="scripts/client.js"></script>
+	<link href="style.css" rel="stylesheet" />
 </head>
 <body>
 	<div id="container">
-		<div class="tab intro hide">
+		<div class="tab" id="system-check">
+			
+		</div>
+		<div class="tab hide" id="intro">
 			<h1>Labirynt</h1>
 			<h3>Dotrzyj do swojego końca</h3>
 			
-			<p><a rel="run-search">Rozpocznij</a></p>
+			<p><a rel="switchTo-search">Rozpocznij</a></p>
 			<p>Tip: Używaj strzałek do poruszania się</p>
 			<p><img src="images/keyboard-arrows.png" alt="strzałki" title="← ↓ ↑ →" /></p>
 		</div>
-		<div class="tab search hide">
+		<div class="tab hide" id="search">
 			<h2>Oczekiwanie na graczy<span class="ellipsis">...</span></h2>
-			<h3>Znaleziono <span class="current-players">1</span> z <span class="needed-players">4</span>.</h3>
+			<h3>Znaleziono <span class="current-players">1</span> z <span class="needed-players">1</span>.</h3>
 			
-			<p><a rel="run-game">Next</a></p>
+			<p><a rel="switchTo-game">Next</a></p>
 		</div>
-		<div class="tab game hide">
-			<h1>3, 2, 1, start!</h1>
-			<p><a rel="run-poll">Next</a></p>
+		<div class="tab hide" id="game">
+			<canvas class="maze"></canvas>
+			<canvas class="points"></canvas>
+			<canvas class="players"></canvas>
+			<div id="fps"></div>
 		</div>
-		<div class="tab poll hide">
+		<div class="tab hide" id="poll">
 			<h1>The cake is a lie...</h1>
 			<h2>Zostałeś poddany testowi</h2>
 			<h3></h3>

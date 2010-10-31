@@ -1,0 +1,346 @@
+<!DOCTYPE HTML>
+<html lang="pl">
+<head>
+	<meta charset="UTF-8">
+	<title>Maze generator</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script>
+		var settings = {
+				init: function() {
+					this.maze.width = this.maze.cols * this.maze.block;
+					this.maze.height = this.maze.rows * this.maze.block;
+					return this;
+				},
+				maze: {
+					width: null,
+					height: null,
+					block: 30,
+					margin: 20,
+					cols: 25,
+					rows: 15
+				}
+			}.init();
+		
+		String.prototype.repeat = String.prototype.repeat || function(n) {
+			return new Array(n + 1).join(this);
+		}
+		
+		Array.prototype.shuffle = Array.prototype.shuffle || function() {
+			var t, n, l = this.length;
+			for(var i = 0; i < l; i++)
+			{
+				n = Math.round(Math.random() * l);
+				t = this[i];
+				this[i] = this[n];
+				this[n] = t;
+			}
+			
+			return this;
+		};
+		
+		function genTable()
+		{
+			var $table = $('.table');
+			
+			if($table.data('sizes')
+			&& $table.find('.row').length
+			&& $table.data('sizes').cols === settings.maze.cols
+			&& $table.data('sizes').rows === settings.maze.rows)
+			{
+				return; // no chages
+			}
+			
+			$table.data('sizes', {cols: settings.maze.cols, rows: settings.maze.rows});
+			
+			$table.empty().append(('<div class="row" style="width: '+(settings.maze.cols*settings.maze.block)+'px" />').repeat(settings.maze.rows))
+					.find('.row').append(('<div class="col" style="width: '+(settings.maze.block)+'px; height: '+(settings.maze.block)+'px" ><div class="v" /><div class="h" /></div>').repeat(settings.maze.cols));
+			
+			$table.css({
+				width: settings.maze.cols*settings.maze.block - 8,
+				height: settings.maze.rows*settings.maze.block - 8
+			})
+				.find('.col:last-child .v, .row:last-child .h').remove();
+			
+			$table.delegate('.v, .h', 'click', function() {
+				$(this).toggleClass('block');
+			});
+		}
+		
+		function genMaze()
+		{
+			var $table = $('.table');
+			
+			$table.find('.row').each(function() {
+				$(this).find('.col').each(function() {
+					var $$ = $(this),
+						rand = Math.random();
+						
+					$$.find('.v, .h').removeClass('block');
+					
+					if(rand > 0.8)
+					{
+						$$.find('.v, .h').addClass('block')
+					}
+					else if(rand > 0.3)
+					{
+						var t = ['.h', '.v'].shuffle();
+						
+						$$.find(t[0]).addClass('block');
+					}
+				});
+			});
+		}
+		
+		function genData() {
+			var $table = $('.table'),
+				data = []
+				i = 0, j = 0;
+			
+			$table.find('.row').each(function() {
+				data[i] = [];
+				j = 0;
+				$(this).find('.col').each(function() {
+					var $$ = $(this);
+					data[i][j] = [$$.find('.v.block').length,$$.find('.h.block').length];
+					j++;
+				});
+				i++;
+			});
+			return data;
+		}
+		
+		jQuery(function($) {
+			$('.tab').addClass('hide')
+				.filter(':first').removeClass('hide')
+			.end()
+				.find('a[rel]').click(function() {
+					var rel = $(this).attr('rel');
+					if(rel && rel.length)
+					{
+						$('.tab').addClass('hide')
+							.filter('#'+rel).removeClass('hide');
+					}
+					
+					return false;
+				});
+			
+			$.each(settings.maze, function(i, v) {
+				$('#maze-'+i).val(v)
+					.not('#maze-width, #maze-height').bind('change keypress', function(event) {
+						var $$ = $(this);
+						settings.maze[i] = parseInt($$.val(), 10) || 0;
+						
+						if(event && event.keyCode)
+						{
+							switch(event.keyCode)
+							{
+								case 40:
+								{
+									settings.maze[i]--;
+									break;
+								}
+								case 38:
+								{
+									settings.maze[i]++;
+									break;
+								}
+							}
+						}
+						
+						$$.val(settings.maze[i]);
+						
+						settings.maze.width = settings.maze.cols * settings.maze.block;
+						settings.maze.height = settings.maze.rows * settings.maze.block;
+						
+						$('#maze-width').val(settings.maze.width);
+						$('#maze-height').val(settings.maze.height);
+					});
+			});
+			
+			$('#setup a[rel=maze]').unbind('click').click(function() {
+				$('.tab').addClass('hide')
+					.filter('#maze').removeClass('hide');
+				genTable();			
+				return false;
+			});
+			
+			$('#maze a[rel=data]').unbind('click').click(function() {
+				$('.tab').addClass('hide')
+					.filter('#data').removeClass('hide');
+					
+				$('#data .out').text(JSON.stringify({
+					data: genData(),
+					settings: settings
+				}, function(k, v) {
+					if(k != 'width' && k != 'height')
+					{
+						return v;
+					}
+					return;
+				}));
+				
+				return false;
+			});
+			
+			$('#maze a[href=#generate]').click(function() {
+				genMaze();
+				return false;
+			});
+		});
+	</script>
+	<link rel="stylesheet" href="../client/style.css" />
+	<style type="text/css">
+		@charset "utf-8";
+		
+		html {
+			overflow: auto;
+		}
+		
+		#container {
+			height: auto;
+		}
+		
+		.tab {
+			display: block;
+		}
+		
+		fieldset {
+			width: 206px;
+			margin: 20px auto;
+			border: 1px solid #84002E;
+			-webkit-border-radius: 10px;
+			-moz-border-radius: 10px;
+			border-radius: 10px;
+			padding: 10px 50px;
+			text-align: left;
+		}
+		
+		legend {
+			margin-left: 20px;
+			padding: 0 5px;
+		}
+		
+		label {
+			display: block;
+			margin-top: 0.5em;
+		}
+		
+		input {
+			border: 1px solid #4AC0F2;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			border-radius: 3px;
+			padding: 3px;
+			font: inherit;
+			width: 200px;
+		}
+		
+		.table {
+			margin: 0 auto;
+			border: 8px solid #555;
+		}
+		
+		.row {
+			margin:-4px;
+			clear: both;
+		}
+		
+		.col {
+			float: left;
+			position: relative;
+		}
+		
+		.row:last-child .col {
+			border-bottom-width: 1px;
+		}
+
+		.col:last-child {
+			border-right-width: 1px;
+		}
+		
+		.v,
+		.h {
+			position: absolute;
+			z-index: 2;
+			border: 1px solid #555;
+			background: #fff;
+			cursor: pointer;
+		}
+		
+		.v:hover,
+		.h:hover {
+			background: #FF5B00;
+		}
+		
+		.v.block,
+		.h.block {
+			background: #555;
+		}
+		
+		.v {
+			top: 0px;
+			bottom: 0px;
+			right: -4px;
+			width: 6px;
+			border-width: 4px 1px;
+		}
+		
+		.h {
+			bottom: -4px;
+			left: 0px;
+			right: 0px;
+			height: 6px;
+			border-width: 1px 4px;
+		}
+		
+		.out {
+			color: #84002E;
+			font: 14px Monaco, "Curier New", monospace;
+			padding: 5px;
+			text-align: left;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div class="tab" id="setup">
+			<fieldset>
+				<legend>Settings</legend>
+				
+				
+				<label for="maze-cols">Cols</label>
+				<input type="text" name="maze-cols" id="maze-cols" />
+				
+				<label for="maze-rows">Rows</label>
+				<input type="text" name="maze-rows" id="maze-rows" />
+				
+				<label for="maze-block">Block</label>
+				<input type="text" name="maze-block" id="maze-block" />
+				
+				<label for="maze-margin">Margin</label>
+				<input type="text" name="maze-margin" id="maze-margin" />
+				
+				<label for="maze-width">Width</label>
+				<input type="text" name="maze-width" id="maze-width" disabled />
+				
+				<label for="maze-height">Height</label>
+				<input type="text" name="maze-height" id="maze-height" disabled />
+			</fieldset>
+			<a rel="maze">Next</a>
+		</div>
+		<div class="tab hide" id="maze">
+			<a href="#generate">Generate</a>
+			<hr />
+			<div class="table"></div>
+			<hr />
+			<a rel="setup">Prev</a> <a rel="data">Next</a>
+		</div>
+		<div class="tab hide" id="data">
+			<h3>Data:</h3>
+			<textarea class="out" rows="20" cols="70" readonly></textarea>
+			<hr />
+			<a rel="maze">Prev</a>
+		</div>
+	</div>
+</body>
+</html>

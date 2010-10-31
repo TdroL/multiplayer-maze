@@ -1,0 +1,101 @@
+@charset "utf-8";
+@import "http://fonts.googleapis.com/css?family=Cuprum&amp;subset=latin";
+
+/*
+ * F2F5ED ~ bialy
+ * FFC200 ~ zolty
+ * FF5B00 ~ pomaranczowy
+ * B80028 ~ czerwony (róż)
+ * 84002E ~ czerwony (wino)
+ * 4AC0F2 ~ niebieski
+ */
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+canvas {
+	display: block;
+}
+
+html, body {
+	overflow: hidden;
+}
+
+body {
+	background-color: #4AC0F2;
+	font-family: 'Cuprum', arial, serif;
+	font-size: 20px;
+	letter-spacing: 0.6px;
+	color: #FF5B00;
+}
+
+hr {
+	clear: both;
+	border: none;
+	padding: 10px 0;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+}
+
+h3 {
+	padding-bottom: 0.8em;
+}
+p {
+	padding-bottom: 1em;
+}
+
+a {
+	text-decoration: underline;
+	color: #B80028;
+	cursor: pointer;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+#container {
+	background-color: #F2F5ED;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	padding: 10px;
+	margin: 10px auto;
+	width: 800px;
+	height: 480px;
+	-webkit-box-shadow: 0 0 5px #84002E;
+	-moz-box-shadow: 0 0 5px #84002E;
+	box-shadow: 0 0 5px #84002E;
+}
+
+.tab {
+	display: table-cell;
+	width: inherit;
+	height: inherit;
+	vertical-align: middle;
+	text-align: center;
+}
+
+/* style indywidualne */
+#game {
+	position: relative;
+	display: block;
+}
+#game canvas {
+	position: absolute;
+}
+
+#fps {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+/* style ogólne */
+.tab.hide {
+	display: none;
+}
