@@ -4,14 +4,11 @@ state = {
 		var canvas,
 			data = [],
 			settings = {
-				init: function() {
-					this.maze.cols = this.maze.width / this.maze.block;
-					this.maze.rows = this.maze.height / this.maze.block;
-					return this;
-				},
 				maze: {
 					width: null,
 					height: null,
+					outerWidth: null,
+					outerHeight: null,
 					block: 30, // blocks width and height; !! (width % block) = 0
 					margin: 20,
 					cols: 25,
@@ -37,9 +34,9 @@ state = {
 						};
 					})()
 				}
-			}.init();
+			};
 		
-		$.getJSON('server/data/test.txt'.url(), function(response) {
+		$.getJSON('test.txt', function(response) {
 			settings = $.extend(true, settings, response.settings);
 			data = response.data;
 			
@@ -59,6 +56,8 @@ state = {
 			}
 			
 			settings.maze.load();
+			
+			delete response;
 		});
 		
 		this.init = function() {
@@ -68,16 +67,19 @@ state = {
 				settings.maze.width = settings.maze.cols * settings.maze.block;
 				settings.maze.height = settings.maze.rows * settings.maze.block;
 				
+				settings.maze.outerWidth = settings.maze.width + 2*settings.maze.margin;
+				settings.maze.outerHeight = settings.maze.height + 2*settings.maze.margin;
+				
 				canvas.attr({
-						width: settings.maze.width + 2*settings.maze.margin,
-						height: settings.maze.height + 2*settings.maze.margin
+						width: settings.maze.outerWidth,
+						height: settings.maze.outerHeight
 				});
 				
-				var maze = ui.canvas(canvas.filter('.maze')),
-					player = ui.canvas(canvas.filter('.players'));
+				ui.maze(ui.canvas(canvas.filter('.maze')), settings.maze, data);
+				ui.player(ui.canvas(canvas.filter('.players')), settings.maze, data);
+				ui.text(ui.canvas(canvas.filter('.text')), settings.maze);
 				
-				ui.maze(maze, settings.maze, data);
-				ui.player(player, settings.maze, data);
+				phy.init(settings.maze, data);
 				
 				ui.loop(true);
 			});
@@ -88,13 +90,6 @@ state = {
 		};
 	}
 };
-
-// declare io binds
-io.bind(['up', 'left'], function(){
-	$.log('down');
-}, function() {
-	$.log('up');
-});
 
 // Konami Code!
 var contra = new Audio('client/audios/contra.ogg'.url());

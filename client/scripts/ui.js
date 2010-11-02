@@ -14,7 +14,7 @@
 				d = settings.block,
 				px, py;
 			
-			c.clearRect(0, 0, settings.width + dx, settings.height + dy);
+			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
 			// clear and draw border
 			c.strokeStyle('#000');
 			c.fillStyle('#fff');
@@ -60,9 +60,14 @@
 			player.init(canvas, settings, data);
 			ui.list.push([player, player.update]);
 		},
+		text: function(canvas, settings) {
+			text.init(canvas, settings);
+			ui.list.push([text, text.update]);
+		},
 		
 		// animation loop
 		_running: false,
+		_frames: -1,
 		list: [],
 		timer: {
 			last: 0,
@@ -72,6 +77,13 @@
 			min_sleep: 5
 		},
 		loop: function() {
+			var timer = this.timer;
+			
+			if( ! this._frames--)
+			{
+				return;
+			}
+			
 			if(arguments.length)
 			{
 				if( ! arguments[0])
@@ -87,9 +99,9 @@
 				}
 				
 				ui._running = true;
-				ui.timer.last = +new Date();
+				timer.last = +new Date();
 				
-				window.setTimeout(function() { ui.loop(); }, ui.timer.min_sleep);
+				window.setTimeout(function() { ui.loop(); }, timer.min_sleep);
 				return;
 			}
 			
@@ -98,26 +110,25 @@
 				return;
 			}
 			
-			ui.timer.current = +new Date();
-			ui.timer.delta = ui.timer.current - ui.timer.last;
+			timer.current = +new Date();
+			timer.delta = timer.current - timer.last;
 			
 			for(var i = 0, l = ui.list.length; i < l; i++)
 			{
 				var v = ui.list[i];
-				v[1].call(v[0], ui.timer.delta);				
+				v[1].call(v[0], timer.delta, timer.current);				
 			}
 			
-			ui.timer.last = ui.timer.current;
+			timer.last = timer.current;
+			timer.delta = timer.target - (new Date() - timer.current);
 			
-			ui.timer.delta = ui.timer.target - (new Date() - ui.timer.current);
-			
-			if(ui.timer.delta > ui.timer.min_sleep)
+			if(timer.delta > timer.min_sleep)
 			{
-				window.setTimeout(function() { ui.loop(); }, ui.timer.delta);
+				window.setTimeout(function() { ui.loop(); }, timer.delta);
 			}
 			else
 			{
-				window.setTimeout(function() { ui.loop(); }, ui.timer.min_sleep);
+				window.setTimeout(function() { ui.loop(); }, timer.min_sleep);
 			}
 		},
 		canvas: function(c) {
@@ -145,12 +156,14 @@
 				{
 					var m = methods[i];
 					ui.canvas.prototype[m] = (function (m) {
-						return function (a, b, c, d, e, f, g, h, i) {
-							this.context[m](a, b, c, d, e, f, g, h, i);
+						return function () {
+							this.context[m].apply(this.context, arguments);
 							return this;
 						};
 					})(m);
 				}
+				
+				delete methods;
 				
 				var props = ['canvas','fillStyle','font','globalAlpha','globalCompositeOperation','lineCap','lineJoin','lineWidth','miterLimit','shadowOffsetX','shadowOffsetY','shadowBlur','shadowColor','strokeStyle','textAlign','textBaseline'];
 				
@@ -168,6 +181,8 @@
 						};
 					})(p);
 				}
+				
+				delete props;
 			}
 		}
 	};

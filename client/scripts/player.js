@@ -7,16 +7,15 @@
 		ball: {
 			x: 15,
 			y: 15,
-			fx: 0, // force
+			px: 15, // previous x, y
+			py: 15,
+			f: 1500, // force
+			fx: 0, // controll force
 			fy: 0,
-			dldl: 0,
-			r: 7,
-			speed: 120, // ax/sec
-			a: function(dl, z, dzdl, dz) {
-				return dl*z;
-			}
+			fr: 0.1, // fraction
+			m: 2, // mass
+			r: 7  // radius
 		},
-		i: 0,
 		init: function(canvas, settings, data) {
 			player.canvas = canvas;
 			player.settings = settings;
@@ -45,24 +44,30 @@
 			}, function() {
 				player.ball.fx -= 1;
 			});
+		
+			io.bind(['add'], function() {
+				player.ball.f += 100;
+			});
+			
+			io.bind(['subtract'], function() {
+				player.ball.f -= 100;
+			});
 		},
 		update: function(dt) {
-			var settings = player.settings,
-				c = player.canvas,
-				dl = (dt * 0.001) * player.ball.speed;
+			var settings = this.settings,
+				c = this.canvas;
 			
-			player.ball.x += player.ball.a(dl, player.ball.fx, player.ball.dldl, player.ball.x);
-			player.ball.y += player.ball.a(dl, player.ball.fy, player.ball.dldl, player.ball.y);
-
-			player.ball.dldl = dl;
-
-			c.clearRect(0, 0, settings.width + 2*player.settings.margin, settings.height + 2*player.settings.margin);
+			dt = (dt > ui.timer.target) ? ui.timer.target : dt;
+			
+			phy.move(this.ball, (dt * 0.001));
+			
+			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
 			
 			c.fillStyle('#00f')
 			 .lineWidth(1);
-
+			
 			c.beginPath();
-			c.arc(player.settings.margin + player.ball.x, player.settings.margin + player.ball.y, player.ball.r, 0, Math.PI*2, true);
+			c.arc(settings.margin + this.ball.x + 1, settings.margin + this.ball.y + 1, this.ball.r, 0, Math.PI*2, true);
 			c.fill();
 		}
 	};

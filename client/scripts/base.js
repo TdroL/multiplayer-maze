@@ -2,9 +2,11 @@ var config,
 	io,
 	net,
 	ui,
+	phy,
 	state,
 	player,
-	point;
+	point,
+	text;
 
 (function($){
 	
