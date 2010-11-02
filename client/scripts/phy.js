@@ -21,9 +21,12 @@
 		},
 		move: function(ball, dt) {
 			var a, p, n, dtdt,
-				fr = ball.fr;
+				fr = ball.fr,
+				target = 1 / 60;
 			
-			dtdt = dt * dt;
+			dtdt = dt * target;
+			
+			$('.info').text(Math.round2(dt, 4));
 			
 			a = ball.fx*ball.f/ball.m;
 			n = (2 - fr)*ball.x - (1 - fr)*ball.px + a * dtdt;

@@ -1,6 +1,6 @@
 var config,
 	io,
-	net,
+	net, ws,
 	ui,
 	phy,
 	state,

@@ -13,7 +13,7 @@
 			
 			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
 			c.fillStyle('#000');
-			c.fillText('FPS: '+(Math.round(10000/dt)/10), settings.margin, 13);
+			c.fillText('FPS: '+(Math.round(10000/dt)/10)+' '+Math.round2(dt, 3), settings.margin, 13);
 		}
 	}
 })(jQuery);
