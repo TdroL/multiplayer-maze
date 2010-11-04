@@ -7,11 +7,12 @@
 				var settings = this,
 					callback = false;
 				
-				$siblings.stop(true, true)
-					.animate({'opacity': 0}, settings.switchTime, function() {
-						var id = this.id;
+				$siblings.stop()
+					.animate({'opacity': 0}, settings.switchTime)
+					.queue(function() {
+						$(this).dequeue().addClass('hide');
 						
-						$(this).addClass('hide');
+						var id = this.id;
 						
 						if(id in state && state[id].release)
 						{
@@ -26,7 +27,7 @@
 				var settings = this,
 					callback = false;
 				
-				$tab.stop(true, true)
+				$tab.stop()
 					.removeClass('hide')
 					.each(function() {
 							var id = this.id;
@@ -36,10 +37,7 @@
 								state[id].init();
 							}
 					})
-					.animate({'opacity': 1}, function() {
-						callback || settings.switchTime;
-						callback = true;
-					});
+					.animate({'opacity': 1}, settings.switchTime);
 			}
 		};
 		

@@ -89,6 +89,24 @@ a:hover {
 	position: absolute;
 }
 
+#servers {
+	height: 400px;
+}
+
+#servers ul {
+	list-style: none;
+	text-align: left;
+	padding: 20px;
+}
+
+#servers li {
+	margin-bottom: 10px;
+}
+
+#servers .players {
+	font-size: 0.8em;
+}
+
 .info {
 	position: absolute;
 	top: 20px;

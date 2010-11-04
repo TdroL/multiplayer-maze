@@ -1,5 +1,6 @@
 (function($) {
 	io = {
+		inited: false,
 		method: 'async', // function calling method
 		binds: {}, binds_cache: {},
 		sequences: {}, sequences_cache: {}, sequences_active: {},
@@ -241,17 +242,6 @@
 	
 	io.init();
 	
-})(jQuery);
-
-jQuery(function($) {
-	var $container = $('#container');
-	
-	$container.switchInit().delegate('a[rel^=switchTo-]', 'click', function() {
-		$container.switchTo($(this).attr('rel').replace(/switchTo-(.+)$/i, '$1'));
-		return false;
-	});
-	
 	$.log('io: ready');
-});
-
+})(jQuery);
 

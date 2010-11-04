@@ -1,8 +1,128 @@
 // declare states
 state = {
+	connect: new function() {
+		var i = 0, interval = 400,
+			timerID, $dots;
+			
+		this.init = function() {
+			net.bind('open', true, false, function() {
+				$('#container').switchTo('servers');
+			});
+			net.init();
+			
+			$dots = $('#container span.dots');
+			var dots = $dots.text(), len = 0;
+			
+			dots = dots.split('');
+			for(var d in dots)
+			{
+				dots[d] = '<span class="dot-'+(len++)+'" style="visibility: hidden">'+dots[d]+'</span>';
+			}
+			$dots.html(dots.join(''));
+			
+			timerID = window.setInterval(function() {
+				if(i < len)
+				{
+					$dots.find('.dot-'+(i++)).css('visibility', 'visible');
+				}
+				else
+				{
+					$dots.find('span').css('visibility', 'hidden');
+					i = 0;
+				}
+				
+			}, interval);
+		};
+		
+		this.release = function() {
+			window.clearInterval(timerID);
+		};
+	},
+	servers: new function() {
+		var timerID, interval = 5000,
+			$ul,
+			$schema = $('<li data-id="{#id}">'
+						+'<div class="name">{#name}</div>'
+						+'<div class="players">{#players}/{#limit}</div>'
+						+'<a rel="join-channel" data-channel-id="{#id}">Dołącz</a>'
+						+'</li>');
+		
+		this.update = function(data) {
+			var channels = {},
+				parsed = JSON.parse(data);
+			
+			$.each(parsed, function(i, v) {
+				channels[v.id] = v;
+			});
+			
+			$ul.find('li').each(function() {
+				var $$ = $(this),
+					id = $$.attr('id').substr(2);
+				
+				if(id in channels)
+				{
+					$$.find('.name').text(channels[id].name);
+					$$.find('.players').text(channels[id].players+'/'+channels[id].limit);
+					delete channels[id];
+				}
+				else
+				{
+					$$.remove();
+				}
+			});
+			
+			$.each(channels, function(i, v) {
+				var $li = $schema.clone();
+				
+				$li.attr('id', '__'+v.id)
+					.find('.name').text(v.name).end()
+					.find('.players').text(v.players+'/'+v.limit).end()
+					.find('a[rel]').attr('rel', '__'+v.id);
+
+				$ul.append($li);
+			});
+			
+			delete data;
+			delete channels;
+			delete parsed;
+		};
+		
+		this.init = function() {
+			$ul = $ul || $('#servers ul').delegate('a', 'click', function() {
+				var $$ = $(this),
+					id = $$.attr('rel').substr(2);
+				
+				if(id)
+				{
+					net.bind('join-channel:'+id, true, function(data) {
+						data = parseInt(data, 10);
+						if(data == 1)
+						{
+							player.in_channel = true;
+							$('#container').switchTo('game');
+						}
+					});
+				}
+				
+				return false;
+			});
+			
+			net.bind('get-channels', this.update);
+			
+			timerID = window.setInterval(function() {
+				net.send('get-channels', false);
+			}, interval);
+		};
+		
+		this.release = function() {
+			net.unbind('get-channels');
+			window.clearInterval(timerID);
+		};
+	},
 	game: new function() {
 		var canvas,
 			data = [],
+			timerID,
 			settings = {
 				maze: {
 					width: null,
@@ -61,6 +181,12 @@ state = {
 		});
 		
 		this.init = function() {
+			if(! window.debug && ! player.in_channel) // no hacking, please
+			{
+				$('#container').switchTo('servers');
+				return;
+			}
+			
 			canvas = $('#game canvas'); // all canvases
 			
 			settings.maze.load(function() {
@@ -82,11 +208,25 @@ state = {
 				phy.init(settings.maze, data);
 				
 				ui.loop(true);
+				
+				timerID = window.setInterval(function() {
+					if(ws.bufferedAmount == 0)
+					{
+						net._data.id = net.id;
+						net._data.date = +new Date();
+						net._data.x = Math.round2(player.ball.x);
+						net._data.y = Math.round2(player.ball.y);
+						
+						net.send('update:'+JSON.stringify(net._data), false);
+					}
+				}, 20); // ms
 			});
 		};
 		
 		this.release = function() {
 			ui.loop(false);
+			player.in_channel = false;
+			window.clearInterval(timerID);
 		};
 	}
 };
@@ -101,14 +241,28 @@ io.sequence(['a', 'a', 'enter'], function() {
 	contra.currentTime = 0;
 });
 
+var docready = false;
+
 // main
 jQuery(function($) {
-	var $container = $('#container'),
-		first = $container.find('#intro');
-	
-	if(window.location.hash.length)
+	if(docready)
 	{
-		first =  $container.find(window.location.hash+'.tab');
+		return false; // 1.4.3 bug - http://bugs.jquery.com/ticket/7247
+	}
+	docready = true;
+	
+	var $container = $('#container'),
+		first = $container.find('#intro'),
+		hash = window.location.hash;
+	
+	$container.switchInit().delegate('a[rel^=switchTo-]', 'click', function() {
+		$container.switchTo($(this).attr('rel').replace(/switchTo-(.+)$/i, '$1'));
+		return false;
+	});
+	
+	if(hash.length)
+	{
+		first =  $container.find(hash+'.tab');
 	}
 	
 	$container.switchTo(first);

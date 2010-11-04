@@ -4,6 +4,7 @@
 		canvas: null,
 		settings: {},
 		data: [],
+		in_channel: false,
 		ball: {
 			x: 15,
 			y: 15,
@@ -59,7 +60,7 @@
 				c = this.canvas;
 			
 			phy.move(this.ball, (dt * 0.001));
-			
+
 			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
 			
 			c.lineWidth(1);
@@ -70,7 +71,6 @@
 				c.arc(settings.margin + v.x + 1, settings.margin + v.y + 1, player.ball.r, 0, Math.PI*2, true);
 				c.fill().closePath();
 			});
-			
 			
 			c.beginPath();
 			c.fillStyle('#00f');

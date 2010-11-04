@@ -6,38 +6,51 @@
 		init: function(settings, data) {
 			this.settings = settings;
 			this.data = data;
-			
-			Math.sgn = Math.sgn || function(x) {
-				if(x < 0) return -1;
-				if(x > 0) return 1;
-				return 0;
-			};
-			
-			Math.round2 = Math.round2 || function(x, t) {
-				t = t || 1;
-				var pt = Math.pow(10, t);
-				return Math.round(x*pt)/pt;
-			};
 		},
+		pdt: 0,
 		move: function(ball, dt) {
-			var a, p, n, dtdt,
-				fr = ball.fr,
+			/*
+			var a, n, dtdt, ptd, p, s,
+				fr_2 = 2 - ball.fr,
+				fr_1 = 1 - ball.fr,
+				step = 0.01,
+				e = 0.00001, // epsilon
 				target = 1 / 60;
+			*/
+			var vt = 120 * dt;
 			
-			dtdt = dt * target;
-			
-			$('.info').text(Math.round2(dt, 4));
-			
-			a = ball.fx*ball.f/ball.m;
-			n = (2 - fr)*ball.x - (1 - fr)*ball.px + a * dtdt;
+
 			ball.px = ball.x;
-			ball.x = n;
+			ball.x = ball.x + ball.fx*vt;
 			
-			a = ball.fy*ball.f/ball.m;
-			n = (2 - fr)*ball.y - (1 - fr)*ball.py + a * dtdt;
 			ball.py = ball.y;
-			ball.y = n;
+			ball.y = ball.y + ball.fy*vt;
+
+			/*
+			pdt = dt;
+			s = Math.floor(dt / step);
+			if(s > 0)
+			{
+				pdt = step + (dt - step)/s;
+			}
 			
+			dtdt = pdt * pdt;
+			
+			while(dt > e)
+			{
+				dt -= pdt;
+				
+				a = ball.fx*ball.f/ball.m;
+				n = fr_2*ball.x - fr_1*ball.px + a * dtdt;
+				ball.px = ball.x;
+				ball.x = n;
+				
+				a = ball.fy*ball.f/ball.m;
+				n = fr_2*ball.y - fr_1*ball.py + a * dtdt;
+				ball.py = ball.y;
+				ball.y = n;
+			}
+			*/
 			this.interpolate(ball);
 		},
 		_collisions: {
@@ -167,7 +180,7 @@
 		interpolate: function(ball) {
 			var dx = ball.x - ball.px, adx = Math.abs(dx), sgx = Math.sgn(dx),
 				dy = ball.y - ball.py, ady = Math.abs(dy), sgy = Math.sgn(dy),
-				i, sx, sy, s, ds, step = 0.4, step_2 = step/1.5,
+				i, sx, sy, s, ds, step = 1, step_2 = step/10,
 				xb = false, yb = false, // blocks
 				c; // collision
 			
@@ -207,6 +220,8 @@
 				xb = xb || c.xb;
 				yb = yb || c.yb;
 				
+				c.ex = Math.abs(c.ex);
+				c.ey = Math.abs(c.ey);
 				// corner fix - semi-magic
 				if(c.tl)
 				{
@@ -214,11 +229,11 @@
 					{
 						do
 						{
-							ball.py += (ball.fy ? step : step_2);
-							ball.y += step;
+							//ball.py += (ball.fy ? step : step_2);
+							ball.y += step_2;
 							c = this.collision(ball);
 						}
-						while(c.br);
+						while(c.tl);
 						
 						xb = false;
 						yb = false;
@@ -227,70 +242,11 @@
 					{
 						do
 						{
-							ball.px += (ball.fx ? step : step_2);
-							ball.x += step;
+							//ball.px += (ball.fx ? step : step_2);
+							ball.x += step_2;
 							c = this.collision(ball);
 						}
-						while(c.br);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx > 0 && ball.fy < 0)
-					{
-						if(c.ex < c.ey)
-						{
-							do
-							{
-								//ball.py -= step_2;
-								ball.y += step;
-								c = this.collision(ball);
-							}
-							while(c.br);
-							
-							xb = false;
-							yb = false;
-						}
-						else if(c.ex > c.ey)
-						{
-							do
-							{
-								//ball.px -= step_2;
-								ball.x += step;
-								c = this.collision(ball);
-							}
-							while(c.br);
-							
-							xb = false;
-							yb = false;
-						}
-						// if equal - block
-					}
-				}
-				else if(c.tr)
-				{
-					if(ball.fx > 0 && ball.fy >= 0)
-					{
-						do
-						{
-							ball.py += (ball.fy ? step : step_2);
-							ball.y += step;
-							c = this.collision(ball);
-						}
-						while(c.br);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx <= 0 && ball.fy < 0)
-					{
-						do
-						{
-							ball.px -= (ball.fx ? step : step_2);
-							ball.x -= step;
-							c = this.collision(ball);
-						}
-						while(c.br);
+						while(c.tl);
 						
 						xb = false;
 						yb = false;
@@ -305,7 +261,66 @@
 								ball.y += step;
 								c = this.collision(ball);
 							}
-							while(c.br);
+							while(c.tl);
+							
+							xb = false;
+							yb = false;
+						}
+						else if(c.ex > c.ey)
+						{
+							do
+							{
+								//ball.px -= step_2;
+								ball.x += step;
+								c = this.collision(ball);
+							}
+							while(c.tl);
+							
+							xb = false;
+							yb = false;
+						}
+						// if equal - block
+					}
+				}
+				else if(c.tr)
+				{
+					if(ball.fx > 0 && ball.fy >= 0)
+					{
+						do
+						{
+							//ball.py += (ball.fy ? step : step_2);
+							ball.y += step_2;
+							c = this.collision(ball);
+						}
+						while(c.tr);
+						
+						xb = false;
+						yb = false;
+					}
+					else if(ball.fx <= 0 && ball.fy < 0)
+					{
+						do
+						{
+							//ball.px -= (ball.fx ? step : step_2);
+							ball.x -= step_2;
+							c = this.collision(ball);
+						}
+						while(c.tr);
+						
+						xb = false;
+						yb = false;
+					}
+					else if(ball.fx > 0 && ball.fy < 0)
+					{
+						if(c.ex < c.ey)
+						{
+							do
+							{
+								//ball.py -= step_2;
+								ball.y += step;
+								c = this.collision(ball);
+							}
+							while(c.tr);
 							
 							xb = false;
 							yb = false;
@@ -318,7 +333,7 @@
 								ball.x -= step;
 								c = this.collision(ball);
 							}
-							while(c.br);
+							while(c.tr);
 							
 							xb = false;
 							yb = false;
@@ -332,11 +347,11 @@
 					{
 						do
 						{
-							ball.py -= (ball.fy ? step :step_2);
-							ball.y -= step;
+							//ball.py -= (ball.fy ? step :step_2);
+							ball.y -= step_2;
 							c = this.collision(ball);
 						}
-						while(c.br);
+						while(c.bl);
 						
 						xb = false;
 						yb = false;
@@ -345,11 +360,11 @@
 					{
 						do
 						{
-							ball.px += (ball.fx ? step : step_2);
-							ball.x += step;
+							//ball.px += (ball.fx ? step : step_2);
+							ball.x += step_2;
 							c = this.collision(ball);
 						}
-						while(c.br);
+						while(c.bl);
 						
 						xb = false;
 						yb = false;
@@ -364,7 +379,7 @@
 								ball.y -= step;
 								c = this.collision(ball);
 							}
-							while(c.br);
+							while(c.bl);
 							
 							xb = false;
 							yb = false;
@@ -377,7 +392,7 @@
 								ball.x += step;
 								c = this.collision(ball);
 							}
-							while(c.br);
+							while(c.bl);
 							
 							xb = false;
 							yb = false;
@@ -391,8 +406,8 @@
 					{
 						do
 						{
-							ball.py -= (ball.fy ? step: step_2);
-							ball.y -= step;
+							//ball.py -= (ball.fy ? step: step_2);
+							ball.y -= step_2;
 							c = this.collision(ball);
 						}
 						while(c.br);
@@ -404,8 +419,8 @@
 					{
 						do
 						{
-							ball.px -= (ball.fx ? step : step_2);
-							ball.x -= step;
+							//ball.px -= (ball.fx ? step : step_2);
+							ball.x -= step_2;
 							c = this.collision(ball);
 						}
 						while(c.br);
