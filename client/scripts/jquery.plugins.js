@@ -55,7 +55,6 @@
 	};
 	
 	$.fn.switchTo = function(tab) {
-		
 		return this.each(function() {
 			var $this = $(this),
 				$tab = ($.type(tab) == 'string') ? $(this).find('#'+tab) : tab;
@@ -70,6 +69,51 @@
 			
 			$siblings.length ? settings.switchOut($siblings, $tab)
 							 : settings.switchIn($siblings, $tab);
+		});
+	};
+	
+	// blink effect
+	
+	$.fn.blink = function(interval) {
+		interval = interval || false;
+		return this.each(function() {
+			var $this = $(this),
+				timerID = $.data($this, 'blink-timerID');
+			
+			if(interval === false)
+			{
+				window.clearInterval(timerID);
+				return;
+			}
+			
+			var letters = $this.text(),
+				i, len = letters.length;
+			
+			letters = letters.split('');
+			
+			for(i in letters)
+			{
+				letters[i] = '<span class="dot-'+i+'">'+letters[i]+'</span>';
+			}
+			
+			$this.html(letters.join(''))
+				.find('span').not(':first').css('visibility', 'hidden');
+			
+			i = 1;
+			
+			timerID = window.setInterval(function() {
+				if(i < len)
+				{
+					$this.find('.dot-'+(i++)).css('visibility', 'visible');
+				}
+				else
+				{
+					$this.find('span').not(':first').css('visibility', 'hidden');
+					i = 1;
+				}
+			}, interval);
+			
+			$.data($this, 'blink-timerID', timerID);
 		});
 	};
 })(jQuery);
