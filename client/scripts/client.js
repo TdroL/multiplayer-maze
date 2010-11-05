@@ -2,40 +2,20 @@
 state = {
 	connect: new function() {
 		var i = 0, interval = 400,
-			timerID, $dots;
+			timerID;
 			
 		this.init = function() {
 			net.bind('open', true, false, function() {
 				$('#container').switchTo('servers');
 			});
+			
 			net.init();
 			
-			$dots = $('#container span.dots');
-			var dots = $dots.text(), len = 0;
-			
-			dots = dots.split('');
-			for(var d in dots)
-			{
-				dots[d] = '<span class="dot-'+(len++)+'" style="visibility: hidden">'+dots[d]+'</span>';
-			}
-			$dots.html(dots.join(''));
-			
-			timerID = window.setInterval(function() {
-				if(i < len)
-				{
-					$dots.find('.dot-'+(i++)).css('visibility', 'visible');
-				}
-				else
-				{
-					$dots.find('span').css('visibility', 'hidden');
-					i = 0;
-				}
-				
-			}, interval);
+			$('#container span.dots').blink(400);
 		};
 		
 		this.release = function() {
-			window.clearInterval(timerID);
+			$('#container span.dots').blink(false);
 		};
 	},
 	servers: new function() {
