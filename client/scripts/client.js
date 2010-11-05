@@ -9,6 +9,10 @@ state = {
 				$('#container').switchTo('servers');
 			});
 			
+			net.bind('close', true, false, function() {
+				$('#container').switchTo('error-connect');
+			});
+			
 			net.init();
 			
 			$('#container span.dots').blink(400);
@@ -85,6 +89,10 @@ state = {
 				}
 				
 				return false;
+			});
+			
+			net.bind('close', true, false, function() {
+				$('#container').switchTo('error-disconnect');
 			});
 			
 			net.bind('get-channels', this.update);
@@ -168,6 +176,27 @@ state = {
 			}
 			
 			canvas = $('#game canvas'); // all canvases
+			
+			
+			net.action('update', function(data) {
+				data = JSON.parse(data);			
+				
+				if('id' in data && data.id && data.id != net.id)
+				{
+					player.opponents[data.id] = player.opponents[data.id] || {x: 15, y: 15};
+					player.opponents[data.id].x = data.x;
+					player.opponents[data.id].y = data.y;
+				}
+				
+				delete data;
+			});
+			
+			net.action('quit', function(id) {
+				if(id in player.opponents)
+				{
+					delete player.opponents[id];
+				}
+			});
 			
 			settings.maze.load(function() {
 				settings.maze.width = settings.maze.cols * settings.maze.block;

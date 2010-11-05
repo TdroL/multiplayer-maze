@@ -5,50 +5,25 @@
 		error: false,
 		_data: {},
 		binds: {},
+		host: ('ws://'+(/^https?:\/\/([^\/]+)\//.exec(window.location)[1])+':8000'),
 		init: function() {
-			if(net.ws) // already inited
-			{
-				return;
-			}
-			
 			if( ! ('WebSocket' in window))
 			{
 				return;
 			}
 			
-			net.binds.id = net.binds.id || {
-				callback: function(data) {
-					net.id = parseInt(data, 10);
-				}
-			};
+			net._initBinds();
 			
-			net.ws = ws = new WebSocket('ws://'+(/^https?:\/\/([^\/]+)\//.exec(window.location)[1])+':8000');
+			net.ws = ws = net.connect();
 			
-			ws.on = function(event,  callback) {
-				ws['on'+event] = callback;
-			};
-			
-			ws.on('message', function(message) {
-				var data = message.data, result;
-				
-				if((result = /^update:(\{.+\})$/.exec(data)))
-				{
-					data = JSON.parse(result[1]);			
-					
-					if('id' in data && data.id && data.id != net.id)
-					{
-						player.opponents[data.id] = player.opponents[data.id] || {x: 15, y: 15};
-						player.opponents[data.id].x = data.x;
-						player.opponents[data.id].y = data.y;
-					}
-					return;
-				}
+			ws.on('message', false, function(event) {
+				var data = event.data, result;
 				
 				if((result = /^response\[([^\]]+)\](?::(.+))?$/.exec(data)))
 				{
 					if(result[1] in net.binds)
 					{
-						net.binds[result[1]].callback.call(null, result[2]);
+						net.binds[result[1]].callback.call(event, result[2]);
 						if(net.binds[result[1]].once)
 						{
 							delete net.binds[result[1]];
@@ -57,25 +32,45 @@
 					return;
 				}
 				
-				if((result = /^quit:(\d+)$/.exec(data)))
+				if((result = /^(.+?)(?::(.+))?$/.exec(data)))
 				{
-					if(result[1] in player.opponents)
+					if(result[1] in net.actions)
 					{
-						delete player.opponents[result[1]];
+						net.actions[result[1]].call(event, result[2]);
 					}
 					return;
 				}
-				
-				if((result = /^error:(.+)$/.exec(data)))
+			});
+			
+			ws.on('error', false, function() {
+				if('error' in net.binds && 'callback' in net.binds.error)
 				{
-					$.log(data);
+					net.binds.error.callback.call(net.ws);
 				}
 			});
 			
-			ws.on('open', function() {
-				net.binds.open.callback.call(null);
+			ws.on('close', false, function(event) {
+				if('open' in net.binds && 'callback' in net.binds.close)
+				{
+					net.binds.close.callback.call(net.ws);
+				}
+			});
+			
+			ws.on('open', false, function() {
+				if('open' in net.binds && 'callback' in net.binds.open)
+				{
+					net.binds.open.callback.call(net.ws);
+				}
 				net.flushQueue();
 			});
+		},
+		connect: function() {
+			if( ! (net.ws instanceof WebSocket) || net.ws.readyState == WebSocket.CLOSED)
+			{
+				net.ws = new WebSocket(net.host);
+			}
+			
+			return net.ws;
 		},
 		_queue: [],
 		send: function(message, queue) {
@@ -90,6 +85,10 @@
 				net.ws.send(message);
 			}
 		},
+		actions: {},
+		action: function(type, callback) {
+			net.actions[type] = callback;
+		},
 		queue: function(message) {
 			net._queue.push(message);
 		},
@@ -98,6 +97,25 @@
 			{
 				net.ws.send(net._queue.shift());
 			}
+		},
+		_initBinds: function() {
+			net.binds.id = net.binds.id || {
+				callback: function(data) {
+					net.id = parseInt(data, 10);
+				}
+			};
+			
+			net.binds.open = net.binds.open || {
+				callback: $.noop
+			};
+			
+			net.binds.close = net.binds.close || {
+				callback: $.noop
+			};
+			
+			net.binds.error = net.binds.error || {
+				callback: $.noop
+			};
 		},
 		bind: function() {
 			var cmd, once, callback, autosend = true;
@@ -147,6 +165,17 @@
 			{
 				delete net.binds[cmd];
 			}
+		}
+	};
+	
+	WebSocket.prototype.on = WebSocket.prototype.on || function(event) {
+		if(typeof arguments[1] === 'boolean' && ! arguments[1])
+		{
+			this['on'+event] = this['on'+event] || arguments[2];
+		}
+		else
+		{
+			this['on'+event] = arguments[1];
 		}
 	};
 
