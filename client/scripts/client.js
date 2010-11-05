@@ -210,7 +210,7 @@ state = {
 				ui.loop(true);
 				
 				timerID = window.setInterval(function() {
-					if(ws.bufferedAmount == 0)
+					if(net.ws && net.ws.bufferedAmount == 0)
 					{
 						net._data.id = net.id;
 						net._data.date = +new Date();

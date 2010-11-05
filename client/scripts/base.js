@@ -2,7 +2,7 @@ var config,
 	io,
 	net, ws,
 	ui,
-	phy,
+	phy, vec,
 	state,
 	player,
 	point,
@@ -43,6 +43,12 @@ var config,
 		t = t || 1;
 		var pt = Math.pow(10, t);
 		return Math.round(x*pt)/pt;
+	};
+	
+	Math.dist = Math.dist || function(p1, p2) {
+		var x = p2[0] - p1[0],
+			y = p2[1] - p1[1];
+		return Math.sqrt(x*x + y*y);
 	};
 	
 	$.log('base: ready');

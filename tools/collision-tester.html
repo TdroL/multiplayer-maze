@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+<html lang="pl">
+<head>
+	<meta charset="UTF-8">
+	<title>Collision tester</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script>
+		var c, r = 35, bx, by,
+			cx, cy, cw = 100, ch = 100,
+			s = 3;
+		function drawBall() {
+			c.strokeStyle = '#222288';
+			c.lineWidth = 2;
+			c.fillStyle = 'rgba(34, 34, 136, 0.5)';
+			c.beginPath();
+			c.arc(bx, by, r - 1, 0, Math.PI*2, true);
+			c.closePath();
+			c.fill();
+			c.stroke();
+			
+			c.lineWidth = 1;
+			// center
+			c.beginPath();
+			c.arc(bx, by, 1, 0, Math.PI*2, true);
+			c.closePath();
+			c.fill();
+			c.stroke();
+		}
+	
+		function drawCorner() {
+			c.strokeStyle = '#882222';
+			c.lineWidth = 2;
+			c.fillStyle = 'rgba(136, 34, 34, 0.5)';
+			
+			c.fillRect(cx, cy, cw, ch);
+			c.strokeRect(cx, cy, cw, ch);
+		}
+		
+		Math.dist = Math.dist || function(p1, p2) {
+			return Math.sqrt((p2[0]-p1[0])*(p2[0]-p1[0]) + (p2[1]-p1[1])*(p2[1]-p1[1]));
+		};
+		
+		function drawVectors() {
+			var colors = ['rgba(54, 238, 11, 0.8)', 'rgba(238, 54, 11, 0.8)'],
+				dist = null,
+				proj = [];
+				
+			c.strokeStyle = colors[0];
+			c.lineWidth = 2;
+			
+			$.each([
+				[(by-r) - cy, 0, 1, true], // top
+				[(cx+cw) - (bx+r), -1, 0, false], // right
+				[(cy+ch) - (by+r), 0, -1, true], // bottom
+				[(bx-r) - cx, 1, 0, true] // left
+			], function(i, v) {
+				if(v[3] && v[0] < 0)
+				{
+					proj.push([-v[1]*v[0], -v[2]*v[0]]);
+				}
+			});
+			
+			c.strokeStyle = colors[0];
+			
+			if(proj.length)
+			{
+				var sum = [0, 0], v;
+				
+				while(proj.length)
+				{
+					v = proj.shift();
+					sum[0] += v[0];
+					sum[1] += v[1];
+				}
+				
+				proj.push(sum);
+			}
+			else
+			{
+				$.each([
+					[cx, cy, true],
+					[cx+cw, cy, true],
+					[cx, cy+ch, true],
+					[cx+cw, cy+ch, true]
+				], function(i, v) {
+					dist = Math.dist([bx, by], v);
+					if(v[2] && dist <= r)
+					{
+						var xp, yp,
+							d_d = r/dist - 1; // d' = r - d; d_d = d'/d;
+						
+						xp = d_d * (v[0] - bx);
+						yp = d_d * (v[1] - by);
+						
+						proj.push([-xp, -yp]);
+					}
+				});
+			}
+			
+			$.each(proj, function(i, v) {
+				c.beginPath();
+				c.moveTo(bx, by);
+				c.lineTo(bx + v[0], by + v[1]);
+				c.closePath();
+				c.stroke();
+			});
+		}
+		
+		jQuery(function($) {
+			c = $('canvas').get(0).getContext('2d')
+			c.lineWidth = 2;
+			bx = 400;
+			by = 200;
+			cx = 350;
+			cy = 150;
+			var i = 1;
+			window.setInterval(function() {
+				c.clearRect(0, 0, 800, 480);
+				drawCorner();
+				drawBall();				
+				drawVectors();
+			}, 13);
+		});
+		
+		$(window).keypress(function(e) {
+			switch(e.keyCode)
+			{
+				case 37:
+				{
+					bx -= s;
+					break;
+				}
+				case 38:
+				{
+					by -= s;
+					break;
+				}
+				case 39:
+				{
+					bx += s;
+					break;
+				}
+				case 40:
+				{
+					by += s;
+					break;
+				}
+			}
+		});
+	</script>
+	<link rel="stylesheet" href="../client/style.css" />
+</head>
+<body>
+	<div id="container">
+		<canvas width="800" height="480"></canvas>
+	</div>
+</body>
+</html>

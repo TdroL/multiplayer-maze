@@ -57,9 +57,10 @@
 		},
 		update: function(dt) {
 			var settings = this.settings,
-				c = this.canvas;
+				c = this.canvas,
+				ball = this.ball;
 			
-			phy.move(this.ball, (dt * 0.001));
+			phy.move(ball, (dt * 0.001));
 
 			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
 			
@@ -68,13 +69,13 @@
 			$.each(this.opponents, function(i, v) {
 				c.beginPath();
 				c.fillStyle('#f00');
-				c.arc(settings.margin + v.x + 1, settings.margin + v.y + 1, player.ball.r, 0, Math.PI*2, true);
+				c.arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true);
 				c.fill().closePath();
 			});
 			
 			c.beginPath();
 			c.fillStyle('#00f');
-			c.arc(settings.margin + this.ball.x + 1, settings.margin + this.ball.y + 1, this.ball.r, 0, Math.PI*2, true);
+			c.arc(settings.margin + ball.x, settings.margin + ball.y, ball.r - 0.5, 0, Math.PI*2, true);
 			c.fill().closePath();
 		}
 	};

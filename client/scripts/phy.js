@@ -4,21 +4,14 @@
 		settings: {},
 		data: [],
 		init: function(settings, data) {
-			this.settings = settings;
-			this.data = data;
+			phy.settings = settings;
+			phy.data = data;
 		},
-		pdt: 0,
 		move: function(ball, dt) {
-			/*
-			var a, n, dtdt, ptd, p, s,
-				fr_2 = 2 - ball.fr,
-				fr_1 = 1 - ball.fr,
-				step = 0.01,
-				e = 0.00001, // epsilon
-				target = 1 / 60;
-			*/
-			var vt = 120 * dt;
+			var vt = 120 * dt, fl;
 			
+			fl = Math.sqrt(ball.fx*ball.fx + ball.fy*ball.fy);
+			vt = fl ? (vt/fl) : vt;
 
 			ball.px = ball.x;
 			ball.x = ball.x + ball.fx*vt;
@@ -26,163 +19,205 @@
 			ball.py = ball.y;
 			ball.y = ball.y + ball.fy*vt;
 
-			/*
-			pdt = dt;
-			s = Math.floor(dt / step);
-			if(s > 0)
-			{
-				pdt = step + (dt - step)/s;
-			}
-			
-			dtdt = pdt * pdt;
-			
-			while(dt > e)
-			{
-				dt -= pdt;
-				
-				a = ball.fx*ball.f/ball.m;
-				n = fr_2*ball.x - fr_1*ball.px + a * dtdt;
-				ball.px = ball.x;
-				ball.x = n;
-				
-				a = ball.fy*ball.f/ball.m;
-				n = fr_2*ball.y - fr_1*ball.py + a * dtdt;
-				ball.py = ball.y;
-				ball.y = n;
-			}
-			*/
-			this.interpolate(ball);
+			phy.interpolate(ball);
 		},
-		_collisions: {
-					t: false,
-					b: false,
-					l: false,
-					r: false,
-					tl: false,
-					tr: false,
-					bl: false,
-					br: false,
-					xb: false, // block x
-					yb: false, // block y
-					ex: 0, // edge distance x
-					ey: 0  // edge distance y
+		_vec: {
+			x: 0,
+			y: 0,
+			bx: false,
+			by: false,
+			reset: function() {
+				this.x = 0;
+				this.y = 0;
+				this.bx = false;
+				this.by = false;
+			}
 		},
+		_sides: [
+			{
+				d: 0,
+				vx: 0, vy: 1,
+				cell: 0,
+				overlap: false
+			},
+			{
+				d: 0,
+				vx: -1, vy: 0,
+				cell: 0,
+				overlap: false
+			},
+			{
+				d: 0,
+				vx: 0, vy: -1,
+				cell: 0,
+				overlap: false
+			},
+			{
+				d: 0,
+				vx: 1, vy: 0,
+				cell: 0,
+				overlap: false
+			}
+		],
+		_corners: [
+			{
+				px: 0, py: 0,
+				valid: false
+			},
+			{
+				px: 0, py: 0,
+				valid: false
+			},
+			{
+				px: 0, py: 0,
+				valid: false
+			},
+			{
+				px: 0, py: 0,
+				valid: false
+			}
+		],
+		_bp: [0, 0],
+		_bv: [0, 0],
 		collision: function(ball) {
-			var b, col, row, r, cell,
-				x, y,
-				ix, ix2r,
-				iy, iy2r,
-				collisions = this._collisions;
-			
-			collisions.t = false;
-			collisions.b = false;
-			collisions.l = false;
-			collisions.r = false;
-			collisions.tl = false;
-			collisions.tr = false;
-			collisions.bl = false;
-			collisions.br = false;
-			collisions.xb = false;
-			collisions.yb = false;
-			collisions.ex = 0;
-			collisions.ey = 0;
+			var col, row,
+				x, y, b, r, bp,
+				cx, cy, cxw, cxh,
+				vec = phy._vec,
+				cell, data;
 			
 			x = ball.x;
 			y = ball.y;
+			b = phy.settings.block;
 			r = ball.r;
-			rr = r*r;
-			b = this.settings.block;
 			
-			col = Math.floor((x) / b);
-			row = Math.floor((y) / b);
+			vec.reset();
 			
-			if( ! (this.data[row] && this.data[row][col]))
+			col = Math.floor(x / b);
+			row = Math.floor(y / b);
+			
+			data = this.data;
+			
+			if( ! (data[row] && data[row][col]))
 			{
-				return collisions;
+				return vec;
 			}
 			
-			cell = this.data[row][col];
+			cell = data[row][col];
 			
-			ix = b * col + r;
-			iy = b * row + r;
+			cx = b * col;
+			cy = b * row;
+			cxw = cx + b;
+			cyh = cy + b;			
 			
-			ix2r = ix + 2*r;
-			iy2r = iy + 2*r;
+			var side;
 			
-			if(x < ix || x > ix2r || y < iy || y > iy2r)
+			side = phy._sides[0];
+			side.d = (y-r) - cy;
+			side.cell = cell[0];
+			side.overlap = false;
+			
+			side = phy._sides[1];
+			side.d = cxw - (x+r);
+			side.cell = cell[1];
+			side.overlap = false;
+			
+			side = phy._sides[2];
+			side.d = cyh - (y+r);
+			side.cell = cell[2];
+			side.overlap = false;
+			
+			side = phy._sides[3];
+			side.d = (x-r) - cx;
+			side.cell = cell[3];
+			side.overlap = false;
+			
+			
+			for(var i in phy._sides)
 			{
-				collisions.l = (x < ix);
-				collisions.r = (x > ix2r);
-				collisions.t = (y < iy);
-				collisions.b = (y > iy2r);
-			}
-			
-			collisions.xb = !! ((cell[1] && collisions.r) || (cell[3] && collisions.l));
-			collisions.yb = !! ((cell[0] && collisions.t) || (cell[2] && collisions.b));
-			
-			if(collisions.t && ! cell[0])
-			{
-				collisions.ey = iy - r - y;
+				side = phy._sides[i];
 				
-				collisions.tl = !! (collisions.l && ! cell[3]  && 
-					(Math.pow(ix - r - x, 2) + Math.pow(collisions.ey, 2) <= rr)
-				);
-				collisions.tr = !! (collisions.r && ! cell[1] &&
-					(Math.pow(ix + 3*r - x, 2) + Math.pow(collisions.ey, 2) <= rr)
-				);
-				
-				if(collisions.tl)
+				if(side.d < 0)
 				{
-					collisions.xb = 
-					collisions.yb = !! (this.data[row-1][col][3] || this.data[row][col-1][0]);
+					side.overlap = true;
 					
-					collisions.ex = ix - r - x;
-				}
-				
-				if(collisions.tr)
-				{
-					collisions.xb = 
-					collisions.yb = !! (this.data[row-1][col][1] || this.data[row][col+1][0]);
-					
-					collisions.ex = ix + 3*r - x;
-				}
-			}
-			else if(collisions.b && ! cell[2])
-			{
-				collisions.ey = iy + 3*r - y;
-				
-				collisions.bl = (collisions.l && ! cell[3] && 
-					(Math.pow(ix - r - x, 2) + Math.pow(collisions.ey, 2) <= rr)
-				);
-				collisions.br = (collisions.r && ! cell[1] && 
-					(Math.pow(ix + 3*r - x, 2) + Math.pow(collisions.ey, 2) <= rr)
-				);
-				
-				if(collisions.bl)
-				{
-					collisions.xb = 
-					collisions.yb = !! (this.data[row+1][col][3] || this.data[row][col-1][2]);
-				
-					collisions.ex = ix - r - x;
-				}
-				
-				if(collisions.br)
-				{
-					collisions.xb = 
-					collisions.yb = !! (this.data[row+1][col][1] || this.data[row][col+1][2]);
-				
-					collisions.ex = ix + 3*r - x;
+					if(side.cell)
+					{
+						vec.x -= side.vx*side.d;
+						vec.y -= side.vy*side.d;
+						
+						vec.bx = vec.bx || (!! side.vx);
+						vec.by = vec.by || (!! side.vy);
+					}
 				}
 			}
 			
-			return collisions;
+			if(vec.x || vec.y)
+			{
+				return vec;
+			}
+			
+			var corner;
+			
+			corner = phy._corners[0];
+			corner.px = cx;
+			corner.py = cy;
+			corner.valid = phy._sides[0].overlap
+						&& phy._sides[3].overlap
+						&& (data[row-1][col][3] || data[row][col-1][0]);
+			
+			corner = phy._corners[1];
+			corner.px = cxw;
+			corner.py = cy;
+			corner.valid = phy._sides[0].overlap
+						&& phy._sides[1].overlap
+						&& (data[row-1][col][1] || data[row][col+1][0]);
+			
+			corner = phy._corners[2];
+			corner.px = cx;
+			corner.py = cyh;
+			corner.valid = phy._sides[2].overlap
+						&& phy._sides[3].overlap
+						&& (data[row+1][col][3] || data[row][col-1][2]);
+			
+			corner = phy._corners[3];
+			corner.px = cxw;
+			corner.py = cyh;
+			corner.valid = phy._sides[1].overlap
+						&& phy._sides[2].overlap
+						&& (data[row+1][col][1] || data[row][col+1][2]);
+
+			phy._bp[0] = x;
+			phy._bp[1] = y;
+			
+			for(var i in phy._corners)
+			{
+				corner = phy._corners[i];
+				if(corner.valid)
+				{
+					phy._bv[0] = corner.px;
+					phy._bv[1] = corner.py;
+					
+					var d = Math.dist(phy._bp, phy._bv);
+					
+					if(d <= r)
+					{
+						var dd = d ? (r/d - 1) : r;
+						
+						vec.x -= dd * (corner.px - x);
+						vec.y -= dd * (corner.py - y);
+					}
+				}
+			}
+			
+			return vec;
 		},
 		interpolate: function(ball) {
 			var dx = ball.x - ball.px, adx = Math.abs(dx), sgx = Math.sgn(dx),
 				dy = ball.y - ball.py, ady = Math.abs(dy), sgy = Math.sgn(dy),
-				i, sx, sy, s, ds, step = 1, step_2 = step/10,
-				xb = false, yb = false, // blocks
-				c; // collision
+				i, sx, sy, s, ds, step = 1,
+				bx = false, by = false, // blocks
+				vec; // collision
 			
 			if( ! (dx || dy)) return;
 			
@@ -205,277 +240,23 @@
 			
 			ball.x = ball.px;
 			ball.y = ball.py;
-
-			var px, py;
 			
 			for(i = 0; i < ds; i += s)
 			{
-				px = ball.x;
-				py = ball.y;
-				xb || (ball.x += sx);
-				yb || (ball.y += sy);
+				bx || (ball.x += sx);
+				by || (ball.y += sy);
 				
-				c = this.collision(ball);
+				vec = phy.collision(ball);
 				
-				xb = xb || c.xb;
-				yb = yb || c.yb;
+				ball.x += vec.x;
+				ball.y += vec.y;
 				
-				c.ex = Math.abs(c.ex);
-				c.ey = Math.abs(c.ey);
-				// corner fix - semi-magic
-				if(c.tl)
-				{
-					if(ball.fx < 0 && ball.fy >= 0)
-					{
-						do
-						{
-							//ball.py += (ball.fy ? step : step_2);
-							ball.y += step_2;
-							c = this.collision(ball);
-						}
-						while(c.tl);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx >= 0 && ball.fy < 0)
-					{
-						do
-						{
-							//ball.px += (ball.fx ? step : step_2);
-							ball.x += step_2;
-							c = this.collision(ball);
-						}
-						while(c.tl);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx < 0 && ball.fy < 0)
-					{
-						if(c.ex < c.ey)
-						{
-							do
-							{
-								//ball.py -= step_2;
-								ball.y += step;
-								c = this.collision(ball);
-							}
-							while(c.tl);
-							
-							xb = false;
-							yb = false;
-						}
-						else if(c.ex > c.ey)
-						{
-							do
-							{
-								//ball.px -= step_2;
-								ball.x += step;
-								c = this.collision(ball);
-							}
-							while(c.tl);
-							
-							xb = false;
-							yb = false;
-						}
-						// if equal - block
-					}
-				}
-				else if(c.tr)
-				{
-					if(ball.fx > 0 && ball.fy >= 0)
-					{
-						do
-						{
-							//ball.py += (ball.fy ? step : step_2);
-							ball.y += step_2;
-							c = this.collision(ball);
-						}
-						while(c.tr);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx <= 0 && ball.fy < 0)
-					{
-						do
-						{
-							//ball.px -= (ball.fx ? step : step_2);
-							ball.x -= step_2;
-							c = this.collision(ball);
-						}
-						while(c.tr);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx > 0 && ball.fy < 0)
-					{
-						if(c.ex < c.ey)
-						{
-							do
-							{
-								//ball.py -= step_2;
-								ball.y += step;
-								c = this.collision(ball);
-							}
-							while(c.tr);
-							
-							xb = false;
-							yb = false;
-						}
-						else if(c.ex > c.ey)
-						{
-							do
-							{
-								//ball.px -= step_2;
-								ball.x -= step;
-								c = this.collision(ball);
-							}
-							while(c.tr);
-							
-							xb = false;
-							yb = false;
-						}
-						// if equal - block
-					}
-				}
-				else if(c.bl)
-				{
-					if(ball.fx < 0 && ball.fy <= 0)
-					{
-						do
-						{
-							//ball.py -= (ball.fy ? step :step_2);
-							ball.y -= step_2;
-							c = this.collision(ball);
-						}
-						while(c.bl);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx >= 0 && ball.fy > 0)
-					{
-						do
-						{
-							//ball.px += (ball.fx ? step : step_2);
-							ball.x += step_2;
-							c = this.collision(ball);
-						}
-						while(c.bl);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx < 0 && ball.fy > 0)
-					{
-						if(c.ex < c.ey)
-						{
-							do
-							{
-								//ball.py -= step_2;
-								ball.y -= step;
-								c = this.collision(ball);
-							}
-							while(c.bl);
-							
-							xb = false;
-							yb = false;
-						}
-						else if(c.ex > c.ey)
-						{
-							do
-							{
-								//ball.px -= step_2;
-								ball.x += step;
-								c = this.collision(ball);
-							}
-							while(c.bl);
-							
-							xb = false;
-							yb = false;
-						}
-						// if equal - block
-					}
-				}
-				else if(c.br)
-				{
-					if(ball.fx > 0 && ball.fy <= 0)
-					{
-						do
-						{
-							//ball.py -= (ball.fy ? step: step_2);
-							ball.y -= step_2;
-							c = this.collision(ball);
-						}
-						while(c.br);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx <= 0 && ball.fy > 0)
-					{
-						do
-						{
-							//ball.px -= (ball.fx ? step : step_2);
-							ball.x -= step_2;
-							c = this.collision(ball);
-						}
-						while(c.br);
-						
-						xb = false;
-						yb = false;
-					}
-					else if(ball.fx > 0 && ball.fy > 0)
-					{
-						if(c.ex < c.ey)
-						{
-							do
-							{
-								//ball.py -= step_2;
-								ball.y -= step;
-								c = this.collision(ball);
-							}
-							while(c.br);
-							
-							xb = false;
-							yb = false;
-						}
-						else if(c.ex > c.ey)
-						{
-							do
-							{
-								//ball.px -= step_2;
-								ball.x -= step;
-								c = this.collision(ball);
-							}
-							while(c.br);
-							
-							xb = false;
-							yb = false;
-						}
-						// if equal - block
-					}
-				}
+				bx = bx || vec.bx;
+				by = by || vec.by;
 				
-				
-				if(xb)
+				if(bx && by)
 				{
-					ball.x = px;
-					ball.px = ball.x;
-				}
-				
-				if(yb)
-				{
-					ball.y = py;
-					ball.py = ball.y;
-				}
-				
-				if(xb && yb)
-				{
-					break;
+					return;
 				}
 			}
 		},
