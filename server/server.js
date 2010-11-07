@@ -2,7 +2,7 @@ var players = {},
 	channels = {};
 
 var sys = require('sys'),
-	ws = require('./lib/ws');
+	ws = require('./websocket/lib/ws');
 
 var server = ws.createServer();
 
@@ -78,7 +78,7 @@ function Channel(id, name, limit)
 	this.players_i = 0;
 	
 	this.add = function(player) {
-		sys.log('Added player <'+player.id+'> to channel <'+this.name+'>');
+		//sys.log('Added player <'+player.id+'> to channel <'+this.name+'>');
 		
 		this.broadcast('joined:'+player.id);
 		
@@ -90,7 +90,7 @@ function Channel(id, name, limit)
 	this.remove = function(player, send) {
 		if(player.id in this.players)
 		{
-			sys.log('Removed player <'+player.id+'> from channel <'+this.name+'>');
+			//sys.log('Removed player <'+player.id+'> from channel <'+this.name+'>');
 			send && player.send('channel-disconnected:'+this.id);
 			
 			player.channel = null;
@@ -129,7 +129,7 @@ channels['channel-2'] = new Channel('channel-2', 'channel #2', 2);
 
 // Handle WebSocket Requests
 server.addListener('connection', function(conn) {
-	sys.log('<'+conn.id+'> connected');
+	//sys.log('<'+conn.id+'> connected');
 	conn.send('response[id]:'+conn.id);
 	
 	players[conn.id] = new Player(conn);
@@ -185,7 +185,7 @@ server.addListener('error', function(conn, e) {
 });
 
 server.addListener('close', function(conn) {
-	sys.log('<'+conn.id+'> disconnected');
+	//sys.log('<'+conn.id+'> disconnected');
 	
 	players[conn.id].destruct();
 	delete players[conn.id];
