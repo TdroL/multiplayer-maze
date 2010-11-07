@@ -269,7 +269,7 @@ var contra = new Audio('client/audios/contra.ogg'.url());
 io.sequence(['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'enter'], function() {
 	contra.play();
 });
-io.sequence(['a', 'a', 'enter'], function() {
+io.bind(['escape'], function() {
 	contra.pause();
 	contra.currentTime = 0;
 });

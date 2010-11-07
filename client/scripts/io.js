@@ -66,7 +66,12 @@
 			{
 				keys = keys ? [keys] : [];
 			}
-
+			
+			if($.isFunction(callbacks))
+			{
+				callbacks = { press: callbacks };
+			}
+			
 			if( ! keys.length)
 			{
 				$.error('io.bind - ', 'No keys to map');
@@ -218,7 +223,7 @@
 									
 									if(v.index == v.list.length)
 									{
-										io._runFn(v.fn);
+										v.fn();
 										release(i, v);
 										return;
 									}
