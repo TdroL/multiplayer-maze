@@ -1,5 +1,3 @@
-
-(function($) {
 	phy = {
 		settings: {},
 		data: [],
@@ -36,7 +34,7 @@
 		_sides: [
 			{
 				d: 0,
-				vx: 0, vy: 1,
+				vx: 0, vy: 1, // response vectors
 				cell: 0,
 				overlap: false
 			},
@@ -61,24 +59,22 @@
 		],
 		_corners: [
 			{
-				px: 0, py: 0,
+				x: 0, y: 0,
 				valid: false
 			},
 			{
-				px: 0, py: 0,
+				x: 0, y: 0,
 				valid: false
 			},
 			{
-				px: 0, py: 0,
+				x: 0, y: 0,
 				valid: false
 			},
 			{
-				px: 0, py: 0,
+				x: 0, y: 0,
 				valid: false
 			}
 		],
-		_bp: [0, 0],
-		_bv: [0, 0],
 		collision: function(ball) {
 			var col, row,
 				x, y, b, r, bp,
@@ -160,52 +156,46 @@
 			var corner;
 			
 			corner = phy._corners[0];
-			corner.px = cx;
-			corner.py = cy;
+			corner.x = cx;
+			corner.y = cy;
 			corner.valid = phy._sides[0].overlap
 						&& phy._sides[3].overlap
 						&& (data[row-1][col][3] || data[row][col-1][0]);
 			
 			corner = phy._corners[1];
-			corner.px = cxw;
-			corner.py = cy;
+			corner.x = cxw;
+			corner.y = cy;
 			corner.valid = phy._sides[0].overlap
 						&& phy._sides[1].overlap
 						&& (data[row-1][col][1] || data[row][col+1][0]);
 			
 			corner = phy._corners[2];
-			corner.px = cx;
-			corner.py = cyh;
+			corner.x = cx;
+			corner.y = cyh;
 			corner.valid = phy._sides[2].overlap
 						&& phy._sides[3].overlap
 						&& (data[row+1][col][3] || data[row][col-1][2]);
 			
 			corner = phy._corners[3];
-			corner.px = cxw;
-			corner.py = cyh;
+			corner.x = cxw;
+			corner.y = cyh;
 			corner.valid = phy._sides[1].overlap
 						&& phy._sides[2].overlap
 						&& (data[row+1][col][1] || data[row][col+1][2]);
-
-			phy._bp[0] = x;
-			phy._bp[1] = y;
 			
 			for(var i in phy._corners)
 			{
 				corner = phy._corners[i];
 				if(corner.valid)
 				{
-					phy._bv[0] = corner.px;
-					phy._bv[1] = corner.py;
-					
-					var d = Math.dist(phy._bp, phy._bv);
+					var d = Math.dist(ball, corner);
 					
 					if(d <= r)
 					{
 						var dd = d ? (r/d - 1) : r;
 						
-						vec.x -= dd * (corner.px - x);
-						vec.y -= dd * (corner.py - y);
+						vec.x -= dd * (corner.x - x);
+						vec.y -= dd * (corner.y - y);
 					}
 				}
 			}
@@ -266,4 +256,3 @@
 	};
 	
 	$.log('phy: ready');
-})(jQuery);

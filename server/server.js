@@ -68,11 +68,11 @@ function Player(conn)
 }
 
 /* class */
-function Channel(id, name)
+function Channel(id, name, limit)
 {
 	this.id = id;
 	this.name = name;
-	this.limit = 4;
+	this.limit = limit || 4;
 	this.status = 1;
 	this.players = {};
 	this.players_i = 0;
@@ -124,7 +124,8 @@ function Channel(id, name)
 	};
 }
 
-channels['channel-1'] = new Channel('channel-1', 'channel #1');
+channels['channel-1'] = new Channel('channel-1', 'channel #1', 4);
+channels['channel-2'] = new Channel('channel-2', 'channel #2', 2);
 
 // Handle WebSocket Requests
 server.addListener('connection', function(conn) {

@@ -1,5 +1,3 @@
-
-(function($) {
 	player = {
 		canvas: null,
 		settings: {},
@@ -23,36 +21,44 @@
 			player.settings = settings;
 			player.data = data;
 			
-			io.bind(['up'], function(){
-				player.ball.fy -= 1;
-			}, function() {
-				player.ball.fy += 1;
+			io.bind(['up'], {
+				down: function(){
+					player.ball.fy -= 1;
+				},
+				press: $.noop,
+				up: function() {
+					player.ball.fy += 1;
+				}
 			});
 			
-			io.bind(['down'], function(){
-				player.ball.fy += 1;
-			}, function() {
-				player.ball.fy -= 1;
+			io.bind(['down'], {
+				down: function(){
+					player.ball.fy += 1;
+				},
+				press: $.noop,
+				up: function() {
+					player.ball.fy -= 1;
+				}
 			});
 			
-			io.bind(['left'], function(){
-				player.ball.fx -= 1;
-			}, function() {
-				player.ball.fx += 1;
+			io.bind(['left'], {
+				down: function(){
+					player.ball.fx -= 1;
+				},
+				press: $.noop,
+				up: function() {
+					player.ball.fx += 1;
+				}
 			});
 			
-			io.bind(['right'], function(){
-				player.ball.fx += 1;
-			}, function() {
-				player.ball.fx -= 1;
-			});
-		
-			io.bind(['add'], function() {
-				player.ball.f += 100;
-			});
-			
-			io.bind(['subtract'], function() {
-				player.ball.f -= 100;
+			io.bind(['right'], {
+				down: function(){
+					player.ball.fx += 1;
+				},
+				press: $.noop,
+				up: function() {
+					player.ball.fx -= 1;
+				}
 			});
 		},
 		update: function(dt) {
@@ -79,4 +85,3 @@
 			c.fill().closePath();
 		}
 	};
-})(jQuery);

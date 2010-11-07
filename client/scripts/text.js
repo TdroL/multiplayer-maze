@@ -1,5 +1,3 @@
-
-(function($) {
 	text = {
 		canvas: null,
 		settings: {},
@@ -13,7 +11,8 @@
 			
 			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
 			c.fillStyle('#000');
-			c.fillText('FPS: '+(Math.round(10000/dt)/10)+' '+Math.round2(dt, 3), settings.margin, 13);
+			c.fillText('fps: '+(Math.round(10000/dt)/10), settings.margin, 13);
+			c.fillText('dt: '+Math.round2(dt, 3), settings.margin + 50, 13);
+			c.fillText('net: '+net.ws.readyState, settings.margin + 100, 13);
 		}
 	}
-})(jQuery);

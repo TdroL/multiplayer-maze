@@ -1,5 +1,3 @@
-
-(function($) {
 	ui = {
 		maze: function(canvas, settings, data) {
 			if( ! (canvas && settings))
@@ -184,6 +182,44 @@
 				
 				delete props;
 			}
+		},
+		// "infos" & "errors" popups
+		_info: null,
+		_error: null,
+		info: function(text, callbacks) {
+			ui._info = ui._info || $('#infos').delegate('.links a', 'click', function() {
+				$('#infos').addClass('hide');
+			});
+			
+			var $text = ui._info.find('p:first'),
+				$links = ui._info.find('.links');
+			
+			$text.text(text);
+			$links.empty();
+			
+			$.each(callbacks, function(i, fn) {
+				$links.append($('<a>').text(i).click(fn || $.noop));
+			});
+			
+			ui._info.removeClass('hide');
+		},
+		error: function(text, callbacks) {
+			ui._error = ui._error || $('#errors').delegate('.links a', 'click', function() {
+				$('#errors').addClass('hide');
+			});
+			
+			var $text = ui._error.find('p:first'),
+				$links = ui._error.find('.links');
+			
+			$text.text(text);
+			$links.empty();
+			
+			$.each(callbacks, function(i, fn) {
+				$links.append($('<a>').text(i).click(fn || $.noop));
+			});
+			
+			ui._error
+				.css('top', (480 - ui._error.outerHeight())/2)
+				.removeClass('hide');
 		}
 	};
-})(jQuery);

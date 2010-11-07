@@ -4,18 +4,17 @@
 	<meta charset="UTF-8">
 	<title>Client</title>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<!--<script src="scripts/minimized.js"></script>-->
+	<script src="scripts/jquery.plugins.js"></script>
 	<script src="scripts/base.js"></script>
-	<script>
-		config.base_url = '/multiplayer/';
-	</script>
 	<script src="scripts/io.js"></script>
 	<script src="scripts/net.js"></script>
 	<script src="scripts/ui.js"></script>
-	<script src="scripts/phy.js"></script>
-	<script src="scripts/jquery.plugins.js"></script>
+	<script src="scripts/phy.js"></script>	
 	<script src="scripts/player.js"></script>
 	<script src="scripts/text.js"></script>
 	<script src="scripts/client.js"></script>
+	
 	<link href="style.css" rel="stylesheet" />
 </head>
 <body>
@@ -34,18 +33,10 @@
 		<div class="tab hide" id="connect">
 			<h2>Łączenie z serwerem<span class="dots">...</span></h2>
 		</div>
-		<div class="tab hide" id="error-connect">
-			<h2>Serwer nie odpowiada</h2>
-			<p><a rel="switchTo-connect">Spróbuj ponownie</a></p>
-		</div>
-		<div class="tab hide" id="error-disconnect">
-			<h2>Utracono połączenie z serwerem</h2>
-			<p><a rel="switchTo-connect">Połącz ponownie</a></p>
-		</div>
 		<div class="tab hide" id="servers">
 			<ul class="test"></ul>
 		</div>
-		<div class="tab hide" id="channel">
+		<div class="tab hide" id="limbo">
 			<h2>Oczekiwanie na graczy<span class="ellipsis">...</span></h2>
 			<h3>Znaleziono <span class="current-players">1</span> z <span class="needed-players">1</span>.</h3>
 			
@@ -62,6 +53,15 @@
 			<h1>The cake is a lie...</h1>
 			<h2>Zostałeś poddany testowi</h2>
 			<h3></h3>
+		</div>
+		
+		<div class="popup hide" id="errors">
+			<p></p>
+			<p class="links"><a>Ok</a></p>
+		</div>
+		<div class="popup hide" id="infos">
+			<p></p>
+			<p class="links"><a>Ok</a></p>
 		</div>
 	</div>
 </body>

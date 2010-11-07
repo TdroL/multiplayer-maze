@@ -7,8 +7,6 @@ var config,
 	player,
 	point,
 	text;
-
-(function($){
 	
 	if(typeof console === "undefined")
 	{
@@ -20,12 +18,12 @@ var config,
 		window.debug && console.log.apply(console, arguments);
 	};
 	$.error = function() {
-		window.debug && console.error.apply(console, arguments);
+		window.debug && console.error.apply(console, arguments) && alert('Error: '+arguments.join(' '));
 		throw arguments.join(' ');
 	};
 	
 	config = {
-		base_url: ''
+		base_url: '/multiplayer/'
 	};
 	
 	String.prototype.url = function() {
@@ -46,11 +44,19 @@ var config,
 	};
 	
 	Math.dist = Math.dist || function(p1, p2) {
-		var x = p2[0] - p1[0],
+		var x, y;
+		if('x' in p1 && 'x' in p2)
+		{
+			x = p2.x - p1.x,
+			y = p2.y - p1.y;
+		}
+		else
+		{
+			x = p2[0] - p1[0],
 			y = p2[1] - p1[1];
+		}
+		
 		return Math.sqrt(x*x + y*y);
 	};
 	
 	$.log('base: ready');
-})(jQuery);
-

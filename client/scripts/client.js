@@ -10,12 +10,16 @@ state = {
 			});
 			
 			net.bind('close', true, false, function() {
-				$('#container').switchTo('error-connect');
+				ui.error('Serwer nie odpowiada', {
+					'Ponów próbę': function() {
+						net.init();
+					}
+				});
 			});
 			
 			net.init();
 			
-			$('#container span.dots').blink(400);
+			$('#container span.dots').blink(false).blink(400);
 		};
 		
 		this.release = function() {
@@ -80,10 +84,26 @@ state = {
 				{
 					net.bind('join-channel:'+id, true, function(data) {
 						data = parseInt(data, 10);
-						if(data == 1)
+						switch(data)
 						{
-							player.in_channel = true;
-							$('#container').switchTo('game');
+							case 1:
+							{
+								player.in_channel = true;
+								$('#container').switchTo('game');
+								break;
+							}
+							case -2:
+							{
+								$.log('-2');
+								ui.info('Brak wolnych miejsc', {'Ok': null});
+								break;
+							}
+							case -1:
+							{
+								$.log('-1');
+								ui.error('Taki kanał nie istnieje', {'Ok': null});
+								break;
+							}
 						}
 					});
 				}
@@ -92,7 +112,11 @@ state = {
 			});
 			
 			net.bind('close', true, false, function() {
-				$('#container').switchTo('error-disconnect');
+				ui.error('Utracono połączenie z serwerem', {
+					'Połącz ponownie': function() {
+						$('#container').switchTo('connect');
+					}
+				});
 			});
 			
 			net.bind('get-channels', this.update);
@@ -251,7 +275,6 @@ io.sequence(['a', 'a', 'enter'], function() {
 });
 
 var docready = false;
-
 // main
 jQuery(function($) {
 	if(docready)
@@ -260,11 +283,35 @@ jQuery(function($) {
 	}
 	docready = true;
 	
+	$(window).bind('unload', function() {
+		$.log('unbind');
+		net.unbind('close');
+	});
+	
 	var $container = $('#container'),
 		first = $container.find('#intro'),
 		hash = window.location.hash;
 	
-	$container.switchInit().delegate('a[rel^=switchTo-]', 'click', function() {
+	$container.switchInit({
+		callback: {
+			switchOut: function() {
+				var id = this.id;
+				
+				if(id in state && state[id].release)
+				{
+					state[id].release();
+				}
+			},
+			switchIn: function() {
+				var id = this.id;
+				
+				if(id in state && state[id].init)
+				{
+					state[id].init();
+				}
+			}
+		}
+	}).delegate('a[rel^=switchTo-]', 'click', function() {
 		$container.switchTo($(this).attr('rel').replace(/switchTo-(.+)$/i, '$1'));
 		return false;
 	});

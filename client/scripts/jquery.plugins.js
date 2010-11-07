@@ -1,8 +1,11 @@
-(function($) {
 	// switch states plugin
 	$.fn.switchInit = function(options) {
 		var settings = {
 			switchTime: 500,
+			callback: {
+				switchOut: $.noop,
+				switchIn: $.noop
+			},
 			switchOut: function($siblings, $tab) {
 				var settings = this,
 					callback = false;
@@ -12,12 +15,7 @@
 					.queue(function() {
 						$(this).dequeue().addClass('hide');
 						
-						var id = this.id;
-						
-						if(id in state && state[id].release)
-						{
-							state[id].release();
-						}
+						settings.callback.switchOut.call(this);
 						
 						callback || settings.switchIn($siblings, $tab);
 						callback = true;
@@ -30,12 +28,7 @@
 				$tab.stop()
 					.removeClass('hide')
 					.each(function() {
-							var id = this.id;
-							
-							if(id in state && state[id].init)
-							{
-								state[id].init();
-							}
+						settings.callback.switchIn.call(this);
 					})
 					.animate({'opacity': 1}, settings.switchTime);
 			}
@@ -50,7 +43,7 @@
 				$(this).find('.tab')
 						.css('opacity', 0)
 						.addClass('hide')
-						.data('switch-settings', settings);
+						.data('switch.settings', settings);
 		});
 	};
 	
@@ -64,8 +57,8 @@
 				$.error('switch - ', 'Unknown slide:', tab);
 			}
 			
-			var $siblings = $tab.siblings('.tab:visible'),
-				settings = $tab.data('switch-settings');
+			var $siblings = $tab.siblings('.tab:not(.hide)'),
+				settings = $tab.data('switch.settings');
 			
 			$siblings.length ? settings.switchOut($siblings, $tab)
 							 : settings.switchIn($siblings, $tab);
@@ -73,16 +66,21 @@
 	};
 	
 	// blink effect
-	
 	$.fn.blink = function(interval) {
 		interval = interval || false;
 		return this.each(function() {
 			var $this = $(this),
-				timerID = $.data($this, 'blink-timerID');
+				timerID = $.data(this, 'blink.timerID');
+			
+			if(timerID)
+			{
+				window.clearInterval(timerID);
+				$.removeData(this, 'blink.timerID');
+				timerID = null;
+			}
 			
 			if(interval === false)
 			{
-				window.clearInterval(timerID);
 				return;
 			}
 			
@@ -93,27 +91,27 @@
 			
 			for(i in letters)
 			{
-				letters[i] = '<span class="dot-'+i+'">'+letters[i]+'</span>';
+				letters[i] = '<span>'+letters[i]+'</span>';
 			}
 			
-			$this.html(letters.join(''))
-				.find('span').not(':first').css('visibility', 'hidden');
+			$this.empty().html(letters.join(''))
+				.find('span').not(':eq(0)').css('visibility', 'hidden');
 			
 			i = 1;
 			
 			timerID = window.setInterval(function() {
 				if(i < len)
 				{
-					$this.find('.dot-'+(i++)).css('visibility', 'visible');
+					$this.find('span:eq('+i+')').css('visibility', 'visible');
+					i++;
 				}
 				else
 				{
-					$this.find('span').not(':first').css('visibility', 'hidden');
+					$this.find('span').not(':eq(0)').css('visibility', 'hidden');
 					i = 1;
 				}
 			}, interval);
 			
-			$.data($this, 'blink-timerID', timerID);
+			$.data(this, 'blink.timerID', timerID);
 		});
 	};
-})(jQuery);

@@ -1,6 +1,5 @@
-(function($) {
 	net = {
-		ws: null,
+		ws: { send: $.noop },
 		id: 0,
 		error: false,
 		_data: {},
@@ -42,24 +41,26 @@
 				}
 			});
 			
-			ws.on('error', false, function() {
+			ws.on('error', false, function(event) {
 				if('error' in net.binds && 'callback' in net.binds.error)
 				{
-					net.binds.error.callback.call(net.ws);
+					net.binds.error.callback.call(event);
 				}
 			});
 			
 			ws.on('close', false, function(event) {
-				if('open' in net.binds && 'callback' in net.binds.close)
+				if('close' in net.binds && 'callback' in net.binds.close)
 				{
-					net.binds.close.callback.call(net.ws);
+					window.setTimeout(function() {
+						net.binds.close.callback.call(event);
+					}, 5); // call after window.unload
 				}
 			});
 			
-			ws.on('open', false, function() {
+			ws.on('open', false, function(event) {
 				if('open' in net.binds && 'callback' in net.binds.open)
 				{
-					net.binds.open.callback.call(net.ws);
+					net.binds.open.callback.call(event);
 				}
 				net.flushQueue();
 			});
@@ -168,16 +169,18 @@
 		}
 	};
 	
-	WebSocket.prototype.on = WebSocket.prototype.on || function(event) {
-		if(typeof arguments[1] === 'boolean' && ! arguments[1])
-		{
-			this['on'+event] = this['on'+event] || arguments[2];
-		}
-		else
-		{
-			this['on'+event] = arguments[1];
-		}
-	};
+	if('WebSocket' in window)
+	{
+		WebSocket.prototype.on = WebSocket.prototype.on || function(event) {
+			if(typeof arguments[1] === 'boolean' && ! arguments[1])
+			{
+				this['on'+event] = this['on'+event] || arguments[2];
+			}
+			else
+			{
+				this['on'+event] = arguments[1];
+			}
+		};
+	}
 
 	$.log('net: ready');
-})(jQuery);

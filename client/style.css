@@ -70,6 +70,7 @@ a:hover {
 	-webkit-box-shadow: 0 0 5px #84002E;
 	-moz-box-shadow: 0 0 5px #84002E;
 	box-shadow: 0 0 5px #84002E;
+	position: relative;
 }
 
 .tab {
@@ -78,6 +79,51 @@ a:hover {
 	height: inherit;
 	vertical-align: middle;
 	text-align: center;
+}
+
+.popup {
+	position: absolute;
+	top: 150px;
+	left: 240px;
+	right: 240px;
+	min-height: 60px;
+	padding: 20px 70px;
+	text-align: center;
+	
+	color: #FFF;
+	background: rgba(255, 91, 0, 0.8) no-repeat 20px 20px;
+	background-image: none;
+
+	border: 2px solid rgba(255, 91, 0, 1);
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	
+	-webkit-box-shadow: 0 0 5px rgba(255, 91, 0, 0.5);
+	-moz-box-shadow: 0 0 5px rgba(255, 91, 0, 0.5);
+	box-shadow: 0 0 5px rgba(255, 91, 0, 0.5);
+}
+
+.popup a {
+	color: #FFF;
+	text-shadow: 0 0 2px #fff;
+	margin: 0 4px;
+}
+
+#errors.popup {
+	background-image: url(images/icon-error.png);
+	/*
+	background-color: rgba(132, 0, 46, 0.5);
+	border-color: #84002E;
+	
+	-webkit-box-shadow: 0 0 5px rgba(132, 0, 46, 0.5);
+	-moz-box-shadow: 0 0 5px rgba(132, 0, 46, 0.5);
+	box-shadow: 0 0 5px rgba(132, 0, 46, 0.5);
+	*/
+}
+
+#infos.popup {
+	background-image: url(images/icon-info.png);
 }
 
 /* style indywidualne */
@@ -114,6 +160,7 @@ a:hover {
 }
 
 /* style ogólne */
+.popup.hide,
 .tab.hide {
 	display: none;
 }
