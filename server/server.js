@@ -77,7 +77,7 @@ function Player(conn)
 			
 			timerID = setTimeout(function() {
 				server.emit('disconnected', parent.conn);
-			}, 5000);
+			}, 10000);
 		};
 	};
 	
