@@ -20,7 +20,7 @@ function Player(conn)
 	var timerID;
 	
 	this.init = function() {
-		this.pong = this.ping();
+		this.ping();
 	};
 	
 	this.leave = function() {
@@ -71,14 +71,17 @@ function Player(conn)
 	this.pong = function() {};
 	this.ping = function() {
 		var parent = this;
-		return function(disable) {
+		
+		this.pong = function(disable) {
 			clearTimeout(timerID);
 			if(disable) return;
 			
 			timerID = setTimeout(function() {
 				server.emit('disconnected', parent.conn);
-			}, 10000);
+			}, 5000);
 		};
+		
+		this.pong();
 	};
 	
 	this.destruct = function() {
@@ -154,10 +157,18 @@ server.addListener('connection', function(conn) {
 	//sys.log('<'+conn.id+'> connected');
 	conn.send('response[id]:'+conn.id);
 	
+	
+	
 	players[conn.id] = new Player(conn);
 	
 	
 	conn.addListener('message', function(message) {
+		if( ! players[conn.id])
+		{
+			// ignore message
+			return;
+		}
+		
 		var result;
 		if((result = /^(.+?)(?::(.+))?$/.exec(message)))
 		{

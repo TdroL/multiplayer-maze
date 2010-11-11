@@ -286,7 +286,7 @@
 		docready = true;
 		
 		$(window).bind('unload', function() {
-			$.log('unbind');
+			net.ws.close();
 			net.unbind('close');
 		});
 		

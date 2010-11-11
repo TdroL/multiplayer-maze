@@ -21,7 +21,9 @@
 			net.action('pong', function() {
 				pong();
 				
-				pongID = window.setTimeout(net.ws.send, 2000, 'ping');
+				pongID = window.setTimeout(function() {
+					net.send('ping');
+				}, 2000);
 			});
 			
 			var ws = net.ws = net.connect();
@@ -78,7 +80,7 @@
 				}
 				_net.flushQueue();
 				
-				net.ws.send('ping');
+				net.send('ping');
 			});
 		},
 		connect: function() {
