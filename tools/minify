@@ -1,21 +1,25 @@
 #!/bin/bash
+
+MYPATH=`dirname $0`
+
 FILES="
-../client/scripts/jquery.plugins.js
-../client/scripts/base.js
-../client/scripts/io.js
-../client/scripts/net.js
-../client/scripts/ui.js
-../client/scripts/phy.js
-../client/scripts/player.js
-../client/scripts/text.js
-../client/scripts/client.js"
+$MYPATH/../client/scripts/jquery.plugins.js
+$MYPATH/../client/scripts/base.js
+$MYPATH/../client/scripts/io.js
+$MYPATH/../client/scripts/net.js
+$MYPATH/../client/scripts/ui.js
+$MYPATH/../client/scripts/phy.js
+$MYPATH/../client/scripts/player.js
+$MYPATH/../client/scripts/text.js
+$MYPATH/../client/scripts/client.js"
 
 TMP=mktemp
-MINIMIZED="../client/scripts/minimized.js"
+MINIMIZED="$MYPATH/../client/scripts/minimized.js"
 
 CONTENT=`cat $FILES`
 echo "(function($){$CONTENT})(jQuery);" > $TMP
 
-java -jar ./compiler.jar --js=$TMP --js_output_file=$MINIMIZED
+java -jar $MYPATH/compiler.jar --js=$TMP --js_output_file=$MINIMIZED
 rm $TMP
 
+echo "Done!"
