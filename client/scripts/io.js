@@ -9,7 +9,7 @@
 		},
 		init: function() {
 			$(window).keydown(function(event) {
-				var code = event.keyCode;
+				var code = event.keyCode || event.which;
 				
 				if(code in io.key && ! io.key[code].pressed)
 				{
@@ -19,14 +19,14 @@
 					io._runSequence.call(event, code);
 				}
 			}).keypress(function(event) {
-				var code = event.keyCode;
+				var code = event.keyCode || event.which;
 				
 				if(code in io.key)
 				{
 					io._runBind.call(event, 'press', code);
 				}
 			}).keyup(function(event) {
-				var code = event.keyCode;
+				var code = event.keyCode || event.which;
 				
 				if(code in io.key && io.key[code].pressed)
 				{

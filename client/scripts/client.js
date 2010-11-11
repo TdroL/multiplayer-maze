@@ -27,7 +27,7 @@ state = {
 		};
 	},
 	servers: new function() {
-		var timerID, interval = 5000,
+		var timerID, interval = 2000,
 			$ul,
 			$schema = $('<li data-id="{#id}">'
 						+'<div class="name">{#name}</div>'
@@ -269,7 +269,7 @@ var contra = new Audio('client/audios/contra.ogg'.url());
 io.sequence(['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'enter'], function() {
 	contra.play();
 });
-io.bind(['escape'], function() {
+io.bind('escape', function() {
 	contra.pause();
 	contra.currentTime = 0;
 });
@@ -322,6 +322,16 @@ jQuery(function($) {
 	}
 	
 	$container.switchTo(first);
+	
+	$.each(['1', '2', '3', '4'], function(i, key) {
+		io.bind(key, function() {
+			$container.find('.tab:not(.hide)').find('a[rel]:eq('+i+')').click();
+		});
+	});
+	
+	io.bind('enter', function() {
+		$container.find('.popup:not(.hide) p.links>a').click();
+	});
 	
 	$.log('main: ready');
 });

@@ -1,7 +1,7 @@
 	// switch states plugin
 	$.fn.switchInit = function(options) {
 		var settings = {
-			switchTime: 500,
+			switchTime: 200,
 			callback: {
 				switchOut: $.noop,
 				switchIn: $.noop

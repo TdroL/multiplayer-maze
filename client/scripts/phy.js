@@ -12,10 +12,10 @@
 			vt = fl ? (vt/fl) : vt;
 
 			ball.px = ball.x;
-			ball.x = ball.x + ball.fx*vt;
+			ball.x += ball.fx*vt;
 			
 			ball.py = ball.y;
-			ball.y = ball.y + ball.fy*vt;
+			ball.y += ball.fy*vt;
 
 			phy.interpolate(ball);
 		},

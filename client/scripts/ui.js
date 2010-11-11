@@ -74,10 +74,16 @@
 			target: 1000/60,
 			min_sleep: 5
 		},
+		now: function() {
+			var d = new Date(),
+				t = d.getTime();
+			delete d;
+			return t;
+		},
 		loop: function() {
-			var timer = this.timer;
+			var timer = ui.timer;
 			
-			if( ! this._frames--)
+			if( ! ui._frames--)
 			{
 				return;
 			}
@@ -97,7 +103,7 @@
 				}
 				
 				ui._running = true;
-				timer.last = +new Date();
+				timer.last = ui.now();
 				
 				window.setTimeout(function() { ui.loop(); }, timer.min_sleep);
 				return;
@@ -108,17 +114,17 @@
 				return;
 			}
 			
-			timer.current = +new Date();
+			timer.current = ui.now();
 			timer.delta = timer.current - timer.last;
 			
 			for(var i = 0, l = ui.list.length; i < l; i++)
 			{
 				var v = ui.list[i];
-				v[1].call(v[0], timer.delta, timer.current);				
+				v[1].call(v[0], timer.delta, timer.current);
 			}
 			
 			timer.last = timer.current;
-			timer.delta = timer.target - (new Date() - timer.current);
+			timer.delta = timer.target - (ui.now() - timer.current);
 			
 			if(timer.delta > timer.min_sleep)
 			{

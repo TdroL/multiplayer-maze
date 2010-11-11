@@ -22,7 +22,7 @@
 			player.data = data;
 			
 			io.bind(['up'], {
-				down: function(){
+				down: function() {
 					player.ball.fy -= 1;
 				},
 				press: $.noop,
@@ -32,7 +32,7 @@
 			});
 			
 			io.bind(['down'], {
-				down: function(){
+				down: function() {
 					player.ball.fy += 1;
 				},
 				press: $.noop,
@@ -42,7 +42,7 @@
 			});
 			
 			io.bind(['left'], {
-				down: function(){
+				down: function() {
 					player.ball.fx -= 1;
 				},
 				press: $.noop,
@@ -52,7 +52,7 @@
 			});
 			
 			io.bind(['right'], {
-				down: function(){
+				down: function() {
 					player.ball.fx += 1;
 				},
 				press: $.noop,

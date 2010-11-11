@@ -53,7 +53,7 @@
 				{
 					window.setTimeout(function() {
 						net.binds.close.callback.call(event);
-					}, 5); // call after window.unload
+					}, 100); // call after window.unload
 				}
 			});
 			
