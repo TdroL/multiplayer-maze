@@ -1,3 +1,4 @@
+(function($) {
 	phy = {
 		settings: {},
 		data: [],
@@ -6,17 +7,17 @@
 			phy.data = data;
 		},
 		move: function(ball, dt) {
-			var vt = 120 * dt, fl;
+			var vt = ball.vt * dt, fl;
 			
 			fl = Math.sqrt(ball.fx*ball.fx + ball.fy*ball.fy);
 			vt = fl ? (vt/fl) : vt;
-
+			
 			ball.px = ball.x;
 			ball.x += ball.fx*vt;
 			
 			ball.py = ball.y;
 			ball.y += ball.fy*vt;
-
+			
 			phy.interpolate(ball);
 		},
 		_vec: {
@@ -256,3 +257,4 @@
 	};
 	
 	$.log('phy: ready');
+})(jQuery);

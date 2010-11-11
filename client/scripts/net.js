@@ -1,3 +1,4 @@
+(function($) {
 	net = {
 		ws: { send: $.noop },
 		id: 0,
@@ -6,6 +7,10 @@
 		binds: {},
 		host: ('ws://'+(/^https?:\/\/([^\/]+)\//.exec(window.location)[1])+':8000'),
 		init: function() {
+			var _net = this,
+				pong = net.ping(),
+				pongID = 0;
+			
 			if( ! ('WebSocket' in window))
 			{
 				return;
@@ -13,19 +18,25 @@
 			
 			net._initBinds();
 			
-			net.ws = ws = net.connect();
+			net.action('pong', function() {
+				pong();
+				
+				pongID = window.setTimeout(net.ws.send, 2000, 'ping');
+			});
+			
+			var ws = net.ws = net.connect();
 			
 			ws.on('message', false, function(event) {
 				var data = event.data, result;
 				
 				if((result = /^response\[([^\]]+)\](?::(.+))?$/.exec(data)))
 				{
-					if(result[1] in net.binds)
+					if(result[1] in _net.binds)
 					{
-						net.binds[result[1]].callback.call(event, result[2]);
-						if(net.binds[result[1]].once)
+						_net.binds[result[1]].callback.call(event, result[2]);
+						if(_net.binds[result[1]].once)
 						{
-							delete net.binds[result[1]];
+							delete _net.binds[result[1]];
 						}
 					}
 					return;
@@ -33,36 +44,41 @@
 				
 				if((result = /^(.+?)(?::(.+))?$/.exec(data)))
 				{
-					if(result[1] in net.actions)
+					if(result[1] in _net.actions)
 					{
-						net.actions[result[1]].call(event, result[2]);
+						_net.actions[result[1]].call(event, result[2]);
 					}
 					return;
 				}
 			});
 			
 			ws.on('error', false, function(event) {
-				if('error' in net.binds && 'callback' in net.binds.error)
+				if('error' in _net.binds && 'callback' in _net.binds.error)
 				{
-					net.binds.error.callback.call(event);
+					_net.binds.error.callback.call(event);
 				}
 			});
 			
 			ws.on('close', false, function(event) {
-				if('close' in net.binds && 'callback' in net.binds.close)
+				pong(false); // disable pong
+				window.clearTimeout(pongID);
+				
+				if('close' in _net.binds && 'callback' in _net.binds.close)
 				{
 					window.setTimeout(function() {
-						net.binds.close.callback.call(event);
+						_net.binds.close.callback.call(event);
 					}, 100); // call after window.unload
 				}
 			});
 			
 			ws.on('open', false, function(event) {
-				if('open' in net.binds && 'callback' in net.binds.open)
+				if('open' in _net.binds && 'callback' in _net.binds.open)
 				{
-					net.binds.open.callback.call(event);
+					_net.binds.open.callback.call(event);
 				}
-				net.flushQueue();
+				_net.flushQueue();
+				
+				net.ws.send('ping');
 			});
 		},
 		connect: function() {
@@ -72,6 +88,20 @@
 			}
 			
 			return net.ws;
+		},
+		ping: function() {
+			var timer;
+			return function (disable) {
+				window.clearTimeout(timer);
+				if(disable) return;
+				timer = window.setTimeout(function(){
+					net.ws.close();
+					if('close' in net.binds && 'callback' in net.binds.close)
+					{
+						net.binds.close.callback.call(null);
+					}
+				}, 10000); 
+			};
 		},
 		_queue: [],
 		send: function(message, queue) {
@@ -184,3 +214,4 @@
 	}
 
 	$.log('net: ready');
+})(jQuery);

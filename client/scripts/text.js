@@ -1,3 +1,4 @@
+(function($) {
 	text = {
 		canvas: null,
 		settings: {},
@@ -16,3 +17,4 @@
 			c.fillText('net: '+net.ws.readyState, settings.margin + 100, 13);
 		}
 	}
+})(jQuery);

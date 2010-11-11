@@ -1,3 +1,4 @@
+(function($) {
 	ui = {
 		maze: function(canvas, settings, data) {
 			if( ! (canvas && settings))
@@ -65,7 +66,6 @@
 		
 		// animation loop
 		_running: false,
-		_frames: -1,
 		list: [],
 		timer: {
 			last: 0,
@@ -83,16 +83,14 @@
 		loop: function() {
 			var timer = ui.timer;
 			
-			if( ! ui._frames--)
-			{
-				return;
-			}
-			
 			if(arguments.length)
 			{
 				if( ! arguments[0])
 				{
 					ui._running = false;
+					timer.last = 0;
+					delete ui.list;
+					ui.list = [];
 					return;
 				}
 				
@@ -114,6 +112,7 @@
 				return;
 			}
 			
+			timer.last = timer.last || ui.now();
 			timer.current = ui.now();
 			timer.delta = timer.current - timer.last;
 			
@@ -229,3 +228,4 @@
 				.removeClass('hide');
 		}
 	};
+})(jQuery);

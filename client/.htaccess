@@ -1,0 +1,57 @@
+<ifModule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault "access plus 1 seconds"
+</ifModule>
+
+<ifModule mod_headers.c>
+	<filesMatch "\\.(ico|pdf|flv|jpg|jpeg|png|gif|swf)$">
+		Header set Cache-Control "max-age=2592000, public"
+	</filesMatch>
+	<filesMatch "\\.(css)$">
+		Header set Cache-Control "max-age=604800, public"
+	</filesMatch>
+	<filesMatch "\\.(js)$">
+		Header set Cache-Control "max-age=1, private, must-revalidate"
+	</filesMatch>
+	<filesMatch "\\.(xml|txt)$">
+		Header set Cache-Control "max-age=216000, public, must-revalidate"
+	</filesMatch>
+	<filesMatch "\\.(html|htm|php)$">
+		Header set Cache-Control "max-age=1, private, must-revalidate"
+	</filesMatch>
+</ifModule>
+
+<ifModule mod_headers.c>
+	Header unset ETag
+</ifModule>
+FileETag None
+
+<ifModule mod_headers.c>
+	Header unset Last-Modified
+</ifModule>
+
+<ifModule mod_deflate.c>
+	# Insert filter
+	SetOutputFilter DEFLATE
+
+	# Netscape 4.x has some problems...
+	BrowserMatch ^Mozilla/4 gzip-only-text/html
+
+	# Netscape 4.06-4.08 have some more problems
+	BrowserMatch ^Mozilla/4\.0[678] no-gzip
+
+	# MSIE masquerades as Netscape, but it is fine
+	BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+	# Don't compress images
+	SetEnvIfNoCase Request_URI \
+	\.(?:gif|jpe?g|png)$ no-gzip dont-vary
+
+	# Make sure proxies don't deliver the wrong content
+	Header append Vary User-Agent env=!dont-vary
+</ifModule>
+
+# Protect hidden files from being viewed
+<Files .*>
+	Order Deny,Allow
+	Deny From All
+</Files>

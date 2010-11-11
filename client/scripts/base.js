@@ -1,16 +1,17 @@
 var config,
 	io,
-	net, ws,
+	net,
 	ui,
 	phy, vec,
 	state,
 	player,
 	point,
 	text;
-	
+
+(function($) {
 	if(typeof console === "undefined")
 	{
-		console = { log: function() { }, error: function() { } };
+		console = { log: function() {}, error: function() {} };
 	}
 	
 	window.debug = true;
@@ -60,3 +61,4 @@ var config,
 	};
 	
 	$.log('base: ready');
+})(jQuery);

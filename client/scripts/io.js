@@ -1,3 +1,4 @@
+(function($) {
 	io = {
 		inited: false,
 		binds: {}, binds_cache: {},
@@ -285,3 +286,4 @@
 	io.init();
 	
 	$.log('io: ready');
+})(jQuery);

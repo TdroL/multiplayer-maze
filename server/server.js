@@ -2,7 +2,7 @@ var players = {},
 	channels = {};
 
 var sys = require('sys'),
-	ws = require('./websocket/lib/ws');
+	ws = require('./websocket/lib/ws/server');
 
 var server = ws.createServer();
 
@@ -17,7 +17,13 @@ function Player(conn)
 	this.conn = conn;
 	this.channel = null;
 	
-	this.leave = function(id) {
+	var timerID;
+	
+	this.init = function() {
+		this.pong = this.ping();
+	};
+	
+	this.leave = function() {
 		if(this.channel)
 		{
 			this.channel.remove(this);
@@ -62,9 +68,25 @@ function Player(conn)
 		return list;
 	};
 	
+	this.pong = function() {};
+	this.ping = function() {
+		var parent = this;
+		return function(disable) {
+			clearTimeout(timerID);
+			if(disable) return;
+			
+			timerID = setTimeout(function() {
+				server.emit('disconnected', parent.conn);
+			}, 5000);
+		};
+	};
+	
 	this.destruct = function() {
+		clearTimeout(timerID);
 		this.leave();
 	};
+	
+	this.init();
 }
 
 /* class */
@@ -134,12 +156,19 @@ server.addListener('connection', function(conn) {
 	
 	players[conn.id] = new Player(conn);
 	
+	
 	conn.addListener('message', function(message) {
 		var result;
 		if((result = /^(.+?)(?::(.+))?$/.exec(message)))
 		{
 			switch(result[1])
 			{
+				case 'ping':
+				{
+					conn.send('pong');
+					players[conn.id].pong();
+					break;
+				}
 				case 'get-channels':
 				{
 					var list = players[conn.id].getChannels();
@@ -180,11 +209,11 @@ server.addListener('connection', function(conn) {
 	});
 });
 
-server.addListener('error', function(conn, e) {
-	sys.log('<'+conn.id+'> error: '+e)
+server.addListener('error', function() {
+	sys.log(Array.prototype.join.call(arguments, ", "));
 });
 
-server.addListener('close', function(conn) {
+server.addListener('disconnected', function(conn) {
 	//sys.log('<'+conn.id+'> disconnected');
 	
 	players[conn.id].destruct();
