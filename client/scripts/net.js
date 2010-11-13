@@ -80,7 +80,7 @@
 				}
 				_net.flushQueue();
 				
-				net.send('ping');
+				_net.send('ping');
 			});
 		},
 		connect: function() {
