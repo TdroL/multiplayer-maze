@@ -38,8 +38,9 @@
 			return this;
 		};
 		
-		function genTable()
+		function genTable(obj)
 		{
+			obj = obj || {};
 			var $table = $('.table');
 			
 			if($table.data('sizes')
@@ -53,17 +54,55 @@
 			$table.data('sizes', {cols: settings.maze.cols, rows: settings.maze.rows});
 			
 			$table.empty().append(('<div class="row" style="width: '+(settings.maze.cols*settings.maze.block)+'px" />').repeat(settings.maze.rows))
-					.find('.row').append(('<div class="col" style="width: '+(settings.maze.block)+'px; height: '+(settings.maze.block)+'px" ><div class="v" /><div class="h" /></div>').repeat(settings.maze.cols));
+					.find('.row').append(('<div class="col" style="width: '+(settings.maze.block)+'px; height: '+(settings.maze.block)+'px" ><div class="point" /><div class="v" /><div class="h" /></div>').repeat(settings.maze.cols));
 			
 			$table.css({
 				width: settings.maze.cols*settings.maze.block - 8,
 				height: settings.maze.rows*settings.maze.block - 8
-			})
-				.find('.col:last-child .v, .row:last-child .h').remove();
+			}).find('.col:last-child .v, .row:last-child .h').remove();
 			
-			$table.delegate('.v, .h', 'click', function() {
-				$(this).toggleClass('block');
-			});
+			if($.isPlainObject(obj))
+			{
+				for(var i in obj.data)
+				{
+					var $row = $table.find('.row:eq('+i+')');
+					for(var j in obj.data[i])
+					{
+						var $col = $row.find('.col:eq('+j+')');
+						
+						if(obj.data[i][j][0])
+						{
+							$col.find('.v').addClass('block');
+						}
+						
+						if(obj.data[i][j][1])
+						{
+							$col.find('.h').addClass('block');
+						}
+					}
+				}
+			}
+			
+			if( ! $table.data('delegate'))
+			{
+				$table.delegate('.v, .h', 'click', function() {
+					$(this).toggleClass('block');
+				}).delegate('.point', 'click', function() {
+					var $type = $('ul li input:checked'),
+						$$ = $(this);
+						
+					$$.toggleClass('checked')
+						.css('background-position', $type.closest('li').css('background-position'));
+					
+					$$.removeData('val');
+					if($$.hasClass('checked'))
+					{
+						$$.data('val', $type.val());
+					}
+				});
+				
+				$table.data('delegate', true);
+			}
 		}
 		
 		function genMaze()
@@ -124,6 +163,24 @@
 					return false;
 				});
 			
+			$('#maze-data').val('').change(function() {
+				var $$ = $(this),
+					data = $$.val();
+				
+				if(data.length)
+				{
+					data = JSON.parse(data);
+					settings.maze = data.settings.maze;
+					
+					$('.table').empty();
+				}
+				
+				for(var i in settings.maze)
+				{
+					$('#maze-'+i).val(settings.maze[i]).trigger('change');
+				}
+			});
+			
 			$.each(settings.maze, function(i, v) {
 				$('#maze-'+i).val(v)
 					.not('#maze-width, #maze-height').bind('change keypress', function(event) {
@@ -160,9 +217,22 @@
 			$('#setup a[rel=maze]').unbind('click').click(function() {
 				$('.tab').addClass('hide')
 					.filter('#maze').removeClass('hide');
-				genTable();			
+				var data = $('#maze-data').val();
+				
+				if(data.length)
+				{
+					data = JSON.parse(data);
+				}
+				
+				genTable(data);			
 				return false;
 			});
+			
+			$('#maze li input').focusin(function() {
+				var $$ = $(this);
+				
+				$$.closest('li').addClass('active').siblings().removeClass('active');
+			}).removeAttr('checked').first().attr('checked', 'checked').focusin();
 			
 			$('#maze a[rel=data]').unbind('click').click(function() {
 				$('.tab').addClass('hide')
@@ -178,6 +248,15 @@
 					}
 					return;
 				}));
+				
+				return false;
+			});
+			
+			$('#setup a.switch').unbind('click').click(function() {
+				var $$ = $(this),
+					rel = $$.attr('rel');
+				
+				$('div.switch').addClass('hide').filter('.'+rel).removeClass('hide');
 				
 				return false;
 			});
@@ -238,6 +317,7 @@
 		.table {
 			margin: 0 auto;
 			border: 8px solid #555;
+			overflow: hidden;
 		}
 		
 		.row {
@@ -258,6 +338,12 @@
 			border-right-width: 1px;
 		}
 		
+		.point {
+			cursor: pointer;
+			width: inherit;
+			height: inherit;
+		}
+		
 		.v,
 		.h {
 			position: absolute;
@@ -268,13 +354,18 @@
 		}
 		
 		.v:hover,
-		.h:hover {
+		.h:hover,
+		.point:hover {
 			background: #FF5B00;
 		}
 		
 		.v.block,
 		.h.block {
 			background: #555;
+		}
+		
+		.point.checked {
+			background: url(images/dots.png) no-repeat 100px 100px;
 		}
 		
 		.v {
@@ -299,6 +390,55 @@
 			padding: 5px;
 			text-align: left;
 		}
+		
+		.hide {
+			display: none;
+		}
+	
+		/* maze-tools */
+		ul {
+			list-style: none;
+			text-align: center;
+		}
+		
+		li {
+			display: inline-block;
+			width: 30px;
+			height: 30px;
+			background: url(images/dots.png) no-repeat 0 0;
+			margin: 1px;
+		}
+		
+		.start-1 { background-position: 0 0px; }
+		.start-2 { background-position: 0 -30px; }
+		.start-3 { background-position: 0 -60px; }
+		.start-4 { background-position: 0 -90px; }
+		.point-1 { background-position: 0 -120px; }
+		.point-2 { background-position: 0 -150px; }
+		.point-3 { background-position: 0 -180px; }
+		.point-4 { background-position: 0 -210px; }
+		
+		li.active {
+			border: 1px dotted #f00;
+			background-color: rgba(255, 0, 0, 0.1);
+			margin: 0;
+		}
+		
+		li input {
+			width: 30px;
+			height: 30px;
+			opacity: 0;
+			cursor: pointer;
+		}
+		
+		li label {
+			margin: 0;
+			padding: 0;
+		}
+		
+		li input+span {
+			display: none;
+		}
 	</style>
 </head>
 <body>
@@ -307,29 +447,93 @@
 			<fieldset>
 				<legend>Settings</legend>
 				
+				<div class="switch textarea hide">
+					<a rel="inputs" class="switch">Switch to inputs</a>
+					
+					<label for="maze-data">Data</label>
+					<textarea class="in" id="maze-data" rows="20" cols="70"></textarea>
+				</div>
 				
-				<label for="maze-cols">Cols</label>
-				<input type="text" name="maze-cols" id="maze-cols" />
-				
-				<label for="maze-rows">Rows</label>
-				<input type="text" name="maze-rows" id="maze-rows" />
-				
-				<label for="maze-block">Block</label>
-				<input type="text" name="maze-block" id="maze-block" />
-				
-				<label for="maze-margin">Margin</label>
-				<input type="text" name="maze-margin" id="maze-margin" />
-				
-				<label for="maze-width">Width</label>
-				<input type="text" name="maze-width" id="maze-width" disabled />
-				
-				<label for="maze-height">Height</label>
-				<input type="text" name="maze-height" id="maze-height" disabled />
+				<div class="switch inputs">
+					<a rel="textarea" class="switch">Switch to textarea</a>
+					<label for="maze-cols">Cols</label>
+					<input type="text" name="maze-cols" id="maze-cols" />
+					
+					<label for="maze-rows">Rows</label>
+					<input type="text" name="maze-rows" id="maze-rows" />
+					
+					<label for="maze-block">Block</label>
+					<input type="text" name="maze-block" id="maze-block" />
+					
+					<label for="maze-margin">Margin</label>
+					<input type="text" name="maze-margin" id="maze-margin" />
+					
+					<label for="maze-width">Width</label>
+					<input type="text" name="maze-width" id="maze-width" disabled />
+					
+					<label for="maze-height">Height</label>
+					<input type="text" name="maze-height" id="maze-height" disabled />
+				</div>
 			</fieldset>
 			<a rel="maze">Next</a>
 		</div>
 		<div class="tab hide" id="maze">
 			<a href="#generate">Generate</a>
+			<hr />
+			<ul>
+				<li class="start-1">
+					<label>
+						<input type="radio" name="type" value="11" />
+						<span>Start #1</span>
+					</label>
+				</li>
+				<li class="start-2">
+					<label>
+						<input type="radio" name="type" value="12" />
+						<span>Start #2</span>
+					</label>
+				</li>
+				<li class="start-3">
+					<label>
+						<input type="radio" name="type" value="13" />
+						<span>Start #3</span>
+					</label>
+				</li>
+				<li class="start-4">
+					<label>
+						<input type="radio" name="type" value="14" />
+						<span>Start #4</span>
+					</label>
+				</li>
+				
+				<li class="point-1">
+					<label>
+						<input type="radio" name="type" value="21" />
+						<span>Point #1</span>
+					</label>
+				</li>
+				
+				<li class="point-2">
+					<label>
+						<input type="radio" name="type" value="22" />
+						<span>Point #2</span>
+					</label>
+				</li>
+				
+				<li class="point-3">
+					<label>
+						<input type="radio" name="type" value="23" />
+						<span>Point #3</span>
+					</label>
+				</li>
+				
+				<li class="point-4">
+					<label>
+						<input type="radio" name="type" value="24" />
+						<span>Point #4</span>
+					</label>
+				</li>
+			</ul>
 			<hr />
 			<div class="table"></div>
 			<hr />
