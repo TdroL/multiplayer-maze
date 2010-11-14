@@ -1,5 +1,6 @@
 (function($) {
 	ui = {
+		font: '11px "Trebutchet MS", Tahoma',
 		maze: function(canvas, settings, data) {
 			if( ! (canvas && settings))
 			{
@@ -63,7 +64,10 @@
 			text.init(canvas, settings);
 			ui.list.push([text, text.update]);
 		},
-		
+		point: function(canvas, settings) {
+			point.init(canvas, settings);
+			ui.list.push([point, point.update]);
+		},
 		// animation loop
 		_running: false,
 		list: [],
@@ -71,7 +75,7 @@
 			last: 0,
 			current: 0,
 			delta: 0,
-			target: 1000/60,
+			target: 1000/40,
 			min_sleep: 5
 		},
 		now: function() {
@@ -152,16 +156,59 @@
 			
 			if( ! ui.canvas.prototype.arc)
 			{
-				var methods = ['arc','arcTo','beginPath','bezierCurveTo','clearRect','clip','closePath','createImageData','createLinearGradient','createRadialGradient','createPattern','drawFocusRing','drawImage','fill','fillRect','fillText','getImageData','isPointInPath','lineTo','measureText','moveTo','putImageData','quadraticCurveTo','rect','restore','rotate','save','scale','setTransform','stroke','strokeRect','strokeText','transform','translate'];
+				var methods = ['arc','arcTo','beginPath','bezierCurveTo','clearRect','clip','closePath','drawFocusRing','drawImage','fill','fillRect','fillText','isPointInPath','lineTo','moveTo','putImageData','quadraticCurveTo','rect','restore','rotate','save','scale','setTransform','stroke','strokeRect','strokeText','transform','translate'];
 				
-				// drawFocusRing not currently supported
 				for(var i = 0; i < methods.length; i++)
 				{
 					var m = methods[i];
 					ui.canvas.prototype[m] = (function (m) {
 						return function () {
-							this.context[m].apply(this.context, arguments);
+							if(window.debug)
+							{
+								try
+								{
+									this.context[m].apply(this.context, arguments);
+									
+								}
+								catch(e)
+								{
+									$.log(m+': '+e);
+								}
+							}
+							else
+							{
+								this.context[m].apply(this.context, arguments);
+							}
+							
 							return this;
+						};
+					})(m);
+				}
+				
+				delete methods;
+				
+				methods = ['createImageData','createLinearGradient','createRadialGradient','createPattern','getImageData','measureText'];
+				
+				for(var i = 0; i < methods.length; i++)
+				{
+					var m = methods[i];
+					ui.canvas.prototype[m] = (function (m) {
+						return function () {
+							if(window.debug)
+							{
+								try
+								{
+									return this.context[m].apply(this.context, arguments);
+								}
+								catch(e)
+								{
+									$.log(m+': '+e);
+								}
+							}
+							else
+							{
+								return this.context[m].apply(this.context, arguments);
+							}
 						};
 					})(m);
 				}

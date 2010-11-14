@@ -1,13 +1,13 @@
 (function($) {
 	net = {
-		ws: { send: $.noop },
+		ws: null,
 		id: 0,
 		error: false,
 		_data: {},
 		binds: {},
-		host: ('ws://'+(/^https?:\/\/([^\/]+)\//.exec(window.location)[1])+':8000'),
+		host: ('ws://'+(/^https?:\/\/([^\/]+)\//.exec('http://localhost/' /*window.location*/)[1])+':8000'),
 		init: function() {
-			var _net = this,
+			var self = this,
 				pong = net.ping(),
 				pongID = 0;
 			
@@ -33,12 +33,12 @@
 				
 				if((result = /^response\[([^\]]+)\](?::(.+))?$/.exec(data)))
 				{
-					if(result[1] in _net.binds)
+					if(result[1] in self.binds)
 					{
-						_net.binds[result[1]].callback.call(event, result[2]);
-						if(_net.binds[result[1]].once)
+						self.binds[result[1]].callback.call(event, result[2]);
+						if(self.binds[result[1]].once)
 						{
-							delete _net.binds[result[1]];
+							delete self.binds[result[1]];
 						}
 					}
 					return;
@@ -46,18 +46,18 @@
 				
 				if((result = /^(.+?)(?::(.+))?$/.exec(data)))
 				{
-					if(result[1] in _net.actions)
+					if(result[1] in self.actions)
 					{
-						_net.actions[result[1]].call(event, result[2]);
+						self.actions[result[1]].call(event, result[2]);
 					}
 					return;
 				}
 			});
 			
 			ws.on('error', false, function(event) {
-				if('error' in _net.binds && 'callback' in _net.binds.error)
+				if('error' in self.binds && 'callback' in self.binds.error)
 				{
-					_net.binds.error.callback.call(event);
+					self.binds.error.callback.call(event);
 				}
 			});
 			
@@ -65,31 +65,47 @@
 				pong(false); // disable pong
 				window.clearTimeout(pongID);
 				
-				if('close' in _net.binds && 'callback' in _net.binds.close)
+				if('close' in self.binds && 'callback' in self.binds.close)
 				{
 					window.setTimeout(function() {
-						_net.binds.close.callback.call(event);
+						self.binds.close.callback.call(event);
 					}, 100); // call after window.unload
 				}
 			});
 			
 			ws.on('open', false, function(event) {
-				if('open' in _net.binds && 'callback' in _net.binds.open)
+				if('open' in self.binds && 'callback' in self.binds.open)
 				{
-					_net.binds.open.callback.call(event);
+					self.binds.open.callback.call(event);
 				}
-				_net.flushQueue();
+				self.flushQueue();
 				
-				_net.send('ping');
+				self.send('ping');
 			});
 		},
 		connect: function() {
-			if( ! (net.ws instanceof WebSocket) || net.ws.readyState == WebSocket.CLOSED)
+			if('WebSocket' in window
+			 && ( ! (net.ws instanceof WebSocket) || net.ws.readyState === WebSocket.CLOSED))
 			{
 				net.ws = new WebSocket(net.host);
 			}
 			
 			return net.ws;
+		},
+		disconnect: function() {
+			if('WebSocket' in window
+			 && net.ws instanceof WebSocket && net.ws.readyState !== WebSocket.CLOSED)
+			{
+				net.ws.close();
+			}
+		},
+		bufferAvaible: function() {
+			if(net.ws && 'bufferedAmount' in net.ws && net.ws.readyState === WebSocket.OPEN)
+			{
+				return net.ws.bufferedAmount === 0;
+			}
+			
+			return false;
 		},
 		ping: function() {
 			var timer;

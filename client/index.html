@@ -1,10 +1,11 @@
 <!DOCTYPE HTML>
 <html lang="pl">
 <head>
-	<meta charset="UTF-8">
+	<meta charset="utf-8">
 	<title>Client</title>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>-->
 	<!--<script src="scripts/minimized.js"></script>-->
+	<script src="scripts/jquery.min.js"></script>
 	<script src="scripts/jquery.plugins.js"></script>
 	<script src="scripts/base.js"></script>
 	<script src="scripts/io.js"></script>
@@ -12,6 +13,7 @@
 	<script src="scripts/ui.js"></script>
 	<script src="scripts/phy.js"></script>	
 	<script src="scripts/player.js"></script>
+	<script src="scripts/point.js"></script>
 	<script src="scripts/text.js"></script>
 	<script src="scripts/client.js"></script>
 	<link href="style.css" rel="stylesheet" />
@@ -23,11 +25,11 @@
 		</div>
 		<div class="tab hide" id="intro">
 			<h1>Labirynt</h1>
-			<h3>Dotrzyj do swojego końca</h3>
+			<h3>Zbierz swoje znaczniki</h3>
 			
 			<p><a rel="switchTo-connect">Rozpocznij</a></p>
-			<p>Tip: Używaj strzałek do poruszania się</p>
-			<p><img src="images/keyboard-arrows.png" alt="strzałki" title="← ↓ ↑ →" /></p>
+			<p>Tip: Używaj strzałek do poruszania się. Spacją łapiesz znaczniki</p>
+			<p><img src="images/keyboard-arrows.png" alt="[strzałki]" title="← ↓ ↑ →" /></p>
 		</div>
 		<div class="tab hide" id="connect">
 			<h2>Łączenie z serwerem<span class="dots">...</span></h2>

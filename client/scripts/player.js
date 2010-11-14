@@ -1,5 +1,6 @@
 (function($) {
 	player = {
+		pid: 1,
 		canvas: null,
 		settings: {},
 		data: [],
@@ -67,6 +68,34 @@
 					player.ball.fx -= 1;
 				}
 			});
+			
+			io.bind('space', {
+				down: function() {
+					player.capture();
+				},
+				press: $.noop
+			});
+		},
+		_p: [],
+		capture: function() {
+			var settings = player.settings,
+				ball = player.ball,
+				p;
+			
+			player._p[0] = Math.floor(ball.x / settings.block);
+			player._p[1] =  Math.floor(ball.y / settings.block);
+			
+			if(point.points[player._p[1]] && point.points[player._p[1]][player._p[0]])
+			{
+				p = point.points[player._p[1]][player._p[0]];
+				
+				if(p.owner === player.pid)
+				{
+					point.queue.push(player._p);
+					net.send('clear:'+JSON.stringify(player._p));
+				}
+			}
+			
 		},
 		update: function(dt) {
 			var settings = player.settings,
@@ -81,13 +110,13 @@
 			
 			$.each(player.opponents, function(i, v) {
 				c.beginPath();
-				c.fillStyle('#f00');
+				c.fillStyle(point.colors[v.pid]);
 				c.arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true);
 				c.fill().closePath();
 			});
 			
 			c.beginPath();
-			c.fillStyle('#00f');
+			c.fillStyle(point.colors[player.pid]);
 			c.arc(settings.margin + ball.x, settings.margin + ball.y, ball.r - 0.5, 0, Math.PI*2, true);
 			c.fill().closePath();
 		}

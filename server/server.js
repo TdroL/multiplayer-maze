@@ -14,6 +14,7 @@ server.addListener('listening', function() {
 function Player(conn)
 {
 	this.id = conn.id;
+	this.pid = 0;
 	this.conn = conn;
 	this.channel = null;
 	
@@ -26,6 +27,7 @@ function Player(conn)
 	this.leave = function() {
 		if(this.channel)
 		{
+			this.pid = this.channel.releasePid(this.pid);
 			this.channel.remove(this);
 		}
 	};
@@ -41,11 +43,12 @@ function Player(conn)
 			if(channel.isAvaible())
 			{
 				channel.add(this);
-				return 1;
+				this.pid = channel.getPid();
+				return [1, this.pid];
 			}
-			return -2;
+			return [-2];
 		}
-		return -1;
+		return [-1];
 	};
 	
 	this.send = function(message) {
@@ -101,6 +104,13 @@ function Channel(id, name, limit)
 	this.status = 1;
 	this.players = {};
 	this.players_i = 0;
+	this.pids = [];
+	
+	// generate pids
+	for(var i = 0; i < this.limit; i++)
+	{
+		this.pids[i] = i+1;
+	}
 	
 	this.add = function(player) {
 		//sys.log('Added player <'+player.id+'> to channel <'+this.name+'>');
@@ -110,6 +120,8 @@ function Channel(id, name, limit)
 		player.channel = this;		
 		this.players[player.id] = player;
 		this.players_i++;
+		
+		return this.players_i;
 	};
 	
 	this.remove = function(player, send) {
@@ -124,6 +136,18 @@ function Channel(id, name, limit)
 			
 			this.broadcast('quit:'+player.id);
 		}
+	};
+	
+	this.getPid = function() {
+		return this.pids.shift();
+	};
+	
+	this.releasePid = function(pid) {
+		if(pid > 0 && pid <= this.limit)
+		{
+			this.pids.pop(pid);
+		}
+		return 0;
 	};
 	
 	this.broadcast = function(message, not) {
@@ -190,7 +214,7 @@ server.addListener('connection', function(conn) {
 				}
 				case 'join-channel':
 				{
-					conn.send('response[join-channel]:'+players[conn.id].join(result[2]));
+					conn.send('response[join-channel]:'+JSON.stringify(players[conn.id].join(result[2])));
 					break;
 				}
 				case 'leave-channel':
@@ -203,6 +227,7 @@ server.addListener('connection', function(conn) {
 					conn.send('response[get-channel-info]:'+JSON.stringify(channels[result[2]]));
 					break;
 				}
+				case 'clear':
 				case 'update':
 				{
 					if(players[conn.id].channel)

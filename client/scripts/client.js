@@ -84,24 +84,28 @@
 					if(id)
 					{
 						net.bind('join-channel:'+id, true, function(data) {
-							data = parseInt(data, 10);
-							switch(data)
+							$.log(data);
+							data = JSON.parse(data);
+							
+							var status = parseInt(data[0], 10),
+								pid = data[1] ? parseInt(data[1], 10) : null;
+								
+							switch(status)
 							{
 								case 1:
 								{
 									player.in_channel = true;
+									player.pid = pid;
 									$('#container').switchTo('game');
 									break;
 								}
 								case -2:
 								{
-									$.log('-2');
 									ui.info('Brak wolnych miejsc', {'Ok': null});
 									break;
 								}
 								case -1:
 								{
-									$.log('-1');
 									ui.error('Taki kanał nie istnieje', {'Ok': null});
 									break;
 								}
@@ -142,10 +146,12 @@
 						height: null,
 						outerWidth: null,
 						outerHeight: null,
-						block: 30, // blocks width and height; !! (width % block) = 0
+						block: 30,
 						margin: 20,
 						cols: 25,
 						rows: 15,
+						points: {}, // points (including start points)
+						starts: {}, // start points
 						
 						load: (function() {
 							var loaded = false, callback = null;
@@ -178,13 +184,33 @@
 					if($.type(data[i]) !== 'array') data[i] = [];
 					
 					for(var j = 0; j < settings.maze.cols; j++)
-					{					
+					{
+						var del = data[i][j];
+						if(data[i][j][2])
+						{
+							var point = data[i][j][2];
+							
+							settings.maze.points[i] = settings.maze.points[i] || {};
+							settings.maze.points[i][j] = [point];
+							
+							if(point[0] === '1')
+							{
+								settings.maze.starts[point[1]] = [i, j];
+							}
+							else if(point[0] === '2')
+							{
+								settings.maze.points[i][j][1] = data[i][j][3] || null;
+							}
+						}
+						
 						data[i][j] = [
 							(i) ? data[i-1][j][2] : 1,
 							(settings.maze.cols - j - 1) ? (data[i][j][0] || 0) : 1,
 							(settings.maze.rows - i - 1) ? (data[i][j][1] || 0) : 1,
 							(j) ? data[i][j-1][1] : 1
 						];
+						
+						delete del;
 					}
 				}
 				
@@ -201,18 +227,28 @@
 				}
 				
 				canvas = $('#game canvas'); // all canvases
-				var _net = window.net,
-					_player = window.player;
+				var _net = /*window.*/net,
+					_point = /*window.*/point,
+					_player = /*window.*/player;
 				
 				net.action('update', function(data) {
 					data = JSON.parse(data);			
 					
-					if('id' in data && data.id && data.id != _net.id)
+					if(data.id && data.id !== _net.id)
 					{
 						_player.opponents[data.id] = _player.opponents[data.id] || {x: 15, y: 15};
+						_player.opponents[data.id].pid = data.pid;
 						_player.opponents[data.id].x = data.x;
 						_player.opponents[data.id].y = data.y;
 					}
+					
+					delete data;
+				});
+				
+				net.action('clear', function(data) {
+					data = JSON.parse(data);			
+					
+					_point.queue.push(data);
 					
 					delete data;
 				});
@@ -237,6 +273,7 @@
 					});
 					
 					ui.maze(ui.canvas(canvas.filter('.maze')), settings.maze, data);
+					ui.point(ui.canvas(canvas.filter('.points')), settings.maze, data);
 					ui.player(ui.canvas(canvas.filter('.players')), settings.maze, data);
 					ui.text(ui.canvas(canvas.filter('.text')), settings.maze);
 					
@@ -245,10 +282,11 @@
 					ui.loop(true);
 					
 					timerID = window.setInterval(function() {
-						if(net.ws && net.ws.bufferedAmount == 0)
+						if(net.bufferAvaible())
 						{
 							net._data.id = net.id;
-							net._data.date = +new Date();
+							net._data.pid = player.pid;
+							//net._data.date = +new Date();
 							net._data.x = Math.round2(player.ball.x);
 							net._data.y = Math.round2(player.ball.y);
 							
@@ -286,7 +324,7 @@
 		docready = true;
 		
 		$(window).bind('unload', function() {
-			net.ws.close();
+			//net.disconnect();
 			net.unbind('close');
 		});
 		

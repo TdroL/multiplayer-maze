@@ -23,12 +23,9 @@
 
 <ifModule mod_headers.c>
 	Header unset ETag
-</ifModule>
-FileETag None
-
-<ifModule mod_headers.c>
 	Header unset Last-Modified
 </ifModule>
+FileETag None
 
 <ifModule mod_deflate.c>
 	# Insert filter
