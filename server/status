@@ -1,0 +1,9 @@
+#!/bin/sh
+SERVICE='node server/server.js'
+ 
+if ps ax | grep -v grep | grep $SERVICE > /dev/null
+then
+    echo "Node service running, everything is fine"
+else
+    echo "Node is not running"
+fi
