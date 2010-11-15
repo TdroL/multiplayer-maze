@@ -5,7 +5,7 @@
 		error: false,
 		_data: {},
 		binds: {},
-		host: ('ws://'+(/^https?:\/\/([^\/]+)\//.exec('http://localhost/' /*window.location*/)[1])+':8000'),
+		host: ('ws://'+(/^https?:\/\/([^\/]+)\//.exec(window.location)[1])+':8000'),
 		init: function() {
 			var self = this,
 				pong = net.ping(),
