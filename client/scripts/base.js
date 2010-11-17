@@ -3,7 +3,7 @@ var config,
 	net,
 	ui,
 	phy, vec,
-	state,
+	state, obj,
 	player,
 	point,
 	text;
@@ -19,12 +19,29 @@ var config,
 		window.debug && console.log.apply(console, arguments);
 	};
 	$.error = function() {
-		window.debug && console.error.apply(console, arguments) && alert('Error: '+arguments.join(' '));
-		throw arguments.join(' ');
+		if(window.debug)
+		{
+			console.error.apply(console, arguments);
+			alert('Error: '+Array.prototype.join.call(arguments, ''));
+		}
+		throw Array.prototype.join.call(arguments, '');
 	};
 	
 	config = {
 		base_url: '/multiplayer/'
+	};
+	
+	Array.prototype.empty = Array.prototype.empty || function() {
+		this.splice(0, this.length);
+		return this;
+	};
+	
+	Array.prototype.merge = Array.prototype.merge || function(arr) {
+		while(arr.length)
+		{
+			this.push(arr.shift());
+		}
+		return this;
 	};
 	
 	String.prototype.url = function() {

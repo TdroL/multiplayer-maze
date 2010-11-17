@@ -1,10 +1,10 @@
 (function($) {
 	phy = {
-		settings: {},
-		data: [],
+		settings: null,
+		data: null,
 		init: function(settings, data) {
 			phy.settings = settings;
-			phy.data = data;
+			phy.data = obj.get('maze').data;
 		},
 		move: function(ball, dt) {
 			var vt = ball.vt * dt, fl;
@@ -33,55 +33,19 @@
 			}
 		},
 		_sides: [
-			{
-				d: 0,
-				vx: 0, vy: 1, // response vectors
-				cell: 0,
-				overlap: false
-			},
-			{
-				d: 0,
-				vx: -1, vy: 0,
-				cell: 0,
-				overlap: false
-			},
-			{
-				d: 0,
-				vx: 0, vy: -1,
-				cell: 0,
-				overlap: false
-			},
-			{
-				d: 0,
-				vx: 1, vy: 0,
-				cell: 0,
-				overlap: false
-			}
+			{ vx:  0, vy:  1 },
+			{ vx: -1, vy:  0 },
+			{ vx:  0, vy: -1 },
+			{ vx:  1, vy:  0 }
 		],
-		_corners: [
-			{
-				x: 0, y: 0,
-				valid: false
-			},
-			{
-				x: 0, y: 0,
-				valid: false
-			},
-			{
-				x: 0, y: 0,
-				valid: false
-			},
-			{
-				x: 0, y: 0,
-				valid: false
-			}
-		],
+		_corners: [{},{},{},{}],
 		collision: function(ball) {
 			var col, row,
 				x, y, b, r, bp,
 				cx, cy, cxw, cxh,
 				vec = phy._vec,
-				cell, data;
+				data = phy.data,
+				cell, side, corner;
 			
 			x = ball.x;
 			y = ball.y;
@@ -93,8 +57,6 @@
 			col = Math.floor(x / b);
 			row = Math.floor(y / b);
 			
-			data = this.data;
-			
 			if( ! (data[row] && data[row][col]))
 			{
 				return vec;
@@ -105,9 +67,7 @@
 			cx = b * col;
 			cy = b * row;
 			cxw = cx + b;
-			cyh = cy + b;			
-			
-			var side;
+			cyh = cy + b;
 			
 			side = phy._sides[0];
 			side.d = (y-r) - cy;
@@ -153,8 +113,6 @@
 			{
 				return vec;
 			}
-			
-			var corner;
 			
 			corner = phy._corners[0];
 			corner.x = cx;

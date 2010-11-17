@@ -71,7 +71,6 @@
 					$ul.append($li);
 				});
 				
-				delete data;
 				delete channels;
 				delete parsed;
 			};
@@ -79,12 +78,12 @@
 			this.init = function() {
 				$ul = $ul || $('#servers ul').delegate('a', 'click', function() {
 					var $$ = $(this),
+						player = obj.get('player'),
 						id = $$.attr('rel').substr(2);
 					
 					if(id)
 					{
 						net.bind('join-channel:'+id, true, function(data) {
-							$.log(data);
 							data = JSON.parse(data);
 							
 							var status = parseInt(data[0], 10),
@@ -132,7 +131,7 @@
 			};
 			
 			this.release = function() {
-				net.unbind('get-channels');
+				net.removeBind('get-channels');
 				window.clearInterval(timerID);
 			};
 		},
@@ -141,83 +140,17 @@
 				data = [],
 				timerID,
 				settings = {
-					maze: {
-						width: null,
-						height: null,
-						outerWidth: null,
-						outerHeight: null,
-						block: 30,
-						margin: 20,
-						cols: 25,
-						rows: 15,
-						points: {}, // points (including start points)
-						starts: {}, // start points
-						
-						load: (function() {
-							var loaded = false, callback = null;
-							
-							return function() {
-								if( ! arguments.length)
-								{
-									loaded = true;
-								}
-								else if($.type(arguments[0]) === 'function')
-								{
-									callback = arguments[0];
-								}
-								
-								if(loaded && $.type(callback) === 'function')
-								{
-									callback();
-								}
-							};
-						})()
-					}
+					width: null,
+					height: null,
+					outerWidth: null,
+					outerHeight: null,
+					block: 30,
+					margin: 20,
+					cols: 25,
+					rows: 15,
+					points: {}, // points (including start points)
+					starts: {} // start points
 				};
-			
-			$.getJSON('test.txt', function(response) {
-				settings = $.extend(true, settings, response.settings);
-				data = response.data;
-				
-				for(var i = 0; i < settings.maze.rows; i++)
-				{
-					if($.type(data[i]) !== 'array') data[i] = [];
-					
-					for(var j = 0; j < settings.maze.cols; j++)
-					{
-						var del = data[i][j];
-						if(data[i][j][2])
-						{
-							var point = data[i][j][2];
-							
-							settings.maze.points[i] = settings.maze.points[i] || {};
-							settings.maze.points[i][j] = [point];
-							
-							if(point[0] === '1')
-							{
-								settings.maze.starts[point[1]] = [i, j];
-							}
-							else if(point[0] === '2')
-							{
-								settings.maze.points[i][j][1] = data[i][j][3] || null;
-							}
-						}
-						
-						data[i][j] = [
-							(i) ? data[i-1][j][2] : 1,
-							(settings.maze.cols - j - 1) ? (data[i][j][0] || 0) : 1,
-							(settings.maze.rows - i - 1) ? (data[i][j][1] || 0) : 1,
-							(j) ? data[i][j-1][1] : 1
-						];
-						
-						delete del;
-					}
-				}
-				
-				settings.maze.load();
-				
-				delete response;
-			});
 			
 			this.init = function() {
 				if(! window.debug && ! player.in_channel) // no hacking, please
@@ -226,10 +159,11 @@
 					return;
 				}
 				
-				canvas = $('#game canvas'); // all canvases
-				var _net = /*window.*/net,
-					_point = /*window.*/point,
-					_player = /*window.*/player;
+				var _net = net,
+					_point = obj.get('point'),
+					_player = obj.get('player');
+				
+				canvas = $('#game canvas');
 				
 				net.action('update', function(data) {
 					data = JSON.parse(data);			
@@ -254,52 +188,24 @@
 				});
 				
 				net.action('quit', function(id) {
-					if(id in player.opponents)
+					if(id in _player.opponents)
 					{
-						delete player.opponents[id];
+						delete _player.opponents[id];
 					}
 				});
 				
-				settings.maze.load(function() {
-					settings.maze.width = settings.maze.cols * settings.maze.block;
-					settings.maze.height = settings.maze.rows * settings.maze.block;
-					
-					settings.maze.outerWidth = settings.maze.width + 2*settings.maze.margin;
-					settings.maze.outerHeight = settings.maze.height + 2*settings.maze.margin;
-					
-					canvas.attr({
-							width: settings.maze.outerWidth,
-							height: settings.maze.outerHeight
-					});
-					
-					ui.maze(ui.canvas(canvas.filter('.maze')), settings.maze, data);
-					ui.point(ui.canvas(canvas.filter('.points')), settings.maze, data);
-					ui.player(ui.canvas(canvas.filter('.players')), settings.maze, data);
-					ui.text(ui.canvas(canvas.filter('.text')), settings.maze);
-					
-					phy.init(settings.maze, data);
-					
-					ui.loop(true);
-					
-					timerID = window.setInterval(function() {
-						if(net.bufferAvaible())
-						{
-							net._data.id = net.id;
-							net._data.pid = player.pid;
-							//net._data.date = +new Date();
-							net._data.x = Math.round2(player.ball.x);
-							net._data.y = Math.round2(player.ball.y);
-							
-							net.send('update:'+JSON.stringify(net._data), false);
-						}
-					}, 20); // ms
+				obj.ready(function() {
+					phy.init(settings);
+					ui.start();
 				});
+				
+				obj.runEach('init', settings);
 			};
 			
 			this.release = function() {
-				ui.loop(false);
-				player.in_channel = false;
-				window.clearInterval(timerID);
+				ui.stop();
+				obj.clear();
+				obj.runEach('stop');
 			};
 		}
 	};
@@ -319,13 +225,14 @@
 	$(function() {
 		if(docready)
 		{
+			$.log('warning: double DOM load');
 			return false; // 1.4.3 bug - http://bugs.jquery.com/ticket/7247
 		}
 		docready = true;
 		
 		$(window).bind('unload', function() {
 			//net.disconnect();
-			net.unbind('close');
+			net.removeBind('close');
 		});
 		
 		var $container = $('#container'),

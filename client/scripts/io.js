@@ -16,15 +16,15 @@
 				{
 					io.key[code].pressed = true;
 					
-					io._runBind.call(event, 'down', code);
-					io._runSequence.call(event, code);
+					io._runBind(event, 'down', code);
+					io._runSequence(event, code);
 				}
 			}).keypress(function(event) {
 				var code = event.keyCode || event.which;
 				
 				if(code in io.key)
 				{
-					io._runBind.call(event, 'press', code);
+					io._runBind(event, 'press', code);
 				}
 			}).keyup(function(event) {
 				var code = event.keyCode || event.which;
@@ -33,7 +33,7 @@
 				{
 					io.key[code].pressed = false;
 					
-					io._runBind.call(event, 'up', code);
+					io._runBind(event, 'up', code);
 				}
 			});
 			
@@ -85,10 +85,8 @@
 				$.error('io.bind - ', 'No valid keys to map');
 			}
 			
-			list.sort(function(a, b) {
-				return a - b;
-			});
-
+			list.sort();
+			
 			var id = list.join(',');
 			
 			if(id in io.binds)
@@ -121,13 +119,14 @@
 			
 			delay = parseInt(delay || io.sequence_delay, 10);
 			
-			var list = io._parseKeys(keys);
-			
-			var id = list.join(',');
+			var list = io._parseKeys(keys),
+				v = list[0],
+				id = list.join(',');
 			
 			if(id in io.sequences)
 			{
 				delete io.sequences[id];
+				delete io.sequences_cache[v][id];
 			}
 			
 			io.sequences[id] = {
@@ -138,12 +137,42 @@
 				fn: fn
 			};
 			
-			var v = list[0];
 			io.sequences_cache[v] = io.sequences_cache[v] || {};
 			io.sequences_cache[v][id] = io.sequences[id];
 		},
-		_runBind: function(method, key) {
-			var event = this;
+		removeBind: function(keys) {
+			if( ! $.isArray(keys))
+			{
+				keys = keys ? [keys] : [];
+			}
+			
+			if( ! keys.length)
+			{
+				return false;
+			}
+			
+			var list = io._parseKeys(keys);
+			
+			if( ! list.length)
+			{
+				return false;
+			}
+			
+			list.sort();
+			
+			var id = list.join(',');
+			
+			if(id in io.binds)
+			{
+				delete io.binds[id];
+			}
+			
+			$.each(list, function(i, v) {
+				delete io.binds_cache[v][id];
+			});
+			return true;
+		},
+		_runBind: function(event, method, key) {
 			event.preventDefault = event.preventDefault || $.noop;
 			
 			if(key in io.binds_cache)
@@ -164,13 +193,23 @@
 					}
 					case 'press':
 					{
+						/*
 						$.each(io.binds_cache[key], function(i, v) {
 							if(io.pressed.apply(io, v.list) && $.isFunction(v.press))
 							{
 								event.preventDefault();
 								v.press();
 							}
-						});
+						});*/
+						for(var i in io.binds_cache[key])
+						{
+							var v = io.binds_cache[key][i];
+							if(io.pressed.apply(io, v.list) && $.isFunction(v.press))
+							{
+								event.preventDefault();
+								v.press();
+							}
+						}
 						break;
 					}
 					case 'up':
@@ -188,8 +227,7 @@
 				}
 			}
 		},
-		_runSequence: function(key) {
-			var event = this;
+		_runSequence: function(event, key) {
 			event.preventDefault = event.preventDefault || $.noop;
 			
 			$.each(io.sequences_active, function(i, v) {

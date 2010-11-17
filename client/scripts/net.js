@@ -197,7 +197,7 @@
 				}
 			}
 			
-			net.unbind(cmd);
+			net.removeBind(cmd);
 			net.binds[cmd] = {
 				once: once,
 				callback: callback
@@ -209,7 +209,7 @@
 			}
 			return true;
 		},
-		unbind: function(cmd) {
+		removeBind: function(cmd) {
 			if(cmd in net.binds)
 			{
 				delete net.binds[cmd];

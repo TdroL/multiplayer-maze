@@ -1,5 +1,5 @@
 #!/bin/sh
-SERVICE='node server/server.js'
+SERVICE='node'
  
 if ps ax | grep -v grep | grep $SERVICE > /dev/null
 then

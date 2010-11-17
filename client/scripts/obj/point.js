@@ -1,15 +1,42 @@
 (function($) {
-	point = {
+	obj.add('point', {
+		status: null,
+		$$: null,
 		canvas: null,
 		settings: {},
 		points: {},
-		colors: ['#f5f5f5', '#3953A4', '#E52225', '#F6EB14', '#60BB46'],
+		colors: ['#e5e5e5', '#3953A4', '#E52225', '#F6EB14', '#60BB46'],
 		queue: [],
-		init: function(canvas, settings) {
-			this.canvas = canvas;
+		init: function(settings) {
+			this.$$ = $('#game canvas.points');
+			this.canvas = ui.canvas(this.$$);
 			this.settings = settings;
 			
-			canvas.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
+			var self = this;
+			obj.ready(function() {
+				self.drawPoints();
+			});
+			
+			this.status(true);
+		},
+		update: function(dt) {
+			var q;
+			
+			while(this.queue.length > 0)
+			{
+				q = this.queue.shift();
+				this.clearPoint(q[0], q[1]);
+				delete q;
+			}
+		},
+		render: function() {
+		
+		},
+		drawPoints: function() {
+			var settings = this.settings,
+				point, value, t = ui.now();
+			
+			this.canvas.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
 			
 			for(var i = 0; i < settings.rows; i++)
 			{
@@ -27,13 +54,14 @@
 					{
 						if(/^(\d+)$/.test(j))
 						{
-							var point = settings.points[i][j][0];
+							point = settings.points[i][j][0];
+							value = settings.points[i][j][1];
 							
 							this.points[i] = this.points[i] || {};
 							this.points[i][j] = {
 								type: parseInt(point[0], 10),
 								owner: parseInt(point[1], 10),
-								val: parseInt(settings.points[i][j][1], 10) || null
+								val: parseInt(value, 10) || null
 							};
 							
 							point = this.points[i][j];
@@ -42,21 +70,12 @@
 							{
 								this.drawPoint(j, i, this.colors[point.owner], point.val);
 							}
-							
 						}
 					}
 				}
 			}
-		},
-		update: function(dt) {
-			var q;
 			
-			while(point.queue.length > 0)
-			{
-				q = point.queue.shift();
-				point.clearPoint(q[0], q[1]);
-				delete q;
-			}
+			$.log('drawPoints time:', ui.now() - t);
 		},
 		drawPoint: function(ix, iy, color, num, num_color)
 		{
@@ -116,6 +135,14 @@
 		},
 		clearPoint: function(i, j) {
 			this.drawPoint(i, j, this.colors[0]);
+		},
+		_patterns:{},
+		getPointPattern: function(color) {
+			
+			if(this._patterns[color])
+			{
+				return this._patterns[color];
+			}
 		}
-	}
+	});
 })(jQuery);
