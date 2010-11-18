@@ -49,13 +49,8 @@
 			});
 			
 			self.status(true);
-			
-			delete keys;
 		},
-		reset: function() {
-			delete this.ball;
-			delete this.opponents;
-			
+		reset: function() {			
 			this.ball = {
 				x:  15,
 				y:  15,

@@ -10,7 +10,7 @@
 		},
 		init: function() {
 			$(window).keydown(function(event) {
-				var code = event.keyCode || event.which;
+				var code = event.which;
 				
 				if(code in io.key && ! io.key[code].pressed)
 				{
@@ -20,14 +20,14 @@
 					io._runSequence(event, code);
 				}
 			}).keypress(function(event) {
-				var code = event.keyCode || event.which;
+				var code = event.which;
 				
 				if(code in io.key)
 				{
 					io._runBind(event, 'press', code);
 				}
 			}).keyup(function(event) {
-				var code = event.keyCode || event.which;
+				var code = event.which;
 				
 				if(code in io.key && io.key[code].pressed)
 				{

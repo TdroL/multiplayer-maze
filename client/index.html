@@ -20,41 +20,51 @@
 </head>
 <body>
 	<div id="container">
-		<div class="tab" id="system-check">
-			
-		</div>
-		<div class="tab hide" id="intro">
+		<section class="tab hide" id="intro">
 			<h1>Labirynt</h1>
-			<h3>Zbierz swoje znaczniki</h3>
 			
-			<p><a rel="switchTo-connect">Rozpocznij</a></p>
-			<p>Tip: Używaj strzałek do poruszania się. Spacją łapiesz znaczniki</p>
-			<p><img src="images/keyboard-arrows.png" alt="[strzałki]" title="← ↓ ↑ →" /></p>
-		</div>
-		<div class="tab hide" id="connect">
+			<div class="testing">
+				<h3>Testowanie przeglądarki</h3>
+			</div>
+			<div class="ready">
+				<h3>Zbierz swoje znaczniki</h3>
+				
+				<p><a rel="switchTo-connect">Połącz z serwerem</a></p>
+				<p>Tip: Używaj strzałek do poruszania się. Spacją łapiesz znaczniki.</p>
+				<p><img src="images/keyboard-arrows.png" alt="[strzałki]" title="← ↓ ↑ →" /></p>
+			</div>
+			<div class="fail">
+				<h3>Wystąpił błąd</h3>
+				
+				<p>Twoja przeglądarka nie spełnia wymagań: obsługa znacznika <code>&lt;canvas&gt;</code>, protokołu <code>WebSocket</code>.</p>
+				<p>Zalecane przeglądarki: Internet Explorer 12*, Opera 11, Chrome 7, Safari 5, Firefox 4.</p>
+				<p><small>* W przypadku IE potrzebna może być jeszcze nowsza wersja.</small></p>
+			</div>
+		</section>
+		<section class="tab hide" id="connect">
 			<h2>Łączenie z serwerem<span class="dots">...</span></h2>
-		</div>
-		<div class="tab hide" id="servers">
+		</section>
+		<section class="tab hide" id="servers">
 			<ul></ul>
-		</div>
-		<div class="tab hide" id="limbo">
+		</section>
+		<section class="tab hide" id="limbo">
 			<h2>Oczekiwanie na graczy<span class="ellipsis">...</span></h2>
 			<h3>Znaleziono <span class="current-players">1</span> z <span class="needed-players">1</span>.</h3>
 			
 			<p><a rel="switchTo-game">Next</a></p>
-		</div>
-		<div class="tab hide" id="game">
+		</section>
+		<section class="tab hide" id="game">
 			<canvas class="maze"></canvas>
 			<canvas class="points"></canvas>
 			<canvas class="players"></canvas>
 			<canvas class="text"></canvas>
 			<div class="info"></div>
-		</div>
-		<div class="tab hide" id="poll">
+		</section>
+		<section class="tab hide" id="poll">
 			<h1>The cake is a lie...</h1>
 			<h2>Zostałeś poddany testowi</h2>
 			<h3></h3>
-		</div>
+		</section>
 		
 		<div class="popup hide" id="errors">
 			<p></p>

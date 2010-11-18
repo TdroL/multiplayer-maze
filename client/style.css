@@ -127,6 +127,9 @@ a:hover {
 }
 
 /* style indywidualne */
+#intro > div {
+	height: 250px;
+}
 #game {
 	position: relative;
 	display: block;

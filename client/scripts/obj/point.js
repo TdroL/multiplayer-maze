@@ -23,7 +23,6 @@
 			{
 				q = this.queue.shift();
 				this.clearPoint(q[0], q[1]);
-				delete q;
 			}
 		},
 		drawPoints: function() {

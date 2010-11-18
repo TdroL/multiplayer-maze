@@ -208,8 +208,6 @@ server.addListener('connection', function(conn) {
 				{
 					var list = players[conn.id].getChannels();
 					conn.send('response[get-channels]:'+JSON.stringify(list));
-					
-					delete list;
 					break;
 				}
 				case 'join-channel':

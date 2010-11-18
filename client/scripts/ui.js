@@ -31,10 +31,7 @@
 		},
 		// util
 		now: function() {
-			var d = new Date(),
-				t = d.getTime();
-			delete d;
-			return t;
+			return (new Date()).getTime();
 		},
 		canvas: function(c) {
 			// source: https://developer.mozilla.org/en/Code_snippets/Canvas
@@ -94,8 +91,6 @@
 					})(m);
 				}
 				
-				delete methods;
-				
 				methods = ['createImageData','createLinearGradient','createRadialGradient','createPattern','getImageData','isPointInPath','measureText'];
 				
 				for(var i = 0; i < methods.length; i++)
@@ -123,8 +118,6 @@
 					})(m);
 				}
 				
-				delete methods;
-				
 				var props = ['canvas','fillStyle','font','globalAlpha','globalCompositeOperation','lineCap','lineJoin','lineWidth','miterLimit','shadowOffsetX','shadowOffsetY','shadowBlur','shadowColor','strokeStyle','textAlign','textBaseline'];
 				
 				for(var i = 0; i < props.length; i++)
@@ -151,8 +144,6 @@
 						};
 					})(p);
 				}
-				
-				delete props;
 			}
 		},
 		// "infos" & "errors" popups

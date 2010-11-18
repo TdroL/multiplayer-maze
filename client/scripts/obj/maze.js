@@ -69,8 +69,6 @@
 							(settings.rows - i - 1) ? (current[1] || 0) : 1,
 							(j) ? data[i][j-1][1] : 1
 						];
-						
-						delete current;
 					}
 				}
 				
@@ -106,7 +104,6 @@
 					px = dx + d * j;
 					py = dy + d * i;
 					
-					delete pp;
 					pp = [
 						{x: px,     y: py}, 
 						{x: px + d, y: py},

@@ -1,6 +1,25 @@
-(function($) {
+//(function($) {
 	// declare states
 	state = {
+		intro: new function() {
+			
+			this.init = function() {
+				var $div = $('#intro').find('>div').hide();
+				
+				$div.filter('.testing').hide();
+				
+				if(config.runTest())
+				{
+					$div.hide();
+					$div.filter('.ready').show();
+				}
+				else
+				{
+					$div.hide();
+					$div.filter('.fail').show();
+				}
+			};
+		},
 		connect: new function() {
 			var i = 0, interval = 400,
 				timerID;
@@ -70,9 +89,6 @@
 	
 					$ul.append($li);
 				});
-				
-				delete channels;
-				delete parsed;
 			};
 			
 			this.init = function() {
@@ -175,16 +191,10 @@
 						_player.opponents[data.id].x = data.x;
 						_player.opponents[data.id].y = data.y;
 					}
-					
-					delete data;
 				});
 				
 				net.action('clear', function(data) {
-					data = JSON.parse(data);
-					
-					_point.queue.push(data);
-					
-					delete data;
+					_point.queue.push(JSON.parse(data));
 				});
 				
 				net.action('quit', function(id) {
@@ -286,4 +296,4 @@
 		$.log('main: ready');
 		/* --debug-end-- */
 	});
-})(jQuery);
+//})(jQuery);

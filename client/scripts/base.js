@@ -1,14 +1,15 @@
-var config,
+var pro,
+	config,
 	io,
 	net,
 	ui,
-	phy, vec,
+	phy,
 	state, obj,
 	player,
 	point,
 	text;
 
-(function($) {
+//(function($) {
 	if(typeof console === "undefined")
 	{
 		console = { log: function() {}, error: function() {} };
@@ -31,7 +32,10 @@ var config,
 	/* --debug-end-- */
 	
 	config = {
-		base_url: '/multiplayer/'
+		base_url: '/multiplayer/',
+		runTest: function() {
+			return ('WebSocket' in window) && ( !! document.createElement('canvas').getContext);
+		}
 	};
 	
 	Array.prototype.empty = Array.prototype.empty || function() {
@@ -83,4 +87,4 @@ var config,
 	/* --debug-begin-- */
 	$.log('base: ready');
 	/* --debug-end-- */
-})(jQuery);
+//})(jQuery);
