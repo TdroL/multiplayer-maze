@@ -1,6 +1,5 @@
 (function($) {
 	obj.add('point', {
-		status: null,
 		$$: null,
 		canvas: null,
 		settings: {},
@@ -12,12 +11,10 @@
 			this.canvas = ui.canvas(this.$$);
 			this.settings = settings;
 			
-			var self = this;
-			obj.ready(function() {
-				self.drawPoints();
-			});
-			
 			this.status(true);
+		},
+		dataReady: function() {
+			this.drawPoints();
 		},
 		update: function(dt) {
 			var q;
@@ -28,9 +25,6 @@
 				this.clearPoint(q[0], q[1]);
 				delete q;
 			}
-		},
-		render: function() {
-		
 		},
 		drawPoints: function() {
 			var settings = this.settings,
@@ -81,20 +75,52 @@
 		{
 			var settings = this.settings,
 				c = this.canvas,
-				metric,
 				b = settings.block,
+				metric;
+			
+			c.clearRect(settings.margin + ix*b, settings.margin + iy*b, b, b);
+			
+			c.drawImage(this.getPointCache(color), settings.margin + ix*b, settings.margin + iy*b);
+			
+			num = num || null;
+			num_color = num_color || '#fff';
+			
+			if(num !== null)
+			{
+				c.font(ui.font);
+				c.fillStyle(num_color);
+				
+				metric = c.measureText(num);
+				
+				c.fillText(num, settings.margin + ix*b + (b - metric.width)/2, settings.margin + iy*b + (b + Math.floor(parseInt(ui.font)*0.75))/2);
+			}
+		},
+		clearPoint: function(i, j) {
+			this.drawPoint(i, j, this.colors[0]);
+		},
+		pointCache:{},
+		getPointCache: function(color) {
+			if(this.pointCache[color])
+			{
+				return this.pointCache[color];
+			}
+			
+			var c, p,
+				b = this.settings.block,
 				bp = b * 0.1,
 				bl = b * 0.6,
-				x = settings.margin + ix*b + 0.1*b,
+				x = bp,
 				xb = x + bp,
 				xc = xb + bl,
 				xbc = xc + bp,
-				y = settings.margin + iy*b + 0.1*b,
+				y = bp,
 				yb = y + bp,
 				yc = yb + bl,
 				ybc = yc + bp;
 			
-			c.clearRect(settings.margin + ix*b, settings.margin + iy*b, b, b);
+			p = this.pointCache[color] = document.createElement('canvas');
+			p.width = p.height = b;
+			c = ui.canvas(p);
 			
 			c.fillStyle(color);
 			
@@ -120,29 +146,7 @@
 			c.closePath();
 			c.fill();
 			
-			num = num || null;
-			num_color = num_color || '#fff';
-			
-			if(num !== null)
-			{
-				c.font(ui.font);
-				c.fillStyle(num_color);
-				
-				metric = c.measureText(num);
-				
-				c.fillText(num, settings.margin + ix*b + (b - metric.width)/2, settings.margin + iy*b + (b + Math.floor(parseInt(ui.font)*0.75))/2);
-			}
-		},
-		clearPoint: function(i, j) {
-			this.drawPoint(i, j, this.colors[0]);
-		},
-		_patterns:{},
-		getPointPattern: function(color) {
-			
-			if(this._patterns[color])
-			{
-				return this._patterns[color];
-			}
+			return p;
 		}
 	});
 })(jQuery);

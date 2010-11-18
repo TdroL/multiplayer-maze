@@ -82,5 +82,7 @@
 		}
 	};
 	
+	/* --debug-begin-- */
 	$.log('obj: ready');
+	/* --debug-end-- */
 })(jQuery);

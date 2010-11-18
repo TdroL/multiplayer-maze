@@ -214,5 +214,7 @@
 		}
 	};
 	
+	/* --debug-begin-- */
 	$.log('phy: ready');
+	/* --debug-end-- */
 })(jQuery);

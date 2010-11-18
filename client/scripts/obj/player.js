@@ -1,7 +1,6 @@
 (function($) {
 	obj.add('player', {
 		pid: 1,
-		status: null,
 		$$: null,
 		canvas: null,
 		settings: {},

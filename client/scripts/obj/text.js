@@ -1,20 +1,30 @@
 (function($) {
-	text = {
+	obj.add('text', {
+		$$: null,
 		canvas: null,
 		settings: {},
-		init: function(canvas, settings) {
-			this.canvas = canvas;
+		fps: 0,
+		dt: 0,
+		init: function(settings) {
+			this.$$ = $('#game canvas.text');
+			this.canvas = ui.canvas(this.$$);
 			this.settings = settings;
-		},
-		update: function(dt, ct) {
-			var settings = this.settings,
-				c = this.canvas;			
 			
-			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
+			this.status(true);
+		},
+		update: function(dt) {
+			this.fps = (Math.round(10000/dt)/10);
+			this.dt = Math.round2(dt, 3);
+		},
+		render: function() {
+			var settings = this.settings,
+				c = this.canvas;
+			
+			c.clearRect(0, 0, settings.outerWidth, 50);
 			c.font(ui.font);
 			c.fillStyle('#000');
-			c.fillText('fps: '+(Math.round(10000/dt)/10), settings.margin, 13);
-			c.fillText('dt: '+Math.round2(dt, 3), settings.margin + 60, 13);
+			c.fillText('fps: '+this.fps, settings.margin, 13);
+			c.fillText('dt: '+this.dt, settings.margin + 60, 13);
 		}
-	}
+	});
 })(jQuery);

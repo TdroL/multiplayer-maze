@@ -71,6 +71,7 @@
 					var m = methods[i];
 					ui.canvas.prototype[m] = (function (m) {
 						return function () {
+							/* --debug-begin-- */
 							if(window.debug)
 							{
 								try
@@ -81,12 +82,12 @@
 								catch(e)
 								{
 									$.log(m+': '+e);
+									return this;
 								}
 							}
-							else
-							{
-								this.context[m].apply(this.context, arguments);
-							}
+							/* --debug-end-- */
+							
+							this.context[m].apply(this.context, arguments);
 							
 							return this;
 						};
@@ -102,6 +103,7 @@
 					var m = methods[i];
 					ui.canvas.prototype[m] = (function (m) {
 						return function () {
+							/* --debug-begin-- */
 							if(window.debug)
 							{
 								try
@@ -111,12 +113,12 @@
 								catch(e)
 								{
 									$.log(m+': '+e);
+									return null;
 								}
 							}
-							else
-							{
-								return this.context[m].apply(this.context, arguments);
-							}
+							/* --debug-end-- */
+							
+							return this.context[m].apply(this.context, arguments);
 						};
 					})(m);
 				}
@@ -130,6 +132,16 @@
 					var p = props[i];
 					ui.canvas.prototype[p] = (function (p) {
 						return function (value) {
+							/* --debug-begin-- */
+							if(window.debug)
+							{
+								if( ! (p in this.context))
+								{
+									$.log(p+': unknown property');
+								}
+							}
+							/* --debug-end-- */
+							
 							if (typeof value === 'undefined')
 							{
 								return this.context[p];
@@ -184,5 +196,7 @@
 		}
 	};
 	
+	/* --debug-begin-- */
 	$.log('ui: ready');
+	/* --debug-end-- */
 })(jQuery);

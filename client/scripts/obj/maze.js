@@ -1,6 +1,5 @@
 (function($) {
 	obj.add('maze', {
-		status: null,
 		$$: null,
 		canvas: null,
 		settings: {},
@@ -75,8 +74,11 @@
 					}
 				}
 				
-				self.drawMaze();
+				obj.runEach('dataReady');
 			});
+		},
+		dataReady: function() {
+			this.drawMaze();
 		},
 		drawMaze: function() {
 			var c = this.canvas,
@@ -98,7 +100,7 @@
 			for(var i = 0; i < settings.rows; i++)
 			{
 				for(var j = 0; j < settings.cols; j++)
-				{					
+				{
 					cell = data[i][j];
 					
 					px = dx + d * j;

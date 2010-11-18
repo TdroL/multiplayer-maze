@@ -15,6 +15,8 @@ var config,
 	}
 	
 	window.debug = true;
+	
+	/* --debug-begin-- */
 	$.log = function() {
 		window.debug && console.log.apply(console, arguments);
 	};
@@ -26,6 +28,7 @@ var config,
 		}
 		throw Array.prototype.join.call(arguments, '');
 	};
+	/* --debug-end-- */
 	
 	config = {
 		base_url: '/multiplayer/'
@@ -77,5 +80,7 @@ var config,
 		return Math.sqrt(x*x + y*y);
 	};
 	
+	/* --debug-begin-- */
 	$.log('base: ready');
+	/* --debug-end-- */
 })(jQuery);

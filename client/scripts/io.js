@@ -287,34 +287,6 @@
 					return;
 				}
 				$.error('io.bind - ', 'Unknown key:', k);
-				/*
-				switch($.type(k))
-				{
-					case 'string':
-					{
-						if(k in io.key)
-						{
-							list.push(parseInt(io.key[k].code, 10));
-							break;
-						}
-						$.error('io.bind - ', 'Unknown key:', k);
-					}
-					case 'object':
-					{
-						if('code' in k)
-						{
-							list.push(parseInt(k, 10));
-							break;
-						}
-						$.error('io.bind - ', 'Unknown key:', k);
-					}
-					case 'number':
-					{
-						list.push(k);
-						break;
-					}
-				}
-				*/
 			});
 			
 			return list;
@@ -323,5 +295,7 @@
 	
 	io.init();
 	
+	/* --debug-begin-- */
 	$.log('io: ready');
+	/* --debug-end-- */
 })(jQuery);

@@ -180,7 +180,7 @@
 				});
 				
 				net.action('clear', function(data) {
-					data = JSON.parse(data);			
+					data = JSON.parse(data);
 					
 					_point.queue.push(data);
 					
@@ -225,7 +225,9 @@
 	$(function() {
 		if(docready)
 		{
+			/* --debug-begin-- */
 			$.log('warning: double DOM load');
+			/* --debug-end-- */
 			return false; // 1.4.3 bug - http://bugs.jquery.com/ticket/7247
 		}
 		docready = true;
@@ -280,6 +282,8 @@
 			$container.find('.popup:not(.hide) p.links>a').click();
 		});
 		
+		/* --debug-begin-- */
 		$.log('main: ready');
+		/* --debug-end-- */
 	});
 })(jQuery);

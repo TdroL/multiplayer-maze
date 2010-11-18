@@ -230,6 +230,7 @@
 			}
 		};
 	}
-
+	/* --debug-begin-- */
 	$.log('net: ready');
+	/* --debug-end-- */
 })(jQuery);
