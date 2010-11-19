@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	obj = {
 		list: {},
 		status: {},
@@ -85,4 +85,4 @@
 	/* --debug-begin-- */
 	$.log('obj: ready');
 	/* --debug-end-- */
-})(jQuery);
+//})(jQuery);

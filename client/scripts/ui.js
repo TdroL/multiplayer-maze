@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	ui = {
 		font: '11px "Trebutchet MS", Tahoma',
 		timer: {
@@ -6,7 +6,7 @@
 			last: 0,
 			current: 0,
 			delta: 0,
-			interval: 1000/60 // 40 fps = 25ms
+			interval: 1000/50
 		},
 		start: function() {
 			ui.stop();
@@ -20,18 +20,23 @@
 		loop: function() {
 			var timer = ui.timer;
 			
-			timer.last = timer.last || ui.now();
-			timer.current = ui.now();
+			timer.last = timer.last || pro.now();
+			timer.current = pro.now();
 			timer.delta = timer.current - timer.last;
 			
+			/* --debug-start-- */
+			pro.start('update-each');
+			/* --debug-end-- */
+			
 			obj.runEach('update', timer.delta, timer.current);
+			
+			/* --debug-start-- */
+			pro.end('update-each');
+			/* --debug-end-- */
+			
 			obj.runEach('render');
 			
 			timer.last = timer.current;
-		},
-		// util
-		now: function() {
-			return (new Date()).getTime();
 		},
 		canvas: function(c) {
 			// source: https://developer.mozilla.org/en/Code_snippets/Canvas
@@ -190,4 +195,4 @@
 	/* --debug-begin-- */
 	$.log('ui: ready');
 	/* --debug-end-- */
-})(jQuery);
+//})(jQuery);

@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	// switch states plugin
 	$.fn.switchInit = function(options) {
 		var settings = {
@@ -116,4 +116,4 @@
 			$.data(this, 'blink.timerID', timerID);
 		});
 	};
-})(jQuery);
+//})(jQuery);

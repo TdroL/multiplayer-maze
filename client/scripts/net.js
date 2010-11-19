@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	net = {
 		ws: null,
 		id: 0,
@@ -233,4 +233,4 @@
 	/* --debug-begin-- */
 	$.log('net: ready');
 	/* --debug-end-- */
-})(jQuery);
+//})(jQuery);

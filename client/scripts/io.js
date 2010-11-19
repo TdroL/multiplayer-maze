@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	io = {
 		inited: false,
 		binds: {}, binds_cache: {},
@@ -298,4 +298,4 @@
 	/* --debug-begin-- */
 	$.log('io: ready');
 	/* --debug-end-- */
-})(jQuery);
+//})(jQuery);

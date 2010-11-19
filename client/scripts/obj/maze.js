@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	obj.add('maze', {
 		$$: null,
 		canvas: null,
@@ -129,4 +129,4 @@
 		// update: function(dt) {},
 		// render: function() {}
 	});
-})(jQuery);
+//})(jQuery);

@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	obj.add('point', {
 		$$: null,
 		canvas: null,
@@ -18,16 +18,21 @@
 		},
 		update: function(dt) {
 			var q;
-			
+			/* --debug-start-- */
+			pro.start('update-point');
+			/* --debug-end-- */
 			while(this.queue.length > 0)
 			{
 				q = this.queue.shift();
 				this.clearPoint(q[0], q[1]);
 			}
+			/* --debug-start-- */
+			pro.end('update-point');
+			/* --debug-end-- */
 		},
 		drawPoints: function() {
 			var settings = this.settings,
-				point, value, t = ui.now();
+				point, value, t = pro.now();
 			
 			this.canvas.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
 			
@@ -68,7 +73,7 @@
 				}
 			}
 			
-			$.log('drawPoints time:', ui.now() - t);
+			$.log('drawPoints time:', pro.now() - t);
 		},
 		drawPoint: function(ix, iy, color, num, num_color)
 		{
@@ -148,4 +153,4 @@
 			return p;
 		}
 	});
-})(jQuery);
+//})(jQuery);

@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	phy = {
 		settings: null,
 		data: null,
@@ -217,4 +217,4 @@
 	/* --debug-begin-- */
 	$.log('phy: ready');
 	/* --debug-end-- */
-})(jQuery);
+//})(jQuery);

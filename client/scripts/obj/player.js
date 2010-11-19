@@ -1,4 +1,4 @@
-(function($) {
+//(function($) {
 	obj.add('player', {
 		pid: 1,
 		$$: null,
@@ -86,7 +86,13 @@
 			
 		},
 		update: function(dt) {
+			/* --debug-start-- */
+			pro.start('update-player');
+			/* --debug-end-- */
 			phy.move(this.ball, (dt * 0.001));
+			/* --debug-start-- */
+			pro.end('update-player');
+			/* --debug-end-- */
 		},
 		render: function() {
 			var settings = this.settings,
@@ -95,20 +101,31 @@
 				c = this.canvas;
 			
 			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
-			
 			c.lineWidth(1);
 			
+			/* --debug-start-- */
+			pro.start('render-opps');
+			/* --debug-end-- */
 			$.each(this.opponents, function(i, v) {
 				c.beginPath();
 				c.fillStyle(point.colors[v.pid]);
 				c.arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true);
 				c.fill().closePath();
 			});
+			/* --debug-start-- */
+			pro.end('render-opps');
+			/* --debug-end-- */
 			
+			/* --debug-start-- */
+			pro.start('render-ball');
+			/* --debug-end-- */
 			c.beginPath();
 			c.fillStyle('#00f' || point.colors[self.pid]);
 			c.arc(settings.margin + ball.x, settings.margin + ball.y, ball.r - 0.5, 0, Math.PI*2, true);
 			c.fill().closePath();
+			/* --debug-start-- */
+			pro.end('render-ball');
+			/* --debug-end-- */
 		}
 	});
-})(jQuery);
+//})(jQuery);
