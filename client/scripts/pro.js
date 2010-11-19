@@ -1,0 +1,7 @@
+(function($) {
+	
+	pro = { // profiler
+		
+	};
+	
+})(jQuery);
