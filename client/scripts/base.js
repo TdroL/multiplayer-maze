@@ -1,23 +1,14 @@
-var pro,
-	config,
-	io,
-	net,
-	ui,
-	phy,
-	state, obj,
-	player,
-	point,
-	text;
+var pro, config, io, net, ui, phy, state, obj;
 
 //(function($) {
-	if(typeof console === "undefined")
+	if( ! console)
 	{
 		console = { log: function() {}, error: function() {} };
 	}
 	
+	/* --debug-begin-- */
 	window.debug = true;
 	
-	/* --debug-begin-- */
 	$.log = function() {
 		window.debug && console.log.apply(console, arguments);
 	};
@@ -83,6 +74,20 @@ var pro,
 		
 		return Math.sqrt(x*x + y*y);
 	};
+	
+	if('WebSocket' in window)
+	{
+		WebSocket.prototype.on = WebSocket.prototype.on || function(event) {
+			if(typeof arguments[1] === 'boolean' && ! arguments[1])
+			{
+				this['on'+event] = this['on'+event] || arguments[2];
+			}
+			else
+			{
+				this['on'+event] = arguments[1];
+			}
+		};
+	}
 	
 	/* --debug-begin-- */
 	$.log('base: ready');
