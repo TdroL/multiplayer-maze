@@ -5,11 +5,9 @@
 		error: false,
 		_data: {},
 		binds: {},
-		host: ('ws://'+(/^https?:\/\/([^\/]+)\//.exec(window.location)[1])+':8000'),
+		host: ('ws://'+document.location.host+':8000'),
 		init: function() {
-			var self = this,
-				pong = net.ping(),
-				pongID = 0;
+			var self = this;
 			
 			if( ! ('WebSocket' in window))
 			{
@@ -17,14 +15,6 @@
 			}
 			
 			net._initBinds();
-			
-			net.action('pong', function() {
-				pong();
-				
-				pongID = window.setTimeout(function() {
-					net.send('ping');
-				}, 2000);
-			});
 			
 			var ws = net.ws = net.connect();
 			
@@ -62,9 +52,6 @@
 			});
 			
 			ws.on('close', false, function(event) {
-				pong(false); // disable pong
-				window.clearTimeout(pongID);
-				
 				if('close' in self.binds && 'callback' in self.binds.close)
 				{
 					window.setTimeout(function() {
@@ -85,7 +72,7 @@
 		},
 		connect: function() {
 			if('WebSocket' in window
-			 && ( ! (net.ws instanceof WebSocket) || net.ws.readyState === WebSocket.CLOSED))
+			 && ( ! (net.ws instanceof WebSocket) || net.ws.readyState >= WebSocket.CLOSING))
 			{
 				net.ws = new WebSocket(net.host);
 			}
@@ -93,8 +80,7 @@
 			return net.ws;
 		},
 		disconnect: function() {
-			if('WebSocket' in window
-			 && net.ws instanceof WebSocket && net.ws.readyState !== WebSocket.CLOSED)
+			if(net.ws && net.ws instanceof WebSocket && net.ws.readyState !== WebSocket.CLOSED)
 			{
 				net.ws.close();
 			}
@@ -106,20 +92,6 @@
 			}
 			
 			return false;
-		},
-		ping: function() {
-			var timer;
-			return function (disable) {
-				window.clearTimeout(timer);
-				if(disable) return;
-				timer = window.setTimeout(function(){
-					net.ws.close();
-					if('close' in net.binds && 'callback' in net.binds.close)
-					{
-						net.binds.close.callback.call(null);
-					}
-				}, 10000); 
-			};
 		},
 		_queue: [],
 		send: function(message, queue) {
@@ -217,19 +189,6 @@
 		}
 	};
 	
-	if('WebSocket' in window)
-	{
-		WebSocket.prototype.on = WebSocket.prototype.on || function(event) {
-			if(typeof arguments[1] === 'boolean' && ! arguments[1])
-			{
-				this['on'+event] = this['on'+event] || arguments[2];
-			}
-			else
-			{
-				this['on'+event] = arguments[1];
-			}
-		};
-	}
 	/* --debug-begin-- */
 	$.log('net: ready');
 	/* --debug-end-- */

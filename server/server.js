@@ -4,7 +4,7 @@ var sys = require('sys'),
 	channel = require('./lib/channel'),
 	channels = channel.getList(true);
 
-var server = ws.createServer().addListener('listening', function() {
+var server = ws.createServer().on('listening', function() {
 	sys.log('Listening for connections.');
 });
 
@@ -12,14 +12,14 @@ channels['channel-1'] = channel.create('channel-1', 'channel #1', 4);
 channels['channel-2'] = channel.create('channel-2', 'channel #2', 2);
 
 // Handle WebSocket Requests
-server.addListener('connection', function(conn) {
+server.on('connection', function(conn) {
 	sys.log('<'+conn.id+'> connected');
 	conn.send('response[id]:'+conn.id);
 	
 	var self = player.create(conn, server, channels);
 	
 	
-	conn.addListener('message', function(message) {
+	conn.on('message', function(message) {
 		if( ! player.exists(conn.id))
 		{
 			// ignore message
@@ -31,12 +31,14 @@ server.addListener('connection', function(conn) {
 		{
 			switch(result[1])
 			{
+				/*
 				case 'ping':
 				{
 					conn.send('pong');
 					self.pong();
 					break;
 				}
+				*/
 				case 'get-channels':
 				{
 					conn.send('response[get-channels]:'+JSON.stringify(channel.getList()));
@@ -73,16 +75,16 @@ server.addListener('connection', function(conn) {
 			}
 		}
 	});
-});
-
-server.addListener('error', function() {
-	sys.log(Array.prototype.join.call(arguments, ", "));
-});
-
-server.addListener('disconnected', function(conn) {
-	players.remove(conn.id);
 	
-	sys.log('<'+conn.id+'> disconnected');
+	conn.on('close', function() {
+		player.remove(conn.id);
+		
+		sys.log('<'+conn.id+'> disconnected');
+	});
+});
+
+server.on('error', function() {
+	sys.log(Array.prototype.join.call(arguments, ", "));
 });
 
 server.listen(8000);

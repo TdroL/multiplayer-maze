@@ -25,10 +25,8 @@ function Player(conn, server, channels)
 	this.pid = 0;
 	this.channel = null;
 	
-	var timerID;
-	
 	this.init = function() {
-		this.ping();
+		
 	};
 	
 	this.leave = function() {
@@ -77,25 +75,8 @@ function Player(conn, server, channels)
 		
 		return list;
 	};
-	
-	this.pong = function() {};
-	this.ping = function() {
-		var parent = this;
 		
-		this.pong = function(disable) {
-			clearTimeout(timerID);
-			if(disable) return;
-			
-			timerID = setTimeout(function() {
-				server.emit('disconnected', parent.conn);
-			}, 10000);
-		};
-		
-		this.pong();
-	};
-	
 	this.destruct = function() {
-		clearTimeout(timerID);
 		this.leave();
 	};
 	
