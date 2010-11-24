@@ -49,10 +49,10 @@
 		servers: new function() {
 			var timerID, interval = 2000,
 				$ul,
-				$schema = $('<li data-id="{#id}">'
+				$schema = $('<li data-channel-id="{#id}">'
 							+'<div class="name">{#name}</div>'
 							+'<div class="players">{#players}/{#limit}</div>'
-							+'<a rel="join-channel" data-channel-id="{#id}">Dołącz</a>'
+							+'<a data-channel-id="{#id}">Dołącz</a>'
 							+'</li>');
 			
 			this.update = function(data) {
@@ -65,7 +65,7 @@
 				
 				$ul.find('li').each(function() {
 					var $$ = $(this),
-						id = $$.attr('id').substr(2);
+						id = $$.data('channel-id');
 					
 					if(id in channels)
 					{
@@ -82,10 +82,9 @@
 				$.each(channels, function(i, v) {
 					var $li = $schema.clone();
 					
-					$li.attr('id', '__'+v.id)
-						.find('.name').text(v.name).end()
+					$li.find('.name').text(v.name).end()
 						.find('.players').text(v.players+'/'+v.limit).end()
-						.find('a[rel]').attr('rel', '__'+v.id);
+						.find('a').andSelf().attr('data-channel-id', v.id);
 	
 					$ul.append($li);
 				});
@@ -95,7 +94,7 @@
 				$ul = $ul || $('#servers ul').delegate('a', 'click', function() {
 					var $$ = $(this),
 						player = obj.get('player'),
-						id = $$.attr('rel').substr(2);
+						id = $$.data('channel-id');
 					
 					if(id)
 					{
@@ -169,15 +168,22 @@
 				};
 			
 			this.init = function() {
-				if(! window.debug && ! player.in_channel) // no hacking, please
-				{
-					$('#container').switchTo('servers');
-					return;
-				}
-				
 				var _net = net,
 					_point = obj.get('point'),
 					_player = obj.get('player');
+				
+				/* --debug-begin-- */
+				if( ! window.debug)
+				{
+				/* --debug-end-- */
+					if(! _player.in_channel)
+					{
+						$('#container').switchTo('servers');
+					return;
+					}
+				/* --debug-begin-- */
+				}
+				/* --debug-end-- */
 				
 				canvas = $('#game canvas');
 				
@@ -242,10 +248,12 @@
 		}
 		docready = true;
 		
+		/*
 		$(window).bind('unload', function() {
-			//net.disconnect();
+			net.disconnect();
 			net.removeBind('close');
 		});
+		*/
 		
 		var $container = $('#container'),
 			first = $container.find('#intro'),
@@ -270,8 +278,8 @@
 					}
 				}
 			}
-		}).delegate('a[rel^=switchTo-]', 'click', function() {
-			$container.switchTo($(this).attr('rel').replace(/switchTo-(.+)$/i, '$1'));
+		}).delegate('a[data-switch-to]', 'click', function() {
+			$container.switchTo($(this).data('switch-to'));
 			return false;
 		});
 		
@@ -284,7 +292,7 @@
 		
 		$.each(['1', '2', '3', '4'], function(i, key) {
 			io.bind(key, function() {
-				$container.find('.tab:not(.hide)').find('a[rel]:eq('+i+')').click();
+				$container.find('.tab:not(.hide)').find('a:eq('+i+')').click();
 			});
 		});
 		
