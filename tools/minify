@@ -1,25 +1,132 @@
-#!/bin/bash
+#!/usr/local/bin/node
 
-MYPATH=`dirname $0`
+var fs = require('fs')
+	exec = require('child_process').exec;
 
-FILES="
-$MYPATH/../client/scripts/jquery.plugins.js
-$MYPATH/../client/scripts/base.js
-$MYPATH/../client/scripts/io.js
-$MYPATH/../client/scripts/net.js
-$MYPATH/../client/scripts/ui.js
-$MYPATH/../client/scripts/phy.js
-$MYPATH/../client/scripts/player.js
-$MYPATH/../client/scripts/text.js
-$MYPATH/../client/scripts/client.js"
+String.prototype.repeat = String.prototype.repeat || function(n) {
+	return new Array(n+1).join(this);
+};
 
-TMP=mktemp
-MINIMIZED="$MYPATH/../client/scripts/minimized.js"
+if(process.argv[2] && process.argv[2] != 'debug')
+{
+	console.log('Usage: '+process.argv[1].split('/').pop()+' [debug]');
+	return;
+}
 
-CONTENT=`cat $FILES`
-echo "(function($){$CONTENT})(jQuery);" > $TMP
+var path = process.argv[1].replace(/\/[^\/]+$/i, ''),
+	debug = (process.argv[2] && process.argv[2] == 'debug');
 
-java -jar $MYPATH/compiler.jar --js=$TMP --js_output_file=$MINIMIZED
-rm $TMP
+if(path == process.cwd())
+{
+	path = './';
+}
+else
+{
+	path = path.replace(process.cwd()+'/', '').replace(/\/*$/, '/');
+}
 
-echo "Done!"
+var client = path+'../client/';
+
+fs.readFile(client+'index.html', 'utf-8', function(err, data) {
+	console.log('Reading index.html');
+	
+	if(err)
+	{
+		console.error('Failed');
+		process.exit(1);
+	}
+	
+	data = data.replace(/[\r\n\t]+/g, '');
+	
+	var sliced = data.replace(/.*?<script src="(scripts\/[^"]+)".*?/ig, '$1;')
+						.replace(/;[^;]+$/, '')
+						.split(';');
+	
+	var filtered = ['jquery.min.js', 'minimized.js'].join('|'),
+		scripts = [],
+		concat = '',
+		script, count, status, temp;
+	
+	for(var i = 0; i < sliced.length; i++)
+	{
+		script = sliced[i];
+		
+		if( ! (new RegExp('('+filtered+')$', 'i').test(script)))
+		{
+			scripts.push(script);
+		}
+	}
+	
+	count = scripts.length;
+		
+	console.log('Found '+count+' scripts');
+	console.log();
+	
+	for(var i = 0; i < count; i++)
+	{
+		script = scripts[i];
+		status = script+' '.repeat(40 - script.length);
+		
+		try
+		{
+			data = fs.readFileSync(client+script, 'utf-8');
+			console.log(status+'[ ok ]');
+		}
+		catch(e)
+		{
+			console.error(status+'[fail]');
+			console.error(err.message);
+			process.exit(1);
+		}
+		
+		if( ! debug)
+		{
+			data = data.replace(/\/\* --debug-begin-- \*\/([\s\S]+?)\/\* --debug-end-- \*\//igm, '');
+		}
+		
+		concat += '\n'+data;
+	}
+	
+	if( ! debug)
+	{
+		concat = '(function($, window, document){\n'+
+					concat+'\n'+
+				'})(jQuery, window, window.document);';
+	}
+	
+	temp = path+'/temp-'+(new Date()).getTime();
+	
+	console.log();
+	
+	fs.writeFile(temp, concat, 'utf8', function(err) {
+		if(err)
+		{
+			console.error('Could not create temporary file');
+			console.error(err.message);
+			process.exit(1);
+		}
+		
+		var params = [
+			'-jar '+path+'compiler.jar',
+			'--js='+temp,
+			'--js_output_file='+client+'scripts/minimized.js'
+		];
+		
+		console.log('Minify-ing ('+(debug ? 'debug' : 'release')+')...');
+		
+		exec('java '+params.join(' '), function (error) {
+			fs.unlink(temp);
+			
+			if(error === null)
+			{
+				console.log('Done');
+				process.exit(0);
+			}
+			else
+			{
+				console.log('Closure exited with code: '+error);
+				process.exit(1);
+			}
+		});
+	});
+});
