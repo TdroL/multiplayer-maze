@@ -73,7 +73,9 @@
 				}
 			}
 			
+			/* --debug-start-- */
 			$.log('drawPoints time:', pro.now() - t);
+			/* --debug-end-- */
 		},
 		drawPoint: function(ix, iy, color, num, num_color)
 		{

@@ -69,6 +69,7 @@
 	
 	pro.init();
 	
+	/* --debug-begin-- */
 	$.log('pro: ready');
-	
+	/* --debug-end-- */
 //})(jQuery);
