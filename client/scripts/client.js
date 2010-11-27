@@ -140,14 +140,14 @@
 				
 				net.bind('get-channels', this.update);
 				
-				timerID = window.setInterval(function() {
+				timerID = setInterval(function() {
 					net.send('get-channels', false);
 				}, interval);
 			};
 			
 			this.release = function() {
 				net.removeBind('get-channels');
-				window.clearInterval(timerID);
+				clearInterval(timerID);
 			};
 		},
 		game: new function() {
@@ -227,7 +227,7 @@
 	};
 	
 	// Konami Code!
-	var contra = new Audio('client/audios/contra.ogg'.url());
+	var contra = new Audio(net.url('client/audios/contra.ogg'));
 	io.sequence(['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'enter'], function() {
 		contra.play();
 	});

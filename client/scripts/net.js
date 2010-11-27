@@ -6,6 +6,7 @@
 		_data: {},
 		binds: {},
 		host: ('ws://'+document.location.host+':8000'),
+		base_url: '/multiplayer/',
 		init: function() {
 			var self = this;
 			
@@ -54,7 +55,7 @@
 			ws.on('close', false, function(event) {
 				if('close' in self.binds && 'callback' in self.binds.close)
 				{
-					window.setTimeout(function() {
+					setTimeout(function() {
 						self.binds.close.callback.call(event);
 					}, 100); // call after window.unload
 				}
@@ -186,6 +187,9 @@
 			{
 				delete net.binds[cmd];
 			}
+		},
+		url: function(url) {
+			return net.base_url + url;
 		}
 	};
 	

@@ -250,7 +250,7 @@
 							var timer;
 							
 							return function(key) {
-									window.clearTimeout(timer);
+									clearTimeout(timer);
 									
 									if(v.list[v.index] != key)
 									{
@@ -267,7 +267,7 @@
 										return;
 									}
 									
-									timer = window.setTimeout(function() {
+									timer = setTimeout(function() {
 										release(i, v);
 									}, v.delay);
 							};

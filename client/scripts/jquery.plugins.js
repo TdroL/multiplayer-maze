@@ -75,7 +75,7 @@
 			
 			if(timerID)
 			{
-				window.clearInterval(timerID);
+				clearInterval(timerID);
 				$.removeData(this, 'blink.timerID');
 				timerID = null;
 			}
@@ -100,7 +100,7 @@
 			
 			i = 1;
 			
-			timerID = window.setInterval(function() {
+			timerID = setInterval(function() {
 				if(i < len)
 				{
 					$this.find('span:eq('+i+')').css('visibility', 'visible');

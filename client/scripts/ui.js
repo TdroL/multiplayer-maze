@@ -6,19 +6,23 @@
 			last: 0,
 			current: 0,
 			delta: 0,
-			interval: 1000/50
+			interval: 1000/50,
+			running: false
 		},
 		start: function() {
 			ui.stop();
-			ui.timer.id = window.setInterval(ui.loop, ui.timer.interval);
+			ui.timer.running = true;
+			ui.loop();
+			//ui.timer.id = setInterval(ui.loop, ui.timer.interval);
 		},
 		stop: function() {
-			window.clearInterval(ui.timer.id);
+			clearTimeout(ui.timer.id);
 			ui.timer.id = null;
 			ui.timer.last = 0;
+			ui.timer.running = false;
 		},
 		loop: function() {
-			var timer = ui.timer;
+			var timer = ui.timer, delay;
 			
 			timer.last = timer.last || pro.now();
 			timer.current = pro.now();
@@ -37,6 +41,14 @@
 			obj.runEach('render');
 			
 			timer.last = timer.current;
+			
+			if(ui.timer.running)
+			{
+				delay = ~~(ui.timer.interval - (pro.now() - timer.current));
+				delay = (delay > 1) ? delay : 1;
+				
+				ui.timer.id = setTimeout(ui.loop, delay);
+			}
 		},
 		canvas: function(c) {
 			// source: https://developer.mozilla.org/en/Code_snippets/Canvas
