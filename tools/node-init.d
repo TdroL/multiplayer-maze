@@ -3,7 +3,7 @@
 # Blah, blah from skeleton
 #
 # Install:
-#  - Change $DAEMON_ARGS and $LOGFILE 
+#  - Change $DAEMON_ARGS directory (if needed)
 #  - Copy this file into /etc/init.d/node and chmod 755
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
@@ -12,7 +12,6 @@ DESC="service"
 NAME=node
 DAEMON=/usr/local/bin/$NAME
 DAEMON_ARGS="/home/tdrol/www/multiplayer/server/server.js" # change this!
-LOGFILE=/home/tdrol/www/multiplayer/server/$NAME.log # change this!
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -39,7 +38,7 @@ do_start()
 	start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile --background --exec $DAEMON --test > /dev/null \
 		|| return 1
 	start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile --background --exec $DAEMON -- \
-		$DAEMON_ARGS > $LOGFILE \
+		$DAEMON_ARGS \
 		|| return 2
 	# Add code here, if necessary, that waits for the process to be ready
 	# to handle requests from services started subsequently which depend
@@ -85,6 +84,18 @@ do_reload() {
 	return 0
 }
 
+get_status() {
+   ret=1
+   if [ -r $PIDFILE ] ; then
+      pid=`cat $PIDFILE`
+      if [ -e /proc/$pid ] ; then
+         procname=`/bin/ps h -p $pid -C bind`
+         [ -n "$procname" ] && ret=0
+      fi
+   fi
+   return $ret
+}
+
 case "$1" in
   start)
 	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
@@ -102,6 +113,15 @@ case "$1" in
 		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
 	esac
 	;;
+  status)
+  	echo "Status of $DESC: $NAME."
+  	if get_status ; then
+  		echo "Running."
+  	else
+  		echo "Not running."
+  	exit 1
+  	fi
+  	;;
   #reload|force-reload)
 	#
 	# If do_reload() is not implemented then leave this commented out

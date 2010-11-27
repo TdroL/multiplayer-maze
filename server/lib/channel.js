@@ -1,4 +1,4 @@
-var sys = require('sys'),
+var log = require('./log'),
 	channels = {};
 
 module.exports = {
@@ -46,7 +46,7 @@ function Channel(id, name, limit)
 	}
 	
 	this.add = function(player) {
-		sys.log('<'+player.id+'> entered channel <'+this.name+'>');
+		log.info('<'+player.id+'> entered channel <'+this.name+'>');
 		
 		this.broadcast('joined:'+player.id);
 		
@@ -58,7 +58,7 @@ function Channel(id, name, limit)
 	this.remove = function(player, send) {
 		if(player.id in this.players)
 		{
-			sys.log('<'+player.id+'> left channel <'+this.name+'>');
+			log.info('<'+player.id+'> left channel <'+this.name+'>');
 			send && player.send('channel-disconnected:'+id);
 			
 			player.channel = null;

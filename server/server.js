@@ -2,10 +2,14 @@ var sys = require('sys'),
 	ws = require('./websocket/lib/ws/server'),
 	player = require('./lib/player'),
 	channel = require('./lib/channel'),
+	log = require('./lib/log'),
 	channels = channel.getList(true);
 
+log.info(null, '--------------------------------------------------------');
+log.info('Starting server');
+
 var server = ws.createServer().on('listening', function() {
-	sys.log('Listening for connections.');
+	log.info('Listening for connections.');
 });
 
 channels['channel-1'] = channel.create('channel-1', 'channel #1', 4);
@@ -13,7 +17,7 @@ channels['channel-2'] = channel.create('channel-2', 'channel #2', 2);
 
 // Handle WebSocket Requests
 server.on('connection', function(conn) {
-	sys.log('<'+conn.id+'> connected');
+	log.info('<'+conn.id+'> connected');
 	conn.send('response[id]:'+conn.id);
 	
 	var self = player.create(conn, server, channels);
@@ -79,12 +83,12 @@ server.on('connection', function(conn) {
 	conn.on('close', function() {
 		player.remove(conn.id);
 		
-		sys.log('<'+conn.id+'> disconnected');
+		log.info('<'+conn.id+'> disconnected');
 	});
 });
 
 server.on('error', function() {
-	sys.log(Array.prototype.join.call(arguments, ", "));
+	log.info(Array.prototype.join.call(arguments, ', '));
 });
 
 server.listen(8000);

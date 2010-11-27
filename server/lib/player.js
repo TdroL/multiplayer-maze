@@ -1,5 +1,4 @@
-var sys = require('sys'),
-	players = {};
+var players = {};
 
 module.exports = {
 	create: function(conn, server, channels) {
