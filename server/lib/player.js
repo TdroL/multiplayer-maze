@@ -1,7 +1,7 @@
 var sys = require('sys'),
 	players = {};
 
-exports = {
+module.exports = {
 	create: function(conn, server, channels) {
 		this.remove(conn.id);
 		players[conn.id] = new Player(conn, server, channels);

@@ -1,7 +1,7 @@
 var sys = require('sys'),
 	channels = {};
 
-exports = {
+module.exports = {
 	getList: function(raw) {
 		if(raw)
 		{
