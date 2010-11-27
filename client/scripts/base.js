@@ -23,7 +23,11 @@ var pro, config, io, net, ui, phy, state, obj;
 	/* --debug-end-- */
 	
 	config = {
+		/*
+		 * See String.prototype below
+		 * --
 		base_url: '/multiplayer/',
+		*/
 		runTest: function() {
 			return ('WebSocket' in window) && ( !! document.createElement('canvas').getContext);
 		}
@@ -42,10 +46,14 @@ var pro, config, io, net, ui, phy, state, obj;
 		return this;
 	};
 	
-	String.prototype.url = function() {
+	/*
+	 * Firebug 1.7a / Firefox 4 issue - http://code.google.com/p/fbug/issues/detail?id=3632
+	 * Use net.url()
+	 * --
+	String.prototype.url = String.prototype.url || function() {
 		return config.base_url + this;
 	};
-	
+	*/
 	
 	Math.sgn = Math.sgn || function(x) {
 		if(x < 0) return -1;
