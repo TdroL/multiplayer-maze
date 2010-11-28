@@ -164,6 +164,7 @@ a:hover {
 
 /* style ogólne */
 .popup.hide,
-.tab.hide {
+.tab.hide,
+#game.hide {
 	display: none;
 }
