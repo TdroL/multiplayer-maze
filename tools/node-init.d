@@ -11,7 +11,7 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="service"
 NAME=node
 DAEMON=/usr/local/bin/$NAME
-DAEMON_ARGS="/home/tdrol/www/multiplayer/server/server.js" # change this!
+DAEMON_ARGS="/home/tdrol/www/projects/multiplayer/server/server.js" # change this!
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -114,11 +114,11 @@ case "$1" in
 	esac
 	;;
   status)
-  	echo "Status of $DESC: $NAME."
+  	echo -n "Status of $DESC: $NAME - "
   	if get_status ; then
-  		echo "Running."
+  		echo "running."
   	else
-  		echo "Not running."
+  		echo "not running."
   	exit 1
   	fi
   	;;
