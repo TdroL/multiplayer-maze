@@ -23,8 +23,7 @@
 					});
 			},
 			switchIn: function($siblings, $tab) {
-				var settings = this,
-					callback = false;
+				var settings = this;
 				
 				$tab.stop()
 					.removeClass('hide')
@@ -51,7 +50,7 @@
 	$.fn.switchTo = function(tab) {
 		return this.each(function() {
 			var $this = $(this),
-				$tab = ($.type(tab) == 'string') ? $(this).find('#'+tab) : tab;
+				$tab = ($.type(tab) == 'string') ? $this.find('#'+tab) : tab;
 			
 			if( ! ($tab.length && 'jquery' in $tab && $tab.is('.tab')))
 			{

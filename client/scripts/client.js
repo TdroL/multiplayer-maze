@@ -8,7 +8,7 @@
 				
 				$div.filter('.testing').hide();
 				
-				if(config.runTest())
+				if(this.test())
 				{
 					$div.hide();
 					$div.filter('.ready').show();
@@ -19,6 +19,10 @@
 					$div.filter('.fail').show();
 				}
 			};
+			
+			this.test = function() {
+				return ('WebSocket' in window) && ( !! document.createElement('canvas').getContext);
+			}
 		},
 		connect: new function() {
 			var i = 0, interval = 400,
@@ -256,7 +260,7 @@
 		*/
 		
 		var $container = $('#container'),
-			first = $container.find('#intro'),
+			first = $container.find(':first'),
 			hash = window.location.hash;
 		
 		$container.switchInit({

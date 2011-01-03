@@ -35,14 +35,6 @@ server.on('connection', function(conn) {
 		{
 			switch(result[1])
 			{
-				/*
-				case 'ping':
-				{
-					conn.send('pong');
-					self.pong();
-					break;
-				}
-				*/
 				case 'get-channels':
 				{
 					conn.send('response[get-channels]:'+JSON.stringify(channel.getList()));

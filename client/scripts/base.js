@@ -1,4 +1,4 @@
-var pro, config, io, net, ui, phy, state, obj;
+var pro, io, net, ui, phy, state, obj;
 
 //(function($) {
 	if( ! console)
@@ -21,17 +21,6 @@ var pro, config, io, net, ui, phy, state, obj;
 		throw Array.prototype.join.call(arguments, '');
 	};
 	/* --debug-end-- */
-	
-	config = {
-		/*
-		 * See String.prototype below
-		 * --
-		base_url: '/multiplayer/',
-		*/
-		runTest: function() {
-			return ('WebSocket' in window) && ( !! document.createElement('canvas').getContext);
-		}
-	};
 	
 	Array.prototype.empty = Array.prototype.empty || function() {
 		this.splice(0, this.length);
