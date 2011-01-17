@@ -3,7 +3,13 @@
 <head>
 	<meta charset="utf-8">
 	<title>Client</title>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	
+	
+	
+	<link href="http://fonts.googleapis.com/css?family=Cuprum&amp;subset=latin" rel="stylesheet" />
+	<link href="style.css" rel="stylesheet" />
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script>!window.jQuery && document.write(unescape('%3Cscript src="scripts/jquery.min.js"%3E%3C/script%3E'))</script>
 	<script src="scripts/jquery.plugins.js"></script>
 	<script src="scripts/base.js"></script>
@@ -18,7 +24,6 @@
 	<script src="scripts/obj/point.js"></script>
 	<script src="scripts/obj/text.js"></script>
 	<script src="scripts/client.js"></script>
-	<link href="style.css" rel="stylesheet" />
 </head>
 <body>
 	<div id="container">
@@ -39,7 +44,7 @@
 				<h3>Wystąpił błąd</h3>
 				
 				<p>Twoja przeglądarka nie spełnia wymagań: obsługa znacznika <code>&lt;canvas&gt;</code>, protokołu <code>WebSocket</code>.</p>
-				<p>Zalecane przeglądarki: Firefox 4, Safari 5, Chrome 7, Opera 11, Internet Explorer 12*.</p>
+				<p>Zalecane przeglądarki: Firefox 4, Safari 5, Chrome 8, Opera 11, Internet Explorer 12*.</p>
 				<p><small>* W przypadku IE potrzebna może być jeszcze nowsza wersja.</small></p>
 			</div>
 		</section>
@@ -56,10 +61,7 @@
 			<p><a data-switch-to="game">Next</a></p>
 		</section>
 		<section class="tab hide" id="game">
-			<canvas class="maze"></canvas>
-			<canvas class="points"></canvas>
-			<canvas class="players"></canvas>
-			<canvas class="text"></canvas>
+			<canvas class="screen" width="800" height="480"></canvas>
 			<div class="info"></div>
 		</section>
 		<section class="tab hide" id="poll">
@@ -78,7 +80,7 @@
 		</div>
 	</div>
 	<!--
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 	<script src="scripts/minimized.js"></script>
 	-->
 </body>

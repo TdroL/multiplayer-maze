@@ -28,16 +28,16 @@ module.exports = {
 	bold: {}
 };
 
-for(var i in colors)
+for (var i in colors)
 {
-	if( ! (colors.hasOwnProperty(i) && typeof colors[i] === 'string'))
+	if ( ! (colors.hasOwnProperty(i) && typeof colors[i] === 'string'))
 	{
 		continue;
 	}
 	
 	module.exports[i] = (function(color) {
 		return function(msg) {
-			if( ! msg)
+			if ( ! msg)
 			{
 				return colors.reset;
 			}
@@ -46,16 +46,16 @@ for(var i in colors)
 	})(colors[i]);
 }
 
-for(var i in colors.bold)
+for (var i in colors.bold)
 {
-	if( ! (colors.bold.hasOwnProperty(i) && typeof colors.bold[i] === 'string'))
+	if ( ! (colors.bold.hasOwnProperty(i) && typeof colors.bold[i] === 'string'))
 	{
 		continue;
 	}
 	
 	module.exports.bold[i] = (function(color) {
 		return function(msg) {
-			if( ! msg)
+			if ( ! msg)
 			{
 				return colors.reset;
 			}

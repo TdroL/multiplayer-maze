@@ -1,6 +1,10 @@
 //(function($) {
 	
 	pro = { // profiler
+		now: function() {
+			return (new Date()).getTime();
+		},
+		/* --debug-begin-- */
 		groups: {},
 		stats: {
 			time: 0,
@@ -8,9 +12,6 @@
 		},
 		init: function() {
 			pro.stats.groups = pro.groups;
-		},
-		now: function() {
-			return (new Date()).getTime();
 		},
 		start: function(name) {
 			var group = pro.get(name);
@@ -26,11 +27,11 @@
 			
 			stats.time = 0;
 			
-			for(var i in pro.groups)
+			for (var i in pro.groups)
 			{
 				group = pro.groups[i];
 				
-				if(group.end && group.start)
+				if (group.end && group.start)
 				{
 					group.time = group.end - group.start;
 					group.sum += group.time;
@@ -42,9 +43,9 @@
 				}
 			}
 			
-			if(pro.stats.time)
+			if (pro.stats.time)
 			{
-				for(var i in pro.groups)
+				for (var i in pro.groups)
 				{
 					group = pro.groups[i];
 					group.part = group.time/stats.time;
@@ -65,9 +66,12 @@
 			
 			return pro.groups[name];
 		}
+		/* --debug-end-- */
 	};
 	
+	/* --debug-begin-- */
 	pro.init();
+	/* --debug-end-- */
 	
 	/* --debug-begin-- */
 	$.log('pro: ready');

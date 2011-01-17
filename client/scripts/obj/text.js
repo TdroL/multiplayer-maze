@@ -6,7 +6,7 @@
 		fps: 0,
 		dt: 0,
 		init: function(settings) {
-			this.$$ = $('#game canvas.text');
+			this.$$ = $('#game canvas.screen').clone(); //$('#game canvas.text');
 			this.canvas = ui.canvas(this.$$);
 			this.settings = settings;
 			
@@ -27,7 +27,7 @@
 			/* --debug-start-- */
 			pro.start('render-text');
 			/* --debug-end-- */
-			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
+			c.clearRect();
 			c.font(ui.font);
 			c.fillStyle('#000');
 			c.fillText('fps: '+this.fps, settings.margin, 13);
@@ -42,7 +42,7 @@
 			c.fillText('Overall time:', 500, h);
 			c.fillText(stats.time, 580, h);
 			
-			for(var i in stats.groups)
+			for (var i in stats.groups)
 			{
 				h += 15;
 				c.fillText(i+':', 500, h);

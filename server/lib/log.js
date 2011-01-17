@@ -6,7 +6,7 @@ var log = {
 	write_to_file: true,
 	log_file: process.argv[1].replace(/\/[^\/]+$/i, '')+'/node.log',
 	info: function() {
-		if( ! arguments.length)
+		if ( ! arguments.length)
 		{
 			return false;
 		}
@@ -15,7 +15,7 @@ var log = {
 			cons_msg = msg,
 			file_msg = msg+'\r\n';
 		
-		if(arguments[0] !== null)
+		if (arguments[0] !== null)
 		{
 			cons_msg = color.cyan(timestamp())+' - '+cons_msg;
 			file_msg = timestamp()+' - '+file_msg;
@@ -28,7 +28,7 @@ var log = {
 		return true;
 	},
 	error: function() {
-		if( ! arguments.length)
+		if ( ! arguments.length)
 		{
 			return false;
 		}
@@ -37,7 +37,7 @@ var log = {
 			cons_msg = msg,
 			file_msg = msg+'\r\n';
 		
-		if(arguments[0] !== null)
+		if (arguments[0] !== null)
 		{
 			cons_msg = color.red(timestamp())+' - '+color.red('ERROR:')+' '+cons_msg;
 			file_msg = timestamp()+' - ERROR: '+file_msg+'\r\n';
@@ -59,7 +59,7 @@ var log = {
 module.exports = log;
 
 function append_to_file(msg) {
-	if(log.write_to_file)
+	if (log.write_to_file)
 	{
 		var fd = fs.openSync(log.log_file, 'a+');
 		fs.writeSync(fd, msg, null);

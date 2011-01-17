@@ -5,7 +5,7 @@
 		settings: {},
 		data: [],
 		init: function(settings) {
-			this.$$ = $('#game canvas.maze');
+			this.$$ = $('#game canvas.screen').clone(); //$('#game canvas.maze');
 			this.canvas = ui.canvas(this.$$);
 			this.settings = settings;
 			
@@ -34,14 +34,14 @@
 				
 				self.data.empty().merge(response.data);
 				
-				for(var i = 0; i < settings.rows; i++)
+				for (var i = 0; i < settings.rows; i++)
 				{
-					if($.type(data[i]) !== 'array') data[i] = [];
+					if ($.type(data[i]) !== 'array') data[i] = [];
 					
-					for(var j = 0; j < settings.cols; j++)
+					for (var j = 0; j < settings.cols; j++)
 					{
 						current = data[i][j];
-						if(current[2])
+						if (current[2])
 						{
 							point = current[2];
 							
@@ -87,7 +87,7 @@
 				d = settings.block,
 				px, py, cell, pp;
 			
-			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
+			c.clearRect();
 			// clear and draw border
 			c.strokeStyle('#000');
 			c.fillStyle('#fff');
@@ -95,9 +95,9 @@
 			c.fillRect(dx, dy, settings.width, settings.height);
 			c.beginPath();
 			
-			for(var i = 0; i < settings.rows; i++)
+			for (var i = 0; i < settings.rows; i++)
 			{
-				for(var j = 0; j < settings.cols; j++)
+				for (var j = 0; j < settings.cols; j++)
 				{
 					cell = data[i][j];
 					
@@ -111,9 +111,9 @@
 						{x: px,     y: py + d}
 					];
 					
-					for(var x = 0; x < 4; x++)
+					for (var x = 0; x < 4; x++)
 					{
-						if(cell[x])
+						if (cell[x])
 						{
 							c.moveTo(pp[x].x, pp[x].y);
 							c.lineTo(pp[((x < 3) ? (x+1) : 0)].x, pp[((x < 3) ? (x+1) : 0)].y);

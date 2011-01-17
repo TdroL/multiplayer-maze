@@ -3,7 +3,7 @@ var log = require('./log'),
 
 module.exports = {
 	getList: function(raw) {
-		if(raw)
+		if (raw)
 		{
 			return channels;
 		}
@@ -11,7 +11,7 @@ module.exports = {
 		var list = [],
 			channel;
 		
-		for(var id in channels)
+		for (var id in channels)
 		{
 			channel = channels[id];
 			list.push({
@@ -40,7 +40,7 @@ function Channel(id, name, limit)
 	this.pids = [];
 	
 	// generate pids
-	for(var i = 0; i < this.limit; i++)
+	for (var i = 0; i < this.limit; i++)
 	{
 		this.pids[i] = i+1;
 	}
@@ -56,7 +56,7 @@ function Channel(id, name, limit)
 	};
 	
 	this.remove = function(player, send) {
-		if(player.id in this.players)
+		if (player.id in this.players)
 		{
 			log.info('<'+player.id+'> left channel <'+this.name+'>');
 			send && player.send('channel-disconnected:'+id);
@@ -74,7 +74,7 @@ function Channel(id, name, limit)
 	};
 	
 	this.releasePid = function(pid) {
-		if(pid > 0 && pid <= this.limit)
+		if (pid > 0 && pid <= this.limit)
 		{
 			this.pids.push(pid);
 			this.pids.sort();
@@ -83,9 +83,9 @@ function Channel(id, name, limit)
 	};
 	
 	this.broadcast = function(message, not) {
-		for(var id in this.players)
+		for (var id in this.players)
 		{
-			if(not !== id)
+			if (not !== id)
 			{
 				this.players[id].send(message);
 			}
@@ -98,7 +98,7 @@ function Channel(id, name, limit)
 	
 	this.destruct = function() {
 		this.status = -1;
-		for(var id in this.players)
+		for (var id in this.players)
 		{
 			this.remove(this.players[id], true);
 		}

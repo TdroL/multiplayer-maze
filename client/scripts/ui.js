@@ -1,6 +1,8 @@
 //(function($) {
 	ui = {
-		font: '11px "Trebutchet MS", Tahoma',
+		font: '11px "Trebuchet MS", Helvetica, Jamrul, sans-serif',
+		screen: null,
+		sizes: { width: 0, height: 0 },
 		timer: {
 			id: null,
 			last: 0,
@@ -10,6 +12,11 @@
 			running: false
 		},
 		start: function() {
+			if ( ! ui.screen)
+			{
+				ui.screen = ui.canvas($('#game canvas.screen'));
+			}
+			
 			ui.stop();
 			ui.timer.running = true;
 			ui.loop();
@@ -40,9 +47,24 @@
 			
 			obj.runEach('render');
 			
+			/* --debug-start-- */
+			pro.start('render-blit');
+			/* --debug-end-- */
+			
+			ui.screen.clearRect();
+			
+			ui.screen.drawImage(obj.get('maze').canvas.c, 0, 0);
+			ui.screen.drawImage(obj.get('point').canvas.c, 0, 0);
+			ui.screen.drawImage(obj.get('player').canvas.c, 0, 0);
+			ui.screen.drawImage(obj.get('text').canvas.c, 0, 0);
+			
+			/* --debug-start-- */
+			pro.end('render-blit');
+			/* --debug-end-- */
+			
 			timer.last = timer.current;
 			
-			if(ui.timer.running)
+			if (ui.timer.running)
 			{
 				delay = ~~(ui.timer.interval - (pro.now() - timer.current));
 				delay = (delay > 1) ? delay : 1;
@@ -52,12 +74,12 @@
 		},
 		canvas: function(c) {
 			// source: https://developer.mozilla.org/en/Code_snippets/Canvas
-			if(c && 'jquery' in c)
+			if (c && 'jquery' in c)
 			{
 				c = c.get(0);
 			}
 			
-			if( ! c)
+			if ( ! c)
 			{
 				$.error('ui.canvas - ', 'empty object', c);
 			}
@@ -76,22 +98,33 @@
 				};
 			})(c);
 			
-			if( ! ui.canvas.prototype.arc)
+			if ( ! ui.canvas.prototype.arc)
 			{
-				var methods = ['arc','arcTo','beginPath','bezierCurveTo','clearRect','clip','closePath','drawFocusRing','drawImage','fill','fillRect','fillText','lineTo','moveTo','putImageData','quadraticCurveTo','rect','restore','rotate','save','scale','setTransform','stroke','strokeRect','strokeText','transform','translate'];
+				var methods = ['arc','arcTo','beginPath','bezierCurveTo',/*'clearRect',*/'clip','closePath','drawFocusRing','drawImage','fill','fillRect','fillText','lineTo','moveTo','putImageData','quadraticCurveTo','rect','restore','rotate','save','scale','setTransform','stroke','strokeRect','strokeText','transform','translate'];
 				
-				for(var i = 0; i < methods.length; i++)
+				ui.canvas.prototype.clearRect = function() {
+					if (arguments.length)
+					{
+						this.context.clearRect.apply(this.context, arguments);
+					}
+					else if(this.c.width && this.c.height)
+					{
+						this.context.clearRect(0, 0, this.c.width, this.c.height);
+					}
+					return this;
+				};
+				
+				for (var i = 0; i < methods.length; i++)
 				{
 					var m = methods[i];
 					ui.canvas.prototype[m] = (function (m) {
 						return function () {
 							/* --debug-begin-- */
-							if(window.debug)
+							if (window.debug)
 							{
 								try
 								{
 									this.context[m].apply(this.context, arguments);
-									
 								}
 								catch(e)
 								{
@@ -110,13 +143,13 @@
 				
 				methods = ['createImageData','createLinearGradient','createRadialGradient','createPattern','getImageData','isPointInPath','measureText'];
 				
-				for(var i = 0; i < methods.length; i++)
+				for (var i = 0; i < methods.length; i++)
 				{
 					var m = methods[i];
 					ui.canvas.prototype[m] = (function (m) {
 						return function () {
 							/* --debug-begin-- */
-							if(window.debug)
+							if (window.debug)
 							{
 								try
 								{
@@ -137,15 +170,15 @@
 				
 				var props = ['canvas','fillStyle','font','globalAlpha','globalCompositeOperation','lineCap','lineJoin','lineWidth','miterLimit','shadowOffsetX','shadowOffsetY','shadowBlur','shadowColor','strokeStyle','textAlign','textBaseline'];
 				
-				for(var i = 0; i < props.length; i++)
+				for (var i = 0; i < props.length; i++)
 				{
 					var p = props[i];
 					ui.canvas.prototype[p] = (function (p) {
 						return function (value) {
 							/* --debug-begin-- */
-							if(window.debug)
+							if (window.debug)
 							{
-								if( ! (p in this.context))
+								if ( ! (p in this.context))
 								{
 									$.log(p+': unknown property');
 								}

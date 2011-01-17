@@ -8,7 +8,7 @@
 				
 				$div.filter('.testing').hide();
 				
-				if(this.test())
+				if (this.test())
 				{
 					$div.hide();
 					$div.filter('.ready').show();
@@ -71,7 +71,7 @@
 					var $$ = $(this),
 						id = $$.data('channel-id');
 					
-					if(id in channels)
+					if (id in channels)
 					{
 						$$.find('.name').text(channels[id].name);
 						$$.find('.players').text(channels[id].players+'/'+channels[id].limit);
@@ -100,38 +100,40 @@
 						player = obj.get('player'),
 						id = $$.data('channel-id');
 					
-					if(id)
+					if ( ! id)
 					{
-						net.bind('join-channel:'+id, true, function(data) {
-							data = JSON.parse(data);
-							
-							var status = parseInt(data[0], 10),
-								pid = data[1] ? parseInt(data[1], 10) : null;
-								
-							switch(status)
-							{
-								case 1:
-								{
-									player.in_channel = true;
-									player.pid = pid;
-									$('#container').switchTo('game');
-									break;
-								}
-								case -2:
-								{
-									ui.info('Brak wolnych miejsc', {'Ok': null});
-									break;
-								}
-								case -1:
-								{
-									ui.error('Taki kanał nie istnieje', {'Ok': null});
-									break;
-								}
-							}
-						});
+						return false;
 					}
 					
-					return false;
+					net.bind('join-channel:'+id, true, function(data) {
+						data = JSON.parse(data);
+						
+						var status = parseInt(data[0], 10),
+							pid = data[1] ? parseInt(data[1], 10) : null;
+							
+						switch(status)
+						{
+							case 1:
+							{
+								player.in_channel = true;
+								player.pid = pid;
+								$('#container').switchTo('limbo');
+								break;
+							}
+							case -2:
+							{
+								ui.info('Brak wolnych miejsc', {'Ok': null});
+								break;
+							}
+							case -1:
+							{
+								ui.error('Taki kanał nie istnieje', {'Ok': null});
+								break;
+							}
+						}
+					});
+					
+					return true;
 				});
 				
 				net.bind('close', true, false, function() {
@@ -153,6 +155,12 @@
 				net.removeBind('get-channels');
 				clearInterval(timerID);
 			};
+		},
+		limbo : new function() {
+			
+			this.init = function() {};
+			
+			this.release = function() {};
 		},
 		game: new function() {
 			var canvas,
@@ -177,10 +185,10 @@
 					_player = obj.get('player');
 				
 				/* --debug-begin-- */
-				if( ! window.debug)
+				if ( ! window.debug)
 				{
 				/* --debug-end-- */
-					if(! _player.in_channel)
+					if ( ! _player.in_channel)
 					{
 						$('#container').switchTo('servers');
 					return;
@@ -194,7 +202,7 @@
 				net.action('update', function(data) {
 					data = JSON.parse(data);			
 					
-					if(data.id && data.id !== _net.id)
+					if (data.id && data.id !== _net.id)
 					{
 						_player.opponents[data.id] = _player.opponents[data.id] || {x: 15, y: 15};
 						_player.opponents[data.id].pid = data.pid;
@@ -208,7 +216,7 @@
 				});
 				
 				net.action('quit', function(id) {
-					if(id in _player.opponents)
+					if (id in _player.opponents)
 					{
 						delete _player.opponents[id];
 					}
@@ -243,7 +251,7 @@
 	var docready = false;
 	// main
 	$(function() {
-		if(docready)
+		if (docready)
 		{
 			/* --debug-begin-- */
 			$.log('warning: double DOM load');
@@ -268,7 +276,7 @@
 				switchOut: function() {
 					var id = this.id;
 					
-					if(id in state && state[id].release)
+					if (id in state && state[id].release)
 					{
 						state[id].release();
 					}
@@ -276,7 +284,7 @@
 				switchIn: function() {
 					var id = this.id;
 					
-					if(id in state && state[id].init)
+					if (id in state && state[id].init)
 					{
 						state[id].init();
 					}
@@ -287,7 +295,7 @@
 			return false;
 		});
 		
-		if(hash.length)
+		if (hash.length)
 		{
 			first =  $container.find(hash+'.tab');
 		}

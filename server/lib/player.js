@@ -7,7 +7,7 @@ module.exports = {
 		return players[conn.id];
 	},
 	remove: function(id) {
-		if(this.exists(id))
+		if (this.exists(id))
 		{
 			players[id].destruct();
 			delete players[id];
@@ -29,7 +29,7 @@ function Player(conn, server, channels)
 	};
 	
 	this.leave = function() {
-		if(this.channel)
+		if (this.channel)
 		{
 			this.pid = this.channel.releasePid(this.pid);
 			this.channel.remove(this);
@@ -38,13 +38,13 @@ function Player(conn, server, channels)
 	
 	this.join = function(id) {
 		var channel;
-		if(id in channels)
+		if (id in channels)
 		{
 			channel = channels[id];
 			
 			this.leave();
 			
-			if(channel.isAvaible())
+			if (channel.isAvaible())
 			{
 				channel.add(this);
 				this.pid = channel.getPid();
@@ -61,7 +61,7 @@ function Player(conn, server, channels)
 	
 	this.getChannels = function() {
 		var list = [], channel;
-		for(var id in channels)
+		for (var id in channels)
 		{
 			channel = channels[id];
 			list.push({

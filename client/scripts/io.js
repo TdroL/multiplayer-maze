@@ -12,7 +12,7 @@
 			$(window).keydown(function(event) {
 				var code = event.which;
 				
-				if(code in io.key && ! io.key[code].pressed)
+				if (code in io.key && ! io.key[code].pressed)
 				{
 					io.key[code].pressed = true;
 					
@@ -22,14 +22,14 @@
 			}).keypress(function(event) {
 				var code = event.which;
 				
-				if(code in io.key)
+				if (code in io.key)
 				{
 					io._runBind(event, 'press', code);
 				}
 			}).keyup(function(event) {
 				var code = event.which;
 				
-				if(code in io.key && io.key[code].pressed)
+				if (code in io.key && io.key[code].pressed)
 				{
 					io.key[code].pressed = false;
 					
@@ -50,11 +50,11 @@
 		pressed: function(keys) {
 			/*
 			 * Usage:
-			 * if(io.pressed('up', 'down')) - if UP and DOWN keys are pressed
+			 * if (io.pressed('up', 'down')) - if UP and DOWN keys are pressed
 			 */
-			for(var i = 0; i < arguments.length; i++)
+			for (var i = 0; i < arguments.length; i++)
 			{
-				if( ! io.key[arguments[i]] || ! io.key[arguments[i]].pressed)
+				if ( ! io.key[arguments[i]] || ! io.key[arguments[i]].pressed)
 				{
 					return false;
 				}
@@ -63,24 +63,24 @@
 			return true;
 		},
 		bind: function(keys, callbacks) {
-			if( ! $.isArray(keys))
+			if ( ! $.isArray(keys))
 			{
 				keys = keys ? [keys] : [];
 			}
 			
-			if($.isFunction(callbacks))
+			if ($.isFunction(callbacks))
 			{
 				callbacks = { press: callbacks };
 			}
 			
-			if( ! keys.length)
+			if ( ! keys.length)
 			{
 				$.error('io.bind - ', 'No keys to map');
 			}
 			
 			var list = io._parseKeys(keys);
 			
-			if( ! list.length)
+			if ( ! list.length)
 			{
 				$.error('io.bind - ', 'No valid keys to map');
 			}
@@ -89,7 +89,7 @@
 			
 			var id = list.join(',');
 			
-			if(id in io.binds)
+			if (id in io.binds)
 			{
 				delete io.binds[id];
 			}
@@ -108,11 +108,11 @@
 			});
 		},
 		sequence: function(keys, fn, delay) {
-			if( ! ($.isArray(keys) && keys.length))
+			if ( ! ($.isArray(keys) && keys.length))
 			{
 				$.error('io.sequence - ', 'first param is not an array or is empty', keys);
 			}
-			if( ! $.isFunction(fn))
+			if ( ! $.isFunction(fn))
 			{
 				$.error('io.sequence - ', 'second param is not a function', fn);
 			}
@@ -123,7 +123,7 @@
 				v = list[0],
 				id = list.join(',');
 			
-			if(id in io.sequences)
+			if (id in io.sequences)
 			{
 				delete io.sequences[id];
 				delete io.sequences_cache[v][id];
@@ -141,19 +141,19 @@
 			io.sequences_cache[v][id] = io.sequences[id];
 		},
 		removeBind: function(keys) {
-			if( ! $.isArray(keys))
+			if ( ! $.isArray(keys))
 			{
 				keys = keys ? [keys] : [];
 			}
 			
-			if( ! keys.length)
+			if ( ! keys.length)
 			{
 				return false;
 			}
 			
 			var list = io._parseKeys(keys);
 			
-			if( ! list.length)
+			if ( ! list.length)
 			{
 				return false;
 			}
@@ -162,7 +162,7 @@
 			
 			var id = list.join(',');
 			
-			if(id in io.binds)
+			if (id in io.binds)
 			{
 				delete io.binds[id];
 			}
@@ -175,14 +175,14 @@
 		_runBind: function(event, method, key) {
 			event.preventDefault = event.preventDefault || $.noop;
 			
-			if(key in io.binds_cache)
+			if (key in io.binds_cache)
 			{
 				switch(method)
 				{
 					case 'down':
 					{
 						$.each(io.binds_cache[key], function(i, v) {
-							if(io.pressed.apply(io, v.list) && $.isFunction(v.down))
+							if (io.pressed.apply(io, v.list) && $.isFunction(v.down))
 							{
 								event.preventDefault();
 								v.status = true;
@@ -195,16 +195,16 @@
 					{
 						/*
 						$.each(io.binds_cache[key], function(i, v) {
-							if(io.pressed.apply(io, v.list) && $.isFunction(v.press))
+							if (io.pressed.apply(io, v.list) && $.isFunction(v.press))
 							{
 								event.preventDefault();
 								v.press();
 							}
 						});*/
-						for(var i in io.binds_cache[key])
+						for (var i in io.binds_cache[key])
 						{
 							var v = io.binds_cache[key][i];
-							if(io.pressed.apply(io, v.list) && $.isFunction(v.press))
+							if (io.pressed.apply(io, v.list) && $.isFunction(v.press))
 							{
 								event.preventDefault();
 								v.press();
@@ -215,7 +215,7 @@
 					case 'up':
 					{
 						$.each(io.binds_cache[key], function(i, v) {
-							if(v.status && $.isFunction(v.up))
+							if (v.status && $.isFunction(v.up))
 							{
 								event.preventDefault();
 								v.up();
@@ -234,7 +234,7 @@
 				v(key);
 			});
 			
-			if(key in io.sequences_cache)
+			if (key in io.sequences_cache)
 			{
 				function release(i, v) {
 					v.index = 0;
@@ -242,7 +242,7 @@
 				};
 				
 				$.each(io.sequences_cache[key], function(i, v) {
-					if( ! (i in io.sequences_active))
+					if ( ! (i in io.sequences_active))
 					{
 						v.index = 1; // skip first key - it's valid
 						
@@ -252,7 +252,7 @@
 							return function(key) {
 									clearTimeout(timer);
 									
-									if(v.list[v.index] != key)
+									if (v.list[v.index] != key)
 									{
 										release(i, v);
 										return;
@@ -260,7 +260,7 @@
 									
 									v.index++;
 									
-									if(v.index == v.list.length)
+									if (v.index == v.list.length)
 									{
 										v.fn();
 										release(i, v);
@@ -281,7 +281,7 @@
 		_parseKeys: function(keys) {
 			var list = [];
 			$.each(keys, function(i, k) {
-				if(k in io.key)
+				if (k in io.key)
 				{
 					list.push(parseInt(io.key[k].code, 10));
 					return;

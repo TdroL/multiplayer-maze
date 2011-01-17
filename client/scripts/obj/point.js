@@ -7,7 +7,7 @@
 		colors: ['#e5e5e5', '#3953A4', '#E52225', '#F6EB14', '#60BB46'],
 		queue: [],
 		init: function(settings) {
-			this.$$ = $('#game canvas.points');
+			this.$$ = $('#game canvas.screen').clone(); //$('#game canvas.points');
 			this.canvas = ui.canvas(this.$$);
 			this.settings = settings;
 			
@@ -21,7 +21,7 @@
 			/* --debug-start-- */
 			pro.start('update-point');
 			/* --debug-end-- */
-			while(this.queue.length > 0)
+			while (this.queue.length > 0)
 			{
 				q = this.queue.shift();
 				this.clearPoint(q[0], q[1]);
@@ -34,23 +34,23 @@
 			var settings = this.settings,
 				point, value, t = pro.now();
 			
-			this.canvas.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
+			this.canvas.clearRect();
 			
-			for(var i = 0; i < settings.rows; i++)
+			for (var i = 0; i < settings.rows; i++)
 			{
-				for(var j = 0; j < settings.cols; j++)
+				for (var j = 0; j < settings.cols; j++)
 				{
 					this.clearPoint(j, i);
 				}
 			}
 			
-			for(var i in settings.points)
+			for (var i in settings.points)
 			{
-				if(/^(\d+)$/.test(i))
+				if (/^(\d+)$/.test(i))
 				{
-					for(var j in settings.points[i])
+					for (var j in settings.points[i])
 					{
-						if(/^(\d+)$/.test(j))
+						if (/^(\d+)$/.test(j))
 						{
 							point = settings.points[i][j][0];
 							value = settings.points[i][j][1];
@@ -64,7 +64,7 @@
 							
 							point = this.points[i][j];
 							
-							if(point.type === 2)
+							if (point.type === 2)
 							{
 								this.drawPoint(j, i, this.colors[point.owner], point.val);
 							}
@@ -91,7 +91,7 @@
 			num = num || null;
 			num_color = num_color || '#fff';
 			
-			if(num !== null)
+			if (num !== null)
 			{
 				c.font(ui.font);
 				c.fillStyle(num_color);
@@ -106,7 +106,7 @@
 		},
 		pointCache:{},
 		getPointCache: function(color) {
-			if(this.pointCache[color])
+			if (this.pointCache[color])
 			{
 				return this.pointCache[color];
 			}

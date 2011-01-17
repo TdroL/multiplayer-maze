@@ -1,19 +1,28 @@
 var pro, io, net, ui, phy, state, obj;
 
 //(function($) {
-	if( ! console)
+	if ( ! ('console' in window))
 	{
-		console = { log: function() {}, error: function() {} };
+		window.console = { log: function() {}, error: function() {} };
+	}
+	
+	if ( ! ('Audio' in window))
+	{
+		window.Audio = function() {
+			this.play = $.noop;
+			this.pause = $.noop;
+			this.currentTime = 0;
+		};
 	}
 	
 	/* --debug-begin-- */
 	window.debug = true;
 	
 	$.log = function() {
-		window.debug && console.log.apply(console, arguments);
+		window.debug && console.log.apply && console.log.apply(console, arguments);
 	};
 	$.error = function() {
-		if(window.debug)
+		if (window.debug && console.error.apply)
 		{
 			console.error.apply(console, arguments);
 			alert('Error: '+Array.prototype.join.call(arguments, ''));
@@ -28,25 +37,16 @@ var pro, io, net, ui, phy, state, obj;
 	};
 	
 	Array.prototype.merge = Array.prototype.merge || function(arr) {
-		while(arr.length)
+		while (arr.length)
 		{
 			this.push(arr.shift());
 		}
 		return this;
 	};
 	
-	/*
-	 * Firebug 1.7a / Firefox 4 issue - http://code.google.com/p/fbug/issues/detail?id=3632
-	 * Use net.url()
-	 * --
-	String.prototype.url = String.prototype.url || function() {
-		return config.base_url + this;
-	};
-	*/
-	
 	Math.sgn = Math.sgn || function(x) {
-		if(x < 0) return -1;
-		if(x > 0) return 1;
+		if (x < 0) return -1;
+		if (x > 0) return 1;
 		return 0;
 	};
 	
@@ -58,7 +58,7 @@ var pro, io, net, ui, phy, state, obj;
 	
 	Math.dist = Math.dist || function(p1, p2) {
 		var x, y;
-		if('x' in p1 && 'x' in p2)
+		if ('x' in p1 && 'x' in p2)
 		{
 			x = p2.x - p1.x,
 			y = p2.y - p1.y;
@@ -72,10 +72,10 @@ var pro, io, net, ui, phy, state, obj;
 		return Math.sqrt(x*x + y*y);
 	};
 	
-	if('WebSocket' in window)
+	if ('WebSocket' in window)
 	{
 		WebSocket.prototype.on = WebSocket.prototype.on || function(event) {
-			if(typeof arguments[1] === 'boolean' && ! arguments[1])
+			if ($.type(arguments[1]) === 'boolean' && ! arguments[1])
 			{
 				this['on'+event] = this['on'+event] || arguments[2];
 			}

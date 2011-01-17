@@ -35,7 +35,7 @@
 		};
 		
 		return this.each(function() {
-				if(options)
+				if (options)
 				{
 					$.extend(settings, options);
 				}
@@ -52,7 +52,7 @@
 			var $this = $(this),
 				$tab = ($.type(tab) == 'string') ? $this.find('#'+tab) : tab;
 			
-			if( ! ($tab.length && 'jquery' in $tab && $tab.is('.tab')))
+			if ( ! ($tab.length && 'jquery' in $tab && $tab.is('.tab')))
 			{
 				$.error('switch - ', 'Unknown slide:', tab);
 			}
@@ -72,14 +72,14 @@
 			var $this = $(this),
 				timerID = $.data(this, 'blink.timerID');
 			
-			if(timerID)
+			if (timerID)
 			{
 				clearInterval(timerID);
 				$.removeData(this, 'blink.timerID');
 				timerID = null;
 			}
 			
-			if(interval === false)
+			if (interval === false)
 			{
 				return;
 			}
@@ -89,7 +89,7 @@
 			
 			letters = letters.split('');
 			
-			for(i in letters)
+			for (i in letters)
 			{
 				letters[i] = '<span>'+letters[i]+'</span>';
 			}
@@ -100,7 +100,7 @@
 			i = 1;
 			
 			timerID = setInterval(function() {
-				if(i < len)
+				if (i < len)
 				{
 					$this.find('span:eq('+i+')').css('visibility', 'visible');
 					i++;

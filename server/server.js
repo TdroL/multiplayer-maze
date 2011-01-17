@@ -24,14 +24,14 @@ server.on('connection', function(conn) {
 	
 	
 	conn.on('message', function(message) {
-		if( ! player.exists(conn.id))
+		if ( ! player.exists(conn.id))
 		{
 			// ignore message
 			return;
 		}
 		
 		var result;
-		if((result = /^(.+?)(?::(.+))?$/.exec(message)))
+		if ((result = /^(.+?)(?::(.+))?$/.exec(message)))
 		{
 			switch(result[1])
 			{
@@ -58,7 +58,7 @@ server.on('connection', function(conn) {
 				case 'clear':
 				case 'update':
 				{
-					if(self.channel)
+					if (self.channel)
 					{
 						self.channel.broadcast(message, conn.id);
 					}

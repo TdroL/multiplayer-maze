@@ -14,41 +14,55 @@
 			})(obj, name);
 		},
 		remove: function(name) {
-			if(name in obj.list)
+			if (name in obj.list)
 			{
 				delete obj.list[name];
 				delete obj.status[name];
 			}
 		},
 		get: function(name) {
-			if(name in obj.list)
+			if (name in obj.list)
 			{
 				return obj.list[name];
 			}
 			return null;
 		},
-		run: function(name, method, arg1, arg2, arg3, arg4) {
-			var el;
-			if((el = obj.get(name)))
+		run: function() {
+			var args = [].slice.call(arguments),
+				name = args.shift(),
+				el = obj.get(name);
+			
+			if (el && method in el)
 			{
-				if(method in el)
-				{
-					el[method].call(el, arg1, arg2, arg3, arg4);
-				}
+				el[method].apply(el, args);
 			}
 		},
-		runEach: function(method, arg1, arg2, arg3, arg4) {
-			if( ! method || $.type(method) !== 'string')
+		runEach: function() {
+			var args = [].slice.call(arguments),
+				method = args.shift();
+			
+			if ( ! method)
 			{
 				return;
 			}
 			
-			for(var i in obj.list)
+			if ($.type(method) === 'function')
 			{
-				var el = obj.list[i];
-				if(method in el)
+				for (var i in obj.list)
 				{
-					el[method].call(el, arg1, arg2, arg3, arg4);
+					var el = obj.list[i];
+					method.apply(el, args);
+				}
+			}
+			else if ($.type(method) === 'string')
+			{
+				for (var i in obj.list)
+				{
+					var el = obj.list[i];
+					if (method in el)
+					{
+						el[method].apply(el, args);
+					}
 				}
 			}
 		},
@@ -57,7 +71,7 @@
 			obj.readyCallback.push(callback);
 		},
 		clear: function() {
-			while(obj.readyCallback.length)
+			while (obj.readyCallback.length)
 			{
 				delete obj.readyCallback.shift();
 			}
@@ -66,15 +80,15 @@
 			var callback;
 			obj.status[name] = !! flag;
 			
-			for(var i in obj.status)
+			for (var i in obj.status)
 			{
-				if( ! obj.status[i])
+				if ( ! obj.status[i])
 				{
 					return;
 				}
 			}
 			
-			while(obj.readyCallback.length)
+			while (obj.readyCallback.length)
 			{
 				callback = obj.readyCallback.shift();
 				callback();

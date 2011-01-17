@@ -10,7 +10,7 @@
 		init: function() {
 			var self = this;
 			
-			if( ! ('WebSocket' in window))
+			if ( ! ('WebSocket' in window))
 			{
 				return;
 			}
@@ -22,12 +22,12 @@
 			ws.on('message', false, function(event) {
 				var data = event.data, result;
 				
-				if((result = /^response\[([^\]]+)\](?::(.+))?$/.exec(data)))
+				if ((result = /^response\[([^\]]+)\](?::(.+))?$/.exec(data)))
 				{
-					if(result[1] in self.binds)
+					if (result[1] in self.binds)
 					{
 						self.binds[result[1]].callback.call(event, result[2]);
-						if(self.binds[result[1]].once)
+						if (self.binds[result[1]].once)
 						{
 							delete self.binds[result[1]];
 						}
@@ -35,9 +35,9 @@
 					return;
 				}
 				
-				if((result = /^(.+?)(?::(.+))?$/.exec(data)))
+				if ((result = /^(.+?)(?::(.+))?$/.exec(data)))
 				{
-					if(result[1] in self.actions)
+					if (result[1] in self.actions)
 					{
 						self.actions[result[1]].call(event, result[2]);
 					}
@@ -46,14 +46,14 @@
 			});
 			
 			ws.on('error', false, function(event) {
-				if('error' in self.binds && 'callback' in self.binds.error)
+				if ('error' in self.binds && 'callback' in self.binds.error)
 				{
 					self.binds.error.callback.call(event);
 				}
 			});
 			
 			ws.on('close', false, function(event) {
-				if('close' in self.binds && 'callback' in self.binds.close)
+				if ('close' in self.binds && 'callback' in self.binds.close)
 				{
 					setTimeout(function() {
 						self.binds.close.callback.call(event);
@@ -62,7 +62,7 @@
 			});
 			
 			ws.on('open', false, function(event) {
-				if('open' in self.binds && 'callback' in self.binds.open)
+				if ('open' in self.binds && 'callback' in self.binds.open)
 				{
 					self.binds.open.callback.call(event);
 				}
@@ -72,7 +72,7 @@
 			});
 		},
 		connect: function() {
-			if('WebSocket' in window
+			if ('WebSocket' in window
 			 && ( ! (net.ws instanceof WebSocket) || net.ws.readyState >= WebSocket.CLOSING))
 			{
 				net.ws = new WebSocket(net.host);
@@ -81,13 +81,13 @@
 			return net.ws;
 		},
 		disconnect: function() {
-			if(net.ws && net.ws instanceof WebSocket && net.ws.readyState !== WebSocket.CLOSED)
+			if (net.ws && net.ws instanceof WebSocket && net.ws.readyState !== WebSocket.CLOSED)
 			{
 				net.ws.close();
 			}
 		},
 		bufferAvaible: function() {
-			if(net.ws && 'bufferedAmount' in net.ws && net.ws.readyState === WebSocket.OPEN)
+			if (net.ws && 'bufferedAmount' in net.ws && net.ws.readyState === WebSocket.OPEN)
 			{
 				return net.ws.bufferedAmount === 0;
 			}
@@ -98,7 +98,7 @@
 		send: function(message, queue) {
 			queue = (1 in arguments) ? queue : true;
 			
-			if(net.ws.readyState !== WebSocket.OPEN)
+			if (net.ws.readyState !== WebSocket.OPEN)
 			{
 				queue && net.queue(message);
 			}
@@ -115,7 +115,7 @@
 			net._queue.push(message);
 		},
 		flushQueue: function() {
-			while(net._queue.length)
+			while (net._queue.length)
 			{
 				net.ws.send(net._queue.shift());
 			}
@@ -141,7 +141,7 @@
 		},
 		bind: function() {
 			var cmd, once, callback, autosend = true;
-			if(arguments.length < 2 || ! (cmd = /^(.+?)(?::(.+))?$/.exec(arguments[0])[1]))
+			if (arguments.length < 2 || ! (cmd = /^(.+?)(?::(.+))?$/.exec(arguments[0])[1]))
 			{
 				return false;
 			}
@@ -176,14 +176,14 @@
 				callback: callback
 			};
 			
-			if(autosend)
+			if (autosend)
 			{
 				net.send(arguments[0]);
 			}
 			return true;
 		},
 		removeBind: function(cmd) {
-			if(cmd in net.binds)
+			if (cmd in net.binds)
 			{
 				delete net.binds[cmd];
 			}

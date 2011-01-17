@@ -15,7 +15,7 @@
 			
 			self.reset();
 			
-			self.$$ = $('#game canvas.players')
+			self.$$ = $('#game canvas.screen').clone(); //$('#game canvas.players')
 			self.canvas = ui.canvas(self.$$);
 			self.settings = settings;
 			
@@ -73,11 +73,11 @@
 			_p[0] = Math.floor(ball.x / settings.block);
 			_p[1] =  Math.floor(ball.y / settings.block);
 			
-			if(point.points[_p[1]] && point.points[_p[1]][_p[0]])
+			if (point.points[_p[1]] && point.points[_p[1]][_p[0]])
 			{
 				p = point.points[_p[1]][_p[0]];
 				
-				if(p.owner === this.pid)
+				if (p.owner === this.pid)
 				{
 					point.queue.push(_p);
 					net.send('clear:'+JSON.stringify(_p));
@@ -100,7 +100,7 @@
 				ball = this.ball,
 				c = this.canvas;
 			
-			c.clearRect(0, 0, settings.outerWidth, settings.outerHeight);
+			c.clearRect();
 			c.lineWidth(1);
 			
 			/* --debug-start-- */

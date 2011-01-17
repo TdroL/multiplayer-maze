@@ -57,7 +57,7 @@
 			col = Math.floor(x / b);
 			row = Math.floor(y / b);
 			
-			if( ! (data[row] && data[row][col]))
+			if ( ! (data[row] && data[row][col]))
 			{
 				return vec;
 			}
@@ -90,15 +90,15 @@
 			side.overlap = false;
 			
 			
-			for(var i in phy._sides)
+			for (var i in phy._sides)
 			{
 				side = phy._sides[i];
 				
-				if(side.d < 0)
+				if (side.d < 0)
 				{
 					side.overlap = true;
 					
-					if(side.cell)
+					if (side.cell)
 					{
 						vec.x -= side.vx*side.d;
 						vec.y -= side.vy*side.d;
@@ -109,7 +109,7 @@
 				}
 			}
 			
-			if(vec.x || vec.y)
+			if (vec.x || vec.y)
 			{
 				return vec;
 			}
@@ -142,14 +142,14 @@
 						&& phy._sides[2].overlap
 						&& (data[row+1][col][1] || data[row][col+1][2]);
 			
-			for(var i in phy._corners)
+			for (var i in phy._corners)
 			{
 				corner = phy._corners[i];
-				if(corner.valid)
+				if (corner.valid)
 				{
 					var d = Math.dist(ball, corner);
 					
-					if(d <= r)
+					if (d <= r)
 					{
 						var dd = d ? (r/d - 1) : r;
 						
@@ -168,12 +168,12 @@
 				bx = false, by = false, // blocks
 				vec; // collision
 			
-			if( ! (dx || dy)) return;
+			if ( ! (dx || dy)) return;
 			
-			if(adx > ady)
+			if (adx > ady)
 			{
 				s = adx;
-				while(s > step) s /= 2;
+				while (s > step) s /= 2;
 				ds = adx;
 				sx = s * sgx;
 				sy = (ady * s / adx) * sgy;
@@ -181,7 +181,7 @@
 			else
 			{
 				s = ady;
-				while(s > step) s /= 2;
+				while (s > step) s /= 2;
 				ds = ady;
 				sy = s * sgy;
 				sx = (adx * s / ady) * sgx;
@@ -190,7 +190,7 @@
 			ball.x = ball.px;
 			ball.y = ball.py;
 			
-			for(i = 0; i < ds; i += s)
+			for (i = 0; i < ds; i += s)
 			{
 				bx || (ball.x += sx);
 				by || (ball.y += sy);
@@ -203,7 +203,7 @@
 				bx = bx || vec.bx;
 				by = by || vec.by;
 				
-				if(bx && by)
+				if (bx && by)
 				{
 					return;
 				}
