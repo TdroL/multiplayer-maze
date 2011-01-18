@@ -208,9 +208,6 @@
 					return;
 				}
 			}
-		},
-		debug: function() {
-			$('.info').html(Array.prototype.splice.call(arguments, 0).join(' '));
 		}
 	};
 	

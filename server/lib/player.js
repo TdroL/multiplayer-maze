@@ -23,12 +23,16 @@ function Player(conn, server, channels)
 	this.id = conn.id;
 	this.pid = 0;
 	this.channel = null;
+	this.status = false;
 	
 	this.init = function() {
 		
 	};
 	
 	this.leave = function() {
+		
+		this.status = false;
+		
 		if (this.channel)
 		{
 			this.pid = this.channel.releasePid(this.pid);
@@ -48,6 +52,8 @@ function Player(conn, server, channels)
 			{
 				channel.add(this);
 				this.pid = channel.getPid();
+				this.status = false;
+				
 				return [1, this.pid];
 			}
 			return [-2];
@@ -74,7 +80,16 @@ function Player(conn, server, channels)
 		
 		return list;
 	};
-		
+	
+	this.getInfo = function() {
+		var self = this;
+		return {
+			id: self.id,
+			pid: self.pid,
+			status: self.status
+		};
+	};
+	
 	this.destruct = function() {
 		this.leave();
 	};

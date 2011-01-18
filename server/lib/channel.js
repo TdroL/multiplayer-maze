@@ -96,6 +96,26 @@ function Channel(id, name, limit)
 		return (this.status > 0 && this.limit > this.count);
 	};
 	
+	this.playersReady = function() {
+		var p = 0, c = 0,
+			players = this.players;
+	
+		if (this.count < 2)
+		{
+			return false;
+		}
+		
+		for (var i in players)
+		{
+			if ( ! players[i].status)
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	};
+	
 	this.destruct = function() {
 		this.status = -1;
 		for (var id in this.players)

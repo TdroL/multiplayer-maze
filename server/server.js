@@ -33,16 +33,36 @@ server.on('connection', function(conn) {
 		var result;
 		if ((result = /^(.+?)(?::(.+))?$/.exec(message)))
 		{
-			switch(result[1])
+			switch (result[1])
 			{
 				case 'get-channels':
 				{
 					conn.send('response[get-channels]:'+JSON.stringify(channel.getList()));
 					break;
 				}
+				case 'change-status':
+				{
+					if ( ! self.channel)
+					{
+						break;
+					}
+					
+					self.status = (result[2] == 'ready');
+					
+					self.channel.broadcast('status-changed:'+JSON.stringify({ id: self.id, status: self.status }), conn.id);
+					
+					if (self.channel.playersReady())
+					{
+						self.channel.broadcast('start-game:'+JSON.stringify({ time: +new Date() }));
+					}
+					
+					break;
+				}
 				case 'join-channel':
 				{
 					conn.send('response[join-channel]:'+JSON.stringify(self.join(result[2])));
+					
+					self.channel.broadcast('joined-channel:'+JSON.stringify(self.getInfo()));
 					break;
 				}
 				case 'leave-channel':
@@ -52,7 +72,29 @@ server.on('connection', function(conn) {
 				}
 				case 'get-channel-info':
 				{
-					conn.send('response[get-channel-info]:'+JSON.stringify(channels[result[2]]));
+					if (result[2] in channels)
+					{
+						var ch = channels[result[2]],
+							response = {
+								name: ch.name,
+								limit: ch.limit,
+								status: ch.status,
+								players: {},
+								count: ch.count
+							};
+						
+						if (ch.count > 0)
+						{
+							for (var i in ch.players)
+							{
+								var el = ch.players[i];
+								
+								response.players[el.pid] = el.getInfo();
+							}
+						}
+						
+						conn.send('response[get-channel-info]:'+JSON.stringify(response));
+					}
 					break;
 				}
 				case 'clear':

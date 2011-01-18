@@ -21,6 +21,7 @@ var pro, io, net, ui, phy, state, obj;
 	$.log = function() {
 		window.debug && console.log.apply && console.log.apply(console, arguments);
 	};
+	
 	$.error = function() {
 		if (window.debug && console.error.apply)
 		{

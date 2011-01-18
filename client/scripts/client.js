@@ -43,11 +43,11 @@
 				
 				net.init();
 				
-				$('#container span.dots').blink(false).blink(400);
+				$('#connect span.dots').blink(false).blink(400);
 			};
 			
 			this.release = function() {
-				$('#container span.dots').blink(false);
+				$('#connect span.dots').blink(false);
 			};
 		},
 		servers: new function() {
@@ -117,6 +117,7 @@
 							{
 								player.in_channel = true;
 								player.pid = pid;
+								player.channel_id = id;
 								$('#container').switchTo('limbo');
 								break;
 							}
@@ -158,9 +159,134 @@
 		},
 		limbo : new function() {
 			
-			this.init = function() {};
+			this.init = function() {
+				var player = obj.get('player'),
+					$limbo = $('#limbo'),
+					$ul = $limbo.find('ul');
+				
+				
+				$limbo.find('span.dots').blink(false).blink(400);
+				
+				id = $('#limbo').data('channel-id');
+				
+				$ul.find('a[data-change-status]').click(function() {
+					var status = $(this).data('change-status');
+					
+					$ul.find('.you').removeClass('ready not-ready')
+									.addClass(status);
+					
+					net.send('change-status:'+status);
+				});
+				
+				net.action('status-changed', function(data) {
+					data = JSON.parse(data);
+					
+					$.log('status', data);
+					
+					$ul.find('.opponent[data-id='+data.id+']')
+							.removeClass('ready not-ready')
+							.addClass(data.status ? 'ready' : 'not-ready');
+				});
+				
+				net.action('start-game', function(data) {
+					data = JSON.parse(data);
+					
+					var time = pro.now(),
+						count = 5000, // 5 sec countdown
+						step = 100,
+						diff = time - data.time;
+					
+					count -= diff;
+					
+					var $counter = $limbo.find('.countdown')
+											.empty()
+											.text(Math.round2(count/1000));
+					
+					$ul.find('a[data-change-status]').unbind('click');
+					
+					window.setTimeout(function() {
+						
+						count -= step;
+						$counter.text(Math.round2(count/1000));
+						
+						var id = window.setInterval(function() {
+							
+							count -= step;
+							
+							if (count <= 0)
+							{
+								window.clearInterval(id);
+								
+								$('#container').switchTo('game');
+								
+								return;
+							}
+							
+							$counter.text(Math.round2(count/1000));
+						}, step);
+					}, step - diff);
+					
+				});
+				
+				net.action('quit', function(data) {
+					$ul.find('.opponent[data-id='+data+']').remove();
+					$ul.find('.waiting:last').after(
+						$ul.find('.waiting:first').clone()
+							.removeClass('hide')
+					);
+				});
+				
+				net.action('joined-channel', function(data) {
+					data = JSON.parse(data);
+					
+					if (data.id != net.id)
+					{
+						$ul.find('.waiting:last').remove();
+						$ul.find('.opponent:last').after(
+							$ul.find('.opponent:first').clone()
+								.removeClass('hide')
+								.addClass(data.status ? 'ready' : 'not-ready')
+								.attr('data-id', data.id)
+						);
+					}
+				});
+				
+				net.bind('get-channel-info:'+player.channel_id, true, function(data) {
+					data = JSON.parse(data);
+					
+					var players = data.players,
+						$ul = $limbo.find('ul');
+					
+					for (var i = 0, c = (data.limit - data.count); i < c; i++)
+					{
+						$ul.find('.waiting:last').after(
+							$ul.find('.waiting:first').clone().removeClass('hide')
+						);
+					}
+					
+					for (var i in players)
+					{
+						var el = players[i];
+						
+						if (el.id == net.id)
+						{
+							continue;
+						}
+						
+						var $li = $ul.find('.opponent:first').clone();
+						
+						$li.attr('data-id', el.id);
+						$li.removeClass('hide')
+							.addClass(el.status ? 'ready' : 'not-ready');
+						
+						$ul.find('.opponent:last').after($li);
+					}
+				});
+			};
 			
-			this.release = function() {};
+			this.release = function() {
+				$('#limbo span.dots').blink(false);
+			};
 		},
 		game: new function() {
 			var canvas,

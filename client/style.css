@@ -43,6 +43,7 @@ h1 {
 h3 {
 	padding-bottom: 0.8em;
 }
+
 p {
 	padding-bottom: 1em;
 }
@@ -56,6 +57,12 @@ a {
 a:hover {
 	text-decoration: none;
 }
+
+/* >> The Magnificent CLEARFIX: Updated to prevent margin-collapsing on child elements << j.mp/bestclearfix */
+.clearfix:before, .clearfix:after { content: "\0020"; display: block; height: 0; visibility: hidden; }
+.clearfix:after { clear: both; }
+/* fix clearfix: blueprintcss.lighthouseapp.com/projects/15318/tickets/5-extra-margin-padding-bottom-of-page */
+.clearfix { zoom: 1; }
 
 #container {
 	background-color: #F2F5ED;
@@ -78,6 +85,19 @@ a:hover {
 	height: inherit;
 	vertical-align: middle;
 	text-align: center;
+}
+
+.tab ul,
+.tab ol {
+	width: 90%;
+	text-align: left;
+	margin: 1em 0 0.5em 5%;
+}
+
+.tab .align-left {
+	width: 90%;
+	text-align: left;
+	margin: 0 0 0 5%;
 }
 
 .popup {
@@ -153,6 +173,68 @@ a:hover {
 
 #servers .players {
 	font-size: 0.8em;
+}
+
+#limbo .status {
+	list-style: none;
+	margin: 30px 0;
+	padding: 0;
+	width: 100%;
+}
+
+#limbo .status li {
+	float: left;
+	width: 370px;
+	padding: 10px;
+	min-height: 105px;
+	color: #666;
+	border: 2px solid #666;
+	background-color: rgba(102, 102, 102, 0.2);
+	margin: 3px;
+	text-align: center;
+	-webkit-border-radius: 10px;
+	   -moz-border-radius: 10px;
+	        border-radius: 10px;
+}
+
+#limbo .status li.waiting {
+	line-height: 105px;
+}
+
+#limbo .status li.hide {
+	display: none;
+}
+
+#limbo .status li a,
+#limbo .status li span {
+	display: block;
+	font-style: italic;
+	font-size: 2em;
+	line-height: 2em;
+	color: inherit;
+}
+
+#limbo .status li.ready {
+	border-color: #00b828;
+	background-color: rgba(0, 184, 40, 0.2);
+}
+
+#limbo .status li.ready {
+	color: #00b828;
+}
+
+#limbo .status li.not-ready {
+	border-color: #B80028;
+	background-color: rgba(184, 0, 40, 0.2);
+}
+
+#limbo .status li.not-ready {
+	color: #B80028;
+}
+
+#limbo .status li.ready .link-not-ready,
+#limbo .status li.not-ready .link-ready {
+	display: none;
 }
 
 .info {

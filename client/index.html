@@ -1,11 +1,9 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="pl">
 <head>
 	<meta charset="utf-8">
 	<title>Client</title>
-	
-	
-	
+
 	<link href="http://fonts.googleapis.com/css?family=Cuprum&amp;subset=latin" rel="stylesheet" />
 	<link href="style.css" rel="stylesheet" />
 
@@ -43,10 +41,27 @@
 			<div class="fail">
 				<h3>Wystąpił błąd</h3>
 				
-				<p>Twoja przeglądarka nie spełnia wymagań: obsługa znacznika <code>&lt;canvas&gt;</code>, protokołu <code>WebSocket</code>.</p>
-				<p>Zalecane przeglądarki: Firefox 4, Safari 5, Chrome 8, Opera 11, Internet Explorer 12*.</p>
-				<p><small>* W przypadku IE potrzebna może być jeszcze nowsza wersja.</small></p>
+				<p class="align-left">Twoja przeglądarka nie obsługauje znacznika <code>&lt;canvas&gt;</code> i/lub protokołu <code>WebSocket</code>.</p>
+				<p class="align-left">Zalecane przeglądarki: Firefox 4*, Safari 5, Chrome 8, Opera 11*.</p>
+				<p class="align-left"><small>* Jeżeli posiadasz tą przeglądarkę i nadal widzisz ten komunikat, to może to oznaczać, że masz wyłączoną obsługę WebSocket. <a data-switch-to="enable-websocket">Poradnik: jak włączyć WebSocket</a></small></p>
 			</div>
+		</section>
+		<section class="tab hide" id="enable-websocket">
+			<h2>Jak włączyć WebSocket</h2>
+			<ol>
+				<li>W nowej karcie otwórz adres "about:config".</li>
+				<li>Kliknij przycisk "Zachowam ostrożność, obiecuję!" jeśli taki się pojawił.</li>
+				<li>W pole tekstowe wpisz "websocket".</li>
+				<li>
+					W zależności od przeglądarki:
+					<ul>
+						<li>FireFox &mdash; dwa razy kliknij na "network.websocket.override-security-block", powiniena zmienić się wartość po prawej stronie z "false" na "true".</li>
+						<li>Opera &mdash; zaznacz pole po prawej od "Enable WebSockets" i kliknij przycisk "Zapisz".</li>
+					</ul>
+				</li>
+				<li>Zamknij konfigurację i odświerz kartę z grą.</li>
+			</ol>
+			<p><a data-switch-to="intro">Wróć</a></p>
 		</section>
 		<section class="tab hide" id="connect">
 			<h2>Łączenie z serwerem<span class="dots">...</span></h2>
@@ -55,19 +70,22 @@
 			<ul></ul>
 		</section>
 		<section class="tab hide" id="limbo">
-			<h2>Oczekiwanie na graczy<span class="ellipsis">...</span></h2>
-			<h3>Znaleziono <span class="current-players">1</span> z <span class="needed-players">1</span>.</h3>
+			<h2>Oczekiwanie na graczy<span class="dots">...</span></h2>
 			
-			<p><a data-switch-to="game">Next</a></p>
+			<ul class="status clearfix">
+				<li class="you not-ready">Ty: <a class="link-ready" data-change-status="not-ready">Gotowy</a><a class="link-not-ready" data-change-status="ready">Nie gotowy</a></li>
+				<li class="opponent hide" data-id="0">Przeciwnik: <span class="link-ready">Gotowy</span><span class="link-not-ready">Nie gotowy</span></li>
+				<li class="waiting hide">Oczekiwanie na przeciwnika</li>
+			</ul>
+			
+			<p class="countdown"></p>
 		</section>
 		<section class="tab hide" id="game">
 			<canvas class="screen" width="800" height="480"></canvas>
 			<div class="info"></div>
 		</section>
 		<section class="tab hide" id="poll">
-			<h1>The cake is a lie...</h1>
-			<h2>Zostałeś poddany testowi</h2>
-			<h3></h3>
+
 		</section>
 		
 		<div class="popup hide" id="errors">

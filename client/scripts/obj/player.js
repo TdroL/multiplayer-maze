@@ -1,5 +1,6 @@
 //(function($) {
 	obj.add('player', {
+		id: 0,
 		pid: 1,
 		$$: null,
 		canvas: null,
@@ -8,6 +9,7 @@
 		point: null,
 		ball: null,
 		in_channel: false,
+		channel_id: null,
 		opponents: null,
 		init: function(settings) {
 			var self = this,
