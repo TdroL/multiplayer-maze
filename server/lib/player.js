@@ -56,6 +56,11 @@ function Player(conn, server, channels)
 				
 				return [1, this.pid];
 			}
+
+			if (channel.in_progress)
+			{
+				return [-3];
+			}
 			return [-2];
 		}
 		return [-1];

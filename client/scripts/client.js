@@ -121,6 +121,11 @@
 								$('#container').switchTo('limbo');
 								break;
 							}
+							case -3:
+							{
+								ui.info('Gra w toku', {'Ok': null});
+								break;
+							}
 							case -2:
 							{
 								ui.info('Brak wolnych miejsc', {'Ok': null});
@@ -159,29 +164,44 @@
 		},
 		limbo : new function() {
 			
+			var ping = new Audio(net.url('client/audios/ping.ogg'));
+			
 			this.init = function() {
 				var player = obj.get('player'),
 					$limbo = $('#limbo'),
-					$ul = $limbo.find('ul');
+					$ul = $limbo.find('ul'),
+					stopCountdown = false;
 				
 				
 				$limbo.find('span.dots').blink(false).blink(400);
 				
 				id = $('#limbo').data('channel-id');
 				
-				$ul.find('a[data-change-status]').click(function() {
-					var status = $(this).data('change-status');
-					
-					$ul.find('.you').removeClass('ready not-ready')
-									.addClass(status);
-					
-					net.send('change-status:'+status);
-				});
+				$limbo.find('a[data-switch-to]').one('click.go-back', function() {
+						net.send('leave-channel');
+					});
+				
+				$limbo.find('.countdown').empty();
+				
+				
+				$ul.find('.you')
+					.removeClass('ready')
+					.addClass('not-ready')
+					.find('a[data-change-status]')
+						.removeClass('unclickable')
+						.click(function() {
+							var status = $(this).data('change-status');
+							
+							$ul.find('.you').removeClass('ready not-ready')
+											.addClass(status);
+							
+							net.send('change-status:'+status);
+						});
+				
+				$ul.find('li').not('.you, .hide').remove();
 				
 				net.action('status-changed', function(data) {
 					data = JSON.parse(data);
-					
-					$.log('status', data);
 					
 					$ul.find('.opponent[data-id='+data.id+']')
 							.removeClass('ready not-ready')
@@ -191,29 +211,38 @@
 				net.action('start-game', function(data) {
 					data = JSON.parse(data);
 					
-					var time = pro.now(),
-						count = 5000, // 5 sec countdown
+					var count = 200, //5000, // 5 sec countdown
 						step = 100,
-						diff = time - data.time;
+						diff = pro.now() - data.time;
 					
 					count -= diff;
 					
-					var $counter = $limbo.find('.countdown')
-											.empty()
-											.text(Math.round2(count/1000));
+					var $counter = $limbo.find('.countdown').empty();
 					
-					$ul.find('a[data-change-status]').unbind('click');
+					$ul.find('a[data-change-status]').unbind('click').addClass('unclickable');
 					
 					window.setTimeout(function() {
+						var time = Math.round2(count/1000),
+							lastTime = Math.ceil(time);
+						
+						time = (/^\d+\.\d+$/.test(''+time)) ? time : time+'.0';
 						
 						count -= step;
-						$counter.text(Math.round2(count/1000));
+						$counter.text(time);
 						
 						var id = window.setInterval(function() {
 							
+							if (stopCountdown)
+							{
+								stopCountdown = false;
+								$limbo.find('.countdown').empty();
+								window.clearInterval(id);
+								return;
+							}
+							
 							count -= step;
 							
-							if (count <= 0)
+							if (count < 0)
 							{
 								window.clearInterval(id);
 								
@@ -222,7 +251,22 @@
 								return;
 							}
 							
-							$counter.text(Math.round2(count/1000));
+							time = Math.round2(count/1000);
+							
+							if (lastTime > Math.ceil(time))
+							{
+								lastTime = Math.ceil(time);
+								
+								if (ping)
+								{
+									ping.currentTime = 0;
+									ping.play();
+								}
+							}
+							
+							time = (/^\d+\.\d+$/.test(''+time)) ? time : time+'.0';
+							
+							$counter.text(time);
 						}, step);
 					}, step - diff);
 					
@@ -234,6 +278,11 @@
 						$ul.find('.waiting:first').clone()
 							.removeClass('hide')
 					);
+					
+					var status = $('.you a[data-change-status]').data('change-status');
+					net.send('change-status:'+status);
+					
+					stopCountdown = true;
 				});
 				
 				net.action('joined-channel', function(data) {
@@ -251,7 +300,7 @@
 					}
 				});
 				
-				net.bind('get-channel-info:'+player.channel_id, true, function(data) {
+				net.bind('get-channel-info:'+player.channel_id, true, true, function(data) {
 					data = JSON.parse(data);
 					
 					var players = data.players,
@@ -286,6 +335,8 @@
 			
 			this.release = function() {
 				$('#limbo span.dots').blink(false);
+				
+				net.removeAction('status-changed', 'start-game', 'quit', 'joined-channel');
 			};
 		},
 		game: new function() {
@@ -317,20 +368,18 @@
 					if ( ! _player.in_channel)
 					{
 						$('#container').switchTo('servers');
-					return;
+						return;
 					}
 				/* --debug-begin-- */
 				}
 				/* --debug-end-- */
 				
-				canvas = $('#game canvas');
-				
 				net.action('update', function(data) {
 					data = JSON.parse(data);			
 					
-					if (data.id && data.id !== _net.id)
+					if (data.id && data.id != _net.id)
 					{
-						_player.opponents[data.id] = _player.opponents[data.id] || {x: 15, y: 15};
+						_player.opponents[data.id] = _player.opponents[data.id] || {pid: 0, x: 15, y: 15};
 						_player.opponents[data.id].pid = data.pid;
 						_player.opponents[data.id].x = data.x;
 						_player.opponents[data.id].y = data.y;
@@ -346,6 +395,11 @@
 					{
 						delete _player.opponents[id];
 					}
+					
+					ui.info('Jeden z graczy wyszedł', {'Ok': null});
+					_net.send('leave-channel');
+					
+					$('#container').switchTo('servers');
 				});
 				
 				obj.ready(function() {
@@ -385,13 +439,6 @@
 			return false; // 1.4.3 bug - http://bugs.jquery.com/ticket/7247
 		}
 		docready = true;
-		
-		/*
-		$(window).bind('unload', function() {
-			net.disconnect();
-			net.removeBind('close');
-		});
-		*/
 		
 		var $container = $('#container'),
 			first = $container.find(':first'),

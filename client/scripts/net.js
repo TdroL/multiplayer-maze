@@ -55,9 +55,7 @@
 			ws.on('close', false, function(event) {
 				if ('close' in self.binds && 'callback' in self.binds.close)
 				{
-					setTimeout(function() {
-						self.binds.close.callback.call(event);
-					}, 100); // call after window.unload
+					self.binds.close.callback.call(event);
 				}
 			});
 			
@@ -81,7 +79,7 @@
 			return net.ws;
 		},
 		disconnect: function() {
-			if (net.ws && net.ws instanceof WebSocket && net.ws.readyState !== WebSocket.CLOSED)
+			if (net.ws && net.ws instanceof WebSocket) //  && net.ws.readyState !== WebSocket.CLOSED
 			{
 				net.ws.close();
 			}
@@ -96,7 +94,7 @@
 		},
 		_queue: [],
 		send: function(message, queue) {
-			queue = (1 in arguments) ? queue : true;
+			queue = (arguments.length > 1) ? queue : true;
 			
 			if (net.ws.readyState !== WebSocket.OPEN)
 			{
@@ -182,10 +180,24 @@
 			}
 			return true;
 		},
-		removeBind: function(cmd) {
-			if (cmd in net.binds)
+		removeAction: function() {
+			for (var i in arguments)
 			{
-				delete net.binds[cmd];
+				var type = arguments[i];
+				if (type in net.actions)
+				{
+					delete net.actions[type];
+				}
+			}
+		},
+		removeBind: function() {
+			for (var i in arguments)
+			{
+				var cmd = arguments[i];
+				if (cmd in net.binds)
+				{
+					delete net.binds[cmd];
+				}
 			}
 		},
 		url: function(url) {

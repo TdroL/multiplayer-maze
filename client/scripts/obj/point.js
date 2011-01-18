@@ -36,6 +36,7 @@
 			
 			this.canvas.clearRect();
 			
+			/*
 			for (var i = 0; i < settings.rows; i++)
 			{
 				for (var j = 0; j < settings.cols; j++)
@@ -43,6 +44,7 @@
 					this.clearPoint(j, i);
 				}
 			}
+			*/
 			
 			for (var i in settings.points)
 			{
@@ -72,10 +74,6 @@
 					}
 				}
 			}
-			
-			/* --debug-start-- */
-			$.log('drawPoints time:', pro.now() - t);
-			/* --debug-end-- */
 		},
 		drawPoint: function(ix, iy, color, num, num_color)
 		{

@@ -14,6 +14,12 @@ module.exports = {
 		for (var id in channels)
 		{
 			channel = channels[id];
+			
+			if (channel.in_progress)
+			{
+				continue;
+			}
+			
 			list.push({
 				id: id,
 				name: channel.name,
@@ -34,7 +40,7 @@ function Channel(id, name, limit)
 	//this.id = id;
 	this.name = name;
 	this.limit = limit || 4;
-	this.status = 1;
+	this.in_progress = false;
 	this.players = {};
 	this.count = 0;
 	this.pids = [];
@@ -65,6 +71,8 @@ function Channel(id, name, limit)
 			delete this.players[player.id];
 			this.count--;
 			
+			this.in_progress = false;
+			
 			this.broadcast('quit:'+player.id);
 		}
 	};
@@ -93,7 +101,7 @@ function Channel(id, name, limit)
 	};
 	
 	this.isAvaible = function() {
-		return (this.status > 0 && this.limit > this.count);
+		return ! (this.in_progress || this.count >= this.limit);
 	};
 	
 	this.playersReady = function() {

@@ -10,7 +10,15 @@
 		ball: null,
 		in_channel: false,
 		channel_id: null,
-		opponents: null,
+		opponents: {},
+		updateInterval: 50,
+		_updateData: {
+			id: 0,
+			pid: 0,
+			x: 0,
+			y: 0
+		},
+		_timerID: null,
 		init: function(settings) {
 			var self = this,
 				keys;
@@ -51,6 +59,16 @@
 			});
 			
 			self.status(true);
+			
+			self._updateData.pid = self.pid;
+			self._updateData.id = net.id;
+			
+			self._timerID = window.setInterval(function() {
+				self._updateData.x = self.ball.x;
+				self._updateData.y = self.ball.y;
+				
+				net.send('update:'+JSON.stringify(self._updateData));
+			}, self.updateInterval);
 		},
 		reset: function() {			
 			this.ball = {
@@ -91,7 +109,9 @@
 			/* --debug-start-- */
 			pro.start('update-player');
 			/* --debug-end-- */
+			
 			phy.move(this.ball, (dt * 0.001));
+			
 			/* --debug-start-- */
 			pro.end('update-player');
 			/* --debug-end-- */
@@ -108,9 +128,10 @@
 			/* --debug-start-- */
 			pro.start('render-opps');
 			/* --debug-end-- */
+			
 			$.each(this.opponents, function(i, v) {
 				c.beginPath();
-				c.fillStyle(point.colors[v.pid]);
+				c.fillStyle(point.colors[v.pid] || '#000');
 				c.arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true);
 				c.fill().closePath();
 			});

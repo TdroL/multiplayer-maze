@@ -177,7 +177,7 @@ a:hover {
 
 #limbo .status {
 	list-style: none;
-	margin: 30px 0;
+	margin: 0 0 30px;
 	padding: 0;
 	width: 100%;
 }
@@ -235,6 +235,31 @@ a:hover {
 #limbo .status li.ready .link-not-ready,
 #limbo .status li.not-ready .link-ready {
 	display: none;
+}
+
+#limbo .unclickable,
+#limbo .unclickable:hover {
+	text-decoration: none;
+	cursor: default;
+}
+
+#limbo .countdown:empty {
+	visibility: hidden;
+}
+
+#limbo .countdown {
+	border: 2px solid #1C3DBC;
+	background-color: rgba(28, 61, 188, 0.2);
+	color: #1C3DBC;
+	padding: 10px;
+	width: 60px;
+	height: 1em;
+	margin: 0 auto;
+	-webkit-border-radius: 10px;
+	   -moz-border-radius: 10px;
+	        border-radius: 10px;
+	
+	font: bold 1.5em/1 'Droid Sans Mono', 'Monaco', 'Courier New', Courier, monospace;
 }
 
 .info {

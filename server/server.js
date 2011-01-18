@@ -51,8 +51,9 @@ server.on('connection', function(conn) {
 					
 					self.channel.broadcast('status-changed:'+JSON.stringify({ id: self.id, status: self.status }), conn.id);
 					
-					if (self.channel.playersReady())
+					if (self.channel.playersReady() && ! self.channel.in_progress)
 					{
+						self.channel.in_progress = true;
 						self.channel.broadcast('start-game:'+JSON.stringify({ time: +new Date() }));
 					}
 					
@@ -62,7 +63,10 @@ server.on('connection', function(conn) {
 				{
 					conn.send('response[join-channel]:'+JSON.stringify(self.join(result[2])));
 					
-					self.channel.broadcast('joined-channel:'+JSON.stringify(self.getInfo()));
+					if (self.channel)
+					{
+						self.channel.broadcast('joined-channel:'+JSON.stringify(self.getInfo()));
+					}
 					break;
 				}
 				case 'leave-channel':
