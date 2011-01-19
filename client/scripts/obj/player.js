@@ -130,10 +130,10 @@
 			/* --debug-end-- */
 			
 			$.each(this.opponents, function(i, v) {
-				c.beginPath();
-				c.fillStyle(point.colors[v.pid] || '#000');
-				c.arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true);
-				c.fill().closePath();
+				c.beginPath()
+				 .fillStyle(point.colors[v.pid] || '#000')
+				 .arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true);
+				 .fill().closePath();
 			});
 			/* --debug-start-- */
 			pro.end('render-opps');

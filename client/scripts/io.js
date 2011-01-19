@@ -122,7 +122,7 @@
 				io.binds_cache[v][id] = io.binds[id];
 			});
 		},
-		sequence: function(keys, fn, delay) {
+		sequence: function(keys, fn) {
 			if ( ! ($.isArray(keys) && keys.length))
 			{
 				io.error('io.sequence - ', 'first param is not an array or is empty', keys);
@@ -132,7 +132,7 @@
 				io.error('io.sequence - ', 'second param is not a function', fn);
 			}
 			
-			delay = parseInt(delay || io.sequence_delay, 10);
+			var delay = parseInt(arguments[2] || io.sequence_delay, 10);
 			
 			var list = io._parseKeys(keys),
 				v = list[0],

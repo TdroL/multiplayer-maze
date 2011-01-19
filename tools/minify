@@ -42,7 +42,7 @@ fs.readFile(client+'index.html', 'utf-8', function(err, data) {
 						.replace(/;[^;]+$/, '')
 						.split(';');
 	
-	var filtered = ['jquery.min.js', 'minimized.js'].join('|'),
+	var filtered = new RegExp(['jquery.min.js', 'minimized.js'].join('|')+'$'),
 		scripts = [],
 		concat = '',
 		script, count, status, temp;
@@ -51,7 +51,7 @@ fs.readFile(client+'index.html', 'utf-8', function(err, data) {
 	{
 		script = sliced[i];
 		
-		if( ! (new RegExp('('+filtered+')$', 'i').test(script)))
+		if ( ! filtered.test(script))
 		{
 			scripts.push(script);
 		}
@@ -115,16 +115,16 @@ fs.readFile(client+'index.html', 'utf-8', function(err, data) {
 		console.log('Minify-ing ('+(debug ? 'debug' : 'release')+')...');
 		
 		exec('java '+params.join(' '), function (error) {
-			fs.unlink(temp);
-			
 			if(error === null)
 			{
+				fs.unlink(temp);
 				console.log('Done');
 				process.exit(0);
 			}
 			else
 			{
 				console.log('Closure exited with code: '+error);
+				console.log('Temp file: '+temp);
 				process.exit(1);
 			}
 		});

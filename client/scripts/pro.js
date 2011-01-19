@@ -1,9 +1,6 @@
 //(function($) {
 	
 	pro = { // profiler
-		now: function() {
-			return (new Date()).getTime();
-		},
 		/* --debug-begin-- */
 		groups: {},
 		stats: {
@@ -65,8 +62,11 @@
 			};
 			
 			return pro.groups[name];
-		}
+		},
 		/* --debug-end-- */
+		now: function() {
+			return (new Date()).getTime();
+		}
 	};
 	
 	/* --debug-begin-- */

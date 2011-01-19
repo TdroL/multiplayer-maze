@@ -91,12 +91,11 @@
 			
 			if (num !== null)
 			{
-				c.font(ui.font);
-				c.fillStyle(num_color);
-				
 				metric = c.measureText(num);
 				
-				c.fillText(num, settings.margin + ix*b + (b - metric.width)/2, settings.margin + iy*b + (b + Math.floor(parseInt(ui.font)*0.75))/2);
+				c.font(ui.font)
+				 .fillStyle(num_color)
+				 .fillText(num, settings.margin + ix*b + (b - metric.width)/2, settings.margin + iy*b + (b + Math.floor(parseInt(ui.font, 10)*0.75))/2);
 			}
 		},
 		clearPoint: function(i, j) {

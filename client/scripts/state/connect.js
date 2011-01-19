@@ -1,14 +1,14 @@
 
-state.add('connect', new function() {
+state.add('connect', function() {
 	var i = 0, interval = 400,
 		timerID;
 		
 	this.init = function() {
-		net.bind('open', true, false, function() {
+		net.bindOnce('open', function() {
 			$('#container').switchTo('servers');
 		});
 		
-		net.bind('close', true, false, function() {
+		net.bindOnce('close', function() {
 			ui.error('Serwer nie odpowiada', {
 				'Ponów próbę': function() {
 					net.init();

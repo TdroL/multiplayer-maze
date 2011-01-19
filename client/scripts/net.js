@@ -71,7 +71,7 @@
 		},
 		connect: function() {
 			if ('WebSocket' in window
-			 && ( ! (net.ws instanceof WebSocket) || net.ws.readyState >= WebSocket.CLOSING))
+			 && ( ! net.ws || net.ws.readyState >= WebSocket.CLOSING))
 			{
 				net.ws = new WebSocket(net.host);
 			}
@@ -79,7 +79,7 @@
 			return net.ws;
 		},
 		disconnect: function() {
-			if (net.ws && net.ws instanceof WebSocket) //  && net.ws.readyState !== WebSocket.CLOSED
+			if (net.ws && net.ws instanceof WebSocket)
 			{
 				net.ws.close();
 			}
@@ -96,9 +96,9 @@
 		send: function(message, queue) {
 			queue = (arguments.length > 1) ? queue : true;
 			
-			if (net.ws.readyState !== WebSocket.OPEN)
+			if (queue && ( ! net.ws || net.ws.readyState !== WebSocket.OPEN))
 			{
-				queue && net.queue(message);
+				net.queue(message);
 			}
 			else
 			{
@@ -146,7 +146,6 @@
 			
 			switch(arguments.length)
 			{
-				case 1:
 				case 2:
 				{
 					once = false;
@@ -179,6 +178,14 @@
 				net.send(arguments[0]);
 			}
 			return true;
+		},
+		bindOnce: function() {
+			if (arguments.length === 2)
+			{
+				return net.bind(arguments[0], true, arguments[1]);
+			}
+			
+			return net.bind(arguments[0], true, arguments[1], arguments[2]);
 		},
 		removeAction: function() {
 			for (var i in arguments)

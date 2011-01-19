@@ -115,8 +115,8 @@
 					{
 						if (cell[x])
 						{
-							c.moveTo(pp[x].x, pp[x].y);
-							c.lineTo(pp[((x < 3) ? (x+1) : 0)].x, pp[((x < 3) ? (x+1) : 0)].y);
+							c.moveTo(pp[x].x, pp[x].y)
+							 .lineTo(pp[((x < 3) ? (x+1) : 0)].x, pp[((x < 3) ? (x+1) : 0)].y);
 						}
 					}
 				}

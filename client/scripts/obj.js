@@ -73,7 +73,8 @@
 		clear: function() {
 			while (obj.readyCallback.length)
 			{
-				delete obj.readyCallback.shift();
+				var callback = obj.readyCallback.shift();
+				delete callback;
 			}
 		},
 		changeStatus: function(name, flag) {
