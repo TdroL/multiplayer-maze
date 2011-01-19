@@ -212,6 +212,6 @@
 	};
 	
 	/* --debug-begin-- */
-	$.log('phy: ready');
+	io.log('phy: ready');
 	/* --debug-end-- */
 //})(jQuery);

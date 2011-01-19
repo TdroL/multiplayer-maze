@@ -17,19 +17,6 @@ var pro, io, net, ui, phy, state, obj;
 	
 	/* --debug-begin-- */
 	window.debug = true;
-	
-	$.log = function() {
-		window.debug && console.log.apply && console.log.apply(console, arguments);
-	};
-	
-	$.error = function() {
-		if (window.debug && console.error.apply)
-		{
-			console.error.apply(console, arguments);
-			alert('Error: '+Array.prototype.join.call(arguments, ''));
-		}
-		throw Array.prototype.join.call(arguments, '');
-	};
 	/* --debug-end-- */
 	
 	Array.prototype.empty = Array.prototype.empty || function() {
@@ -86,8 +73,4 @@ var pro, io, net, ui, phy, state, obj;
 			}
 		};
 	}
-	
-	/* --debug-begin-- */
-	$.log('base: ready');
-	/* --debug-end-- */
 //})(jQuery);

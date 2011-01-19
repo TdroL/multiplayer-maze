@@ -81,7 +81,7 @@
 			
 			if ( ! c)
 			{
-				$.error('ui.canvas - ', 'empty object', c);
+				io.error('ui.canvas - ', 'empty object', c);
 			}
 			
 			if ( ! (this instanceof ui.canvas))
@@ -128,7 +128,7 @@
 								}
 								catch(e)
 								{
-									$.log(m+': '+e);
+									io.log('ui.canvas<method>: '+m+' - '+e);
 									return this;
 								}
 							}
@@ -157,7 +157,7 @@
 								}
 								catch(e)
 								{
-									$.log(m+': '+e);
+									io.log('ui.canvas<method>: '+m+' - '+e);
 									return null;
 								}
 							}
@@ -180,7 +180,7 @@
 							{
 								if ( ! (p in this.context))
 								{
-									$.log(p+': unknown property');
+									io.log('ui.canvas<property>: '+p+': unknown property');
 								}
 							}
 							/* --debug-end-- */
@@ -238,6 +238,6 @@
 	};
 	
 	/* --debug-begin-- */
-	$.log('ui: ready');
+	io.log('ui: ready');
 	/* --debug-end-- */
 //})(jQuery);

@@ -5,8 +5,8 @@
 		error: false,
 		_data: {},
 		binds: {},
-		host: ('ws://'+document.location.host+':8000'),
-		base_url: '/multiplayer/',
+		host: ('ws://'+window.location.host+':8000'),
+		base_url: window.location.pathname.replace(/\/[^\/]*$/, '/'),
 		init: function() {
 			var self = this;
 			
@@ -206,6 +206,6 @@
 	};
 	
 	/* --debug-begin-- */
-	$.log('net: ready');
+	io.log('net: ready');
 	/* --debug-end-- */
 //})(jQuery);

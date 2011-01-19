@@ -77,7 +77,6 @@
 			}
 		},
 		changeStatus: function(name, flag) {
-			var callback;
 			obj.status[name] = !! flag;
 			
 			for (var i in obj.status)
@@ -90,13 +89,16 @@
 			
 			while (obj.readyCallback.length)
 			{
-				callback = obj.readyCallback.shift();
+				(obj.readyCallback.shift())(); // execute callback
+				/* same as:
+				var callback = obj.readyCallback.shift();
 				callback();
+				*/
 			}
 		}
 	};
 	
 	/* --debug-begin-- */
-	$.log('obj: ready');
+	io.log('obj: ready');
 	/* --debug-end-- */
 //})(jQuery);

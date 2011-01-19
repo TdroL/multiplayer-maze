@@ -54,7 +54,7 @@
 			
 			if ( ! ($tab.length && 'jquery' in $tab && $tab.is('.tab')))
 			{
-				$.error('switch - ', 'Unknown slide:', tab);
+				io.error('switch - ', 'Unknown slide:', tab);
 			}
 			
 			var $siblings = $tab.siblings('.tab:not(.hide)'),

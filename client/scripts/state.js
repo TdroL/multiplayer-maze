@@ -2,8 +2,8 @@
 	state = {
 		list: {},
 		add: function(name, o) {
-			obj.remove(name);
-			obj.list[name] = o;
+			state.remove(name);
+			state.list[name] = o;
 			
 			// add methods if not present
 			o.init = o.init || $.noop;

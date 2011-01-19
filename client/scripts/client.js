@@ -1,7 +1,8 @@
 //(function($) {
 
 	// Konami Code!
-	var contra = new Audio(net.url('client/audios/contra.ogg'));
+	var contra = new Audio(net.url('audios/contra.ogg'));
+	
 	io.sequence(['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'enter'], function() {
 		contra.play();
 	});
@@ -16,7 +17,7 @@
 		if (docready)
 		{
 			/* --debug-begin-- */
-			$.log('warning: double DOM load');
+			io.log('warning: double DOM load');
 			/* --debug-end-- */
 			return false; // 1.4.3 bug - http://bugs.jquery.com/ticket/7247
 		}
@@ -29,14 +30,14 @@
 		$container.switchInit({
 			callback: {
 				switchOut: function() {
-					var obj = state.get(this.id);
+					var st = state.get(this.id);
 					
-					(obj && obj.release());
+					st && st.release();
 				},
 				switchIn: function() {
-					var obj = state.get(this.id);
+					var st = state.get(this.id);
 					
-					(obj && obj.init());
+					st && st.init();
 				}
 			}
 		}).delegate('a[data-switch-to]', 'click', function() {
@@ -58,11 +59,11 @@
 		});
 		
 		io.bind('enter', function() {
-			$container.find('.popup:not(.hide) p.links>a').click();
+			$container.find('.popup:not(.hide) p.links>a:first').click();
 		});
 		
 		/* --debug-begin-- */
-		$.log('main: ready');
+		io.log('main: ready');
 		/* --debug-end-- */
 	});
 //})(jQuery);

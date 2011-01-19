@@ -1,6 +1,6 @@
 
 state.add('limbo', new function() {
-	var ping = new Audio(net.url('client/audios/ping.ogg'));
+	var ping = new Audio(net.url('audios/ping.ogg'));
 	
 	this.init = function() {
 		var player = obj.get('player'),
@@ -8,17 +8,13 @@ state.add('limbo', new function() {
 			$ul = $limbo.find('ul'),
 			stopCountdown = false;
 		
-		
-		$limbo.find('span.dots').blink(false).blink(400);
-		
 		id = $('#limbo').data('channel-id');
 		
-		$limbo.find('a[data-switch-to]').one('click.go-back', function() {
+		$limbo.find('span.dots')/*.blink(false)*/.blink(400)
+			.end().find('a[data-switch-to]').one('click.go-back', function() {
 				net.send('leave-channel');
-			});
-		
-		$limbo.find('.countdown').empty();
-		
+			})
+			.end().find('.countdown').empty();
 		
 		$ul.find('.you')
 			.removeClass('ready')

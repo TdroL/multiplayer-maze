@@ -74,6 +74,6 @@
 	/* --debug-end-- */
 	
 	/* --debug-begin-- */
-	$.log('pro: ready');
+	io.log('pro: ready');
 	/* --debug-end-- */
 //})(jQuery);

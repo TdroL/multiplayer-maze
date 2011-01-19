@@ -5,9 +5,24 @@
 		sequences: {}, sequences_cache: {}, sequences_active: {},
 		sequence_delay: 1000,
 		key: { // acceptable keys
-			8: 'backspace', 9: 'tab', 13: 'enter', 16: 'shift', 17: 'ctrl', 18: 'alt', 19: 'pause', 27: 'escape', 32: 'space', 33: 'page-up', 34: 'page-down', 35: 'end', 36: 'home', 37: 'left', 38: 'up', 39: 'right', 40: 'down', 45: 'insert', 46: 'delete', 48: '0', 49: '1', 50: '2', 51: '3', 52: '4', 53: '5', 54: '6', 55: '7', 56: '8', 57: '9', 65: 'a', 66: 'b', 67: 'c', 68: 'd', 69: 'e', 70: 'f', 71: 'g', 72: 'h', 73: 'i', 74: 'j', 75: 'k', 76: 'l', 77: 'm', 78: 'n', 79: 'o', 80: 'p', 81: 'q', 82: 'r', 83: 's', 84: 't', 85: 'u', 86: 'v', 87: 'w', 88: 'x', 89: 'y', 90: 'z', 96: 'numpad-0', 97: 'numpad-1', 98: 'numpad-2', 99: 'numpad-3', 100: 'numpad-4', 101: 'numpad-5', 102: 'numpad-6', 103: 'numpad-7', 104: 'numpad-8', 105: 'numpad-9'
+			8: 'backspace', 9: 'tab', 13: 'enter', 16: 'shift', 17: 'ctrl', 18: 'alt', 19: 'pause', 27: 'escape', 32: 'space', 33: 'page-up', 34: 'page-down', 35: 'end', 36: 'home', 37: 'left', 38: 'up', 39: 'right', 40: 'down', 45: 'insert', 46: 'delete', 48: '0', 49: '1', 50: '2', 51: '3', 52: '4', 53: '5', 54: '6', 55: '7', 56: '8', 57: '9', 65: 'a', 66: 'b', 67: 'c', 68: 'd', 69: 'e', 70: 'f', 71: 'g', 72: 'h', 73: 'i', 74: 'j', 75: 'k', 76: 'l', 77: 'm', 78: 'n', 79: 'o', 80: 'p', 81: 'q', 82: 'r', 83: 's', 84: 't', 85: 'u', 86: 'v', 87: 'w', 88: 'x', 89: 'y', 90: 'z'
+			/* Numpad:
+			96: 'numpad-0', 97: 'numpad-1', 98: 'numpad-2', 99: 'numpad-3', 100: 'numpad-4', 101: 'numpad-5', 102: 'numpad-6', 103: 'numpad-7', 104: 'numpad-8', 105: 'numpad-9'*/
 			// 112 - 123: f1 - f12
 		},
+		/* --debug-begin-- */
+		log: function() {
+			window.debug && console.log && console.log.apply && console.log.apply(console, arguments);
+		},
+		error: function() {
+			if (window.debug && console.error && console.error.apply)
+			{
+				console.error.apply(console, arguments);
+				alert('Error: '+[].join.call(arguments, ''));
+			}
+			throw [].join.call(arguments, '');
+		},
+		/* --debug-end-- */
 		init: function() {
 			$(window).keydown(function(event) {
 				var code = event.which;
@@ -75,14 +90,14 @@
 			
 			if ( ! keys.length)
 			{
-				$.error('io.bind - ', 'No keys to map');
+				io.error('io.bind - ', 'No keys to map');
 			}
 			
 			var list = io._parseKeys(keys);
 			
 			if ( ! list.length)
 			{
-				$.error('io.bind - ', 'No valid keys to map');
+				io.error('io.bind - ', 'No valid keys to map');
 			}
 			
 			list.sort();
@@ -110,11 +125,11 @@
 		sequence: function(keys, fn, delay) {
 			if ( ! ($.isArray(keys) && keys.length))
 			{
-				$.error('io.sequence - ', 'first param is not an array or is empty', keys);
+				io.error('io.sequence - ', 'first param is not an array or is empty', keys);
 			}
 			if ( ! $.isFunction(fn))
 			{
-				$.error('io.sequence - ', 'second param is not a function', fn);
+				io.error('io.sequence - ', 'second param is not a function', fn);
 			}
 			
 			delay = parseInt(delay || io.sequence_delay, 10);
@@ -286,7 +301,7 @@
 					list.push(parseInt(io.key[k].code, 10));
 					return;
 				}
-				$.error('io.bind - ', 'Unknown key:', k);
+				io.error('io.bind - ', 'Unknown key:', k);
 			});
 			
 			return list;
@@ -296,6 +311,6 @@
 	io.init();
 	
 	/* --debug-begin-- */
-	$.log('io: ready');
+	io.log('io: ready');
 	/* --debug-end-- */
 //})(jQuery);
