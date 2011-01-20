@@ -108,8 +108,9 @@ fs.readFile(client+'index.html', 'utf-8', function(err, data) {
 		
 		var params = [
 			'-jar '+path+'compiler.jar',
-			'--js='+temp,
-			'--js_output_file='+client+'scripts/minimized.js'
+			'--compilation_level ADVANCED_OPTIMIZATIONS',
+			'--js '+temp,
+			'--js_output_file '+client+'scripts/minimized.js'
 		];
 		
 		console.log('Minify-ing ('+(debug ? 'debug' : 'release')+')...');

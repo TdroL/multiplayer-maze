@@ -132,7 +132,7 @@
 			$.each(this.opponents, function(i, v) {
 				c.beginPath()
 				 .fillStyle(point.colors[v.pid] || '#000')
-				 .arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true);
+				 .arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true)
 				 .fill().closePath();
 			});
 			/* --debug-start-- */

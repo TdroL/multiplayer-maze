@@ -36,7 +36,7 @@ state.add('game', (function() {
 			/* --debug-end-- */
 			
 			net.action('update', function(data) {
-				data = JSON.parse(data);			
+				data = JSON.parse(data);
 				
 				if (data.id && data.id != _net.id)
 				{

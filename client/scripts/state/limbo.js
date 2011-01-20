@@ -1,6 +1,7 @@
 
 state.add('limbo', (function() {
-	var ping = new Audio(net.url('audios/ping.ogg'));
+	var ping = new Audio(net.url('audios/ping.ogg')),
+		countdown = 5000;
 	
 	return {
 		init: function() {
@@ -11,8 +12,9 @@ state.add('limbo', (function() {
 			
 			id = $('#limbo').data('channel-id');
 			
-			$limbo.find('span.dots')/*.blink(false)*/.blink(400)
-				.end().find('a[data-switch-to]').one('click.go-back', function() {
+			$limbo.find('span.dots').blink(false).blink(400)
+				.end().find('a[data-switch-to]').unbind('.go-back').one('click.go-back', function() {
+					stopCountdown = true;
 					net.send('leave-channel');
 				})
 				.end().find('.countdown').empty();
@@ -22,13 +24,23 @@ state.add('limbo', (function() {
 				.addClass('not-ready')
 				.find('a[data-change-status]')
 					.removeClass('unclickable')
+					.unbind('click')
 					.click(function() {
-						var status = $(this).data('change-status');
+						var $this = $(this);
+						
+						if ($this.is('.unclickable'))
+						{
+							return false;
+						}
+						
+						var status = $this.data('change-status');
 						
 						$ul.find('.you').removeClass('ready not-ready')
 										.addClass(status);
 						
 						net.send('change-status:'+status);
+						
+						return false;
 					});
 			
 			$ul.find('li').not('.you, .hide').remove();
@@ -44,7 +56,7 @@ state.add('limbo', (function() {
 			net.action('start-game', function(data) {
 				data = JSON.parse(data);
 				
-				var count = 200, //5000, // 5 sec countdown
+				var count = countdown,
 					step = 100,
 					diff = pro.now() - data.time;
 				
@@ -52,7 +64,7 @@ state.add('limbo', (function() {
 				
 				var $counter = $limbo.find('.countdown').empty();
 				
-				$ul.find('a[data-change-status]').unbind('click').addClass('unclickable');
+				$ul.find('a[data-change-status]').addClass('unclickable');
 				
 				window.setTimeout(function() {
 					var time = Math.round2(count/1000),
@@ -112,8 +124,10 @@ state.add('limbo', (function() {
 						.removeClass('hide')
 				);
 				
-				var status = $('.you a[data-change-status]').data('change-status');
-				net.send('change-status:'+status);
+				var status = $('.you').removeClass('ready')
+								.addClass('not-ready')
+								.find('.unclickable').removeClass('unclickable');
+				net.send('change-status:not-ready');
 				
 				stopCountdown = true;
 			});
