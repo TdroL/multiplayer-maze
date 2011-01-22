@@ -42,7 +42,7 @@ fs.readFile(client+'index.html', 'utf-8', function(err, data) {
 						.replace(/;[^;]+$/, '')
 						.split(';');
 	
-	var filtered = new RegExp(['jquery.min.js', 'minimized.js'].join('|')+'$'),
+	var filtered = new RegExp(['jquery.min.js', 'minimized.js'].join('|')),
 		scripts = [],
 		concat = '',
 		script, count, status, temp;
@@ -75,7 +75,7 @@ fs.readFile(client+'index.html', 'utf-8', function(err, data) {
 		catch(e)
 		{
 			console.error(status+'[fail]');
-			console.error(err.message);
+			console.error(err);
 			process.exit(1);
 		}
 		

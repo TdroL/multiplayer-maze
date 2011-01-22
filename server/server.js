@@ -65,7 +65,7 @@ server.on('connection', function(conn) {
 					
 					if (self.channel)
 					{
-						self.channel.broadcast('joined-channel:'+JSON.stringify(self.getInfo()));
+						self.channel.broadcast('joined-channel:'+JSON.stringify(self.getInfo()), conn.id);
 					}
 					break;
 				}
@@ -83,17 +83,15 @@ server.on('connection', function(conn) {
 								name: ch.name,
 								limit: ch.limit,
 								status: ch.status,
-								players: {},
-								count: ch.count
+								count: ch.count,
+								players: []
 							};
 						
 						if (ch.count > 0)
 						{
 							for (var i in ch.players)
 							{
-								var el = ch.players[i];
-								
-								response.players[el.pid] = el.getInfo();
+								response.players.push(ch.players[i].getInfo());
 							}
 						}
 						

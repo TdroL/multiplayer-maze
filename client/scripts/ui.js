@@ -8,15 +8,15 @@
 			last: 0,
 			current: 0,
 			delta: 0,
-			interval: 1000/50,
+			interval: 20, // 1000/50,
 			running: false
 		},
-		start: function() {
-			if ( ! ui.screen)
-			{
+		init: function() {
+			$(function() {
 				ui.screen = ui.canvas($('#game canvas.screen'));
-			}
-			
+			});
+		},
+		start: function() {
 			ui.stop();
 			ui.timer.running = true;
 			ui.loop();
@@ -74,6 +74,7 @@
 		},
 		canvas: function(c) {
 			// source: https://developer.mozilla.org/en/Code_snippets/Canvas
+			
 			if (c && 'jquery' in c)
 			{
 				c = c.get(0);
@@ -92,14 +93,20 @@
 			this.c = c;
 			this.context = c.getContext('2d');
 			
-			this.get = (function(c) {
-				return function() {
-					return c;
-				};
-			})(c);
-			
 			if ( ! ui.canvas.prototype.arc)
 			{
+				ui.canvas.prototype.get = function() {
+					return this.c;
+				};
+				
+				// clone canvas
+				ui.canvas.prototype.clone = function() {
+					var nc = document.createElement('canvas');
+					nc.width = this.c.width;
+					nc.height = this.c.height;
+					return ui.canvas(nc);
+				};
+				
 				var methods = ['arc','arcTo','beginPath','bezierCurveTo',/*'clearRect',*/'clip','closePath','drawFocusRing','drawImage','fill','fillRect','fillText','lineTo','moveTo','putImageData','quadraticCurveTo','rect','restore','rotate','save','scale','setTransform','stroke','strokeRect','strokeText','transform','translate'];
 				
 				ui.canvas.prototype.clearRect = function() {
@@ -236,6 +243,8 @@
 				.removeClass('hide');
 		}
 	};
+	
+	ui.init();
 	
 	/* --debug-begin-- */
 	io.log('ui: ready');

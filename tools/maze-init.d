@@ -4,12 +4,13 @@
 #
 # Install:
 #  - Change $DAEMON_ARGS directory (if needed)
-#  - Copy this file into /etc/init.d/node and chmod 755
+#  - Copy this file into /etc/init.d/maze and chmod 755
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="service"
+DESC="server"
 NAME=node
+APP="maze"
 DAEMON=/usr/local/bin/$NAME
 DAEMON_ARGS="/home/tdrol/www/projects/multiplayer/server/server.js" # change this!
 PIDFILE=/var/run/$NAME.pid
@@ -98,7 +99,7 @@ get_status() {
 
 case "$1" in
   start)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$APP"
 	do_start
 	case "$?" in
 		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
@@ -106,7 +107,7 @@ case "$1" in
 	esac
 	;;
   stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$APP"
 	do_stop
 	case "$?" in
 		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
@@ -114,7 +115,7 @@ case "$1" in
 	esac
 	;;
   status)
-  	echo -n "Status of $DESC: $NAME - "
+  	echo -n "Status of $DESC: $APP - "
   	if get_status ; then
   		echo "running."
   	else
@@ -136,7 +137,7 @@ case "$1" in
 	# If the "reload" option is implemented then remove the
 	# 'force-reload' alias
 	#
-	log_daemon_msg "Restarting $DESC" "$NAME"
+	log_daemon_msg "Restarting $DESC" "$APP"
 	do_stop
 	case "$?" in
 	  0|1)

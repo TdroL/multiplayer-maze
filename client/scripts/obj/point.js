@@ -1,14 +1,13 @@
-//(function($) {
-	obj.add('point', {
-		$$: null,
+
+obj.add('point', (function() {
+	return {
 		canvas: null,
 		settings: {},
 		points: {},
 		colors: ['#e5e5e5', '#3953A4', '#E52225', '#F6EB14', '#60BB46'],
 		queue: [],
 		init: function(settings) {
-			this.$$ = $('#game canvas.screen').clone(); //$('#game canvas.points');
-			this.canvas = ui.canvas(this.$$);
+			this.canvas = ui.screen.clone();
 			this.settings = settings;
 			
 			this.status(true);
@@ -48,11 +47,11 @@
 			
 			for (var i in settings.points)
 			{
-				if (/^(\d+)$/.test(i))
+				if (/^\d+$/.test(i))
 				{
 					for (var j in settings.points[i])
 					{
-						if (/^(\d+)$/.test(j))
+						if (/^\d+$/.test(j))
 						{
 							point = settings.points[i][j][0];
 							value = settings.points[i][j][1];
@@ -80,11 +79,12 @@
 			var settings = this.settings,
 				c = this.canvas,
 				b = settings.block,
+				m = settings.margin,
 				metric;
 			
-			c.clearRect(settings.margin + ix*b, settings.margin + iy*b, b, b);
+			c.clearRect(m + ix*b, m + iy*b, b, b);
 			
-			c.drawImage(this.getPointCache(color), settings.margin + ix*b, settings.margin + iy*b);
+			c.drawImage(this.getPointCache(color), m + ix*b, m + iy*b);
 			
 			num = num || null;
 			num_color = num_color || '#fff';
@@ -95,7 +95,7 @@
 				
 				c.font(ui.font)
 				 .fillStyle(num_color)
-				 .fillText(num, settings.margin + ix*b + (b - metric.width)/2, settings.margin + iy*b + (b + Math.floor(parseInt(ui.font, 10)*0.75))/2);
+				 .fillText(num, m + ix*b + (b - metric.width)/2, m + iy*b + (b + Math.floor(parseInt(ui.font, 10)*0.75))/2);
 			}
 		},
 		clearPoint: function(i, j) {
@@ -125,31 +125,22 @@
 			p.width = p.height = b;
 			c = ui.canvas(p);
 			
-			c.fillStyle(color);
-			
-			c.beginPath();
-			
-			c.moveTo(xb, y);
-			c.lineTo(xc, y);
-			
-			c.arc(xc, yb, bp, Math.PI * 1.5, 0, false);
-			
-			c.lineTo(xbc, yc);
-			
-			c.arc(xc, yc, bp, 0, Math.PI * 0.5, false);
-			
-			c.lineTo(xb, ybc);
-			
-			c.arc(xb, yc, bp, Math.PI * 0.5, Math.PI, false);
-			
-			c.lineTo(x, yb);
-			
-			c.arc(xb, yb, bp, Math.PI, Math.PI * 1.5, false);
-			
-			c.closePath();
-			c.fill();
+			c.fillStyle(color)
+			 .beginPath()
+				.moveTo(xb, y)
+				.lineTo(xc, y)
+				.arc(xc, yb, bp, Math.PI * 1.5, 0, false)
+				.lineTo(xbc, yc)
+				.arc(xc, yc, bp, 0, Math.PI * 0.5, false)
+				.lineTo(xb, ybc)
+				.arc(xb, yc, bp, Math.PI * 0.5, Math.PI, false)
+				.lineTo(x, yb)
+				.arc(xb, yb, bp, Math.PI, Math.PI * 1.5, false)
+			 .closePath()
+			 .fill();
 			
 			return p;
 		}
-	});
+	};
+})());
 //})(jQuery);

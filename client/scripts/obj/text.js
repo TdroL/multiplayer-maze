@@ -1,13 +1,12 @@
-//(function($) {
-	obj.add('text', {
-		$$: null,
+
+obj.add('text', (function() {
+	return {
 		canvas: null,
 		settings: {},
 		fps: 0,
 		dt: 0,
 		init: function(settings) {
-			this.$$ = $('#game canvas.screen').clone(); //$('#game canvas.text');
-			this.canvas = ui.canvas(this.$$);
+			this.canvas = ui.screen.clone();
 			this.settings = settings;
 			
 			this.status(true);
@@ -51,5 +50,5 @@
 			}
 			/* --debug-end-- */
 		}
-	});
-//})(jQuery);
+	};
+})());

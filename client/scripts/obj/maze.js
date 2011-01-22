@@ -1,12 +1,11 @@
-//(function($) {
-	obj.add('maze', {
-		$$: null,
+
+obj.add('maze', (function() {
+	return {
 		canvas: null,
 		settings: {},
 		data: [],
 		init: function(settings) {
-			this.$$ = $('#game canvas.screen').clone(); //$('#game canvas.maze');
-			this.canvas = ui.canvas(this.$$);
+			this.canvas = ui.screen.clone();
 			this.settings = settings;
 			
 			this.loadData('test.txt');
@@ -26,11 +25,6 @@
 				
 				settings.outerWidth = settings.width + 2*settings.margin;
 				settings.outerHeight = settings.height + 2*settings.margin;
-				
-				self.$$.parent().find('canvas').attr({
-					width: settings.outerWidth,
-					height: settings.outerHeight
-				});
 				
 				self.data.empty().merge(response.data);
 				
@@ -126,7 +120,7 @@
 			
 			this.status(true);
 		}
-		// update: function(dt) {},
-		// render: function() {}
-	});
-//})(jQuery);
+	};
+	// update: function(dt) {},
+	// render: function() {}
+})());

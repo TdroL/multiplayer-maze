@@ -14,11 +14,19 @@ state.add('game', (function() {
 			rows: 15,
 			points: {}, // points (including start points)
 			starts: {} // start points
+		},
+		updateData = {
+			id: 0,
+			pid: 0,
+			x: 0,
+			y: 0
 		};
 	
 	return {
+		updateInterval: 50,
 		init: function() {
-			var _net = net,
+			var self = this,
+				_net = net,
 				_point = obj.get('point'),
 				_player = obj.get('player');
 			
@@ -65,7 +73,18 @@ state.add('game', (function() {
 			
 			obj.ready(function() {
 				phy.init(settings);
+				obj.runEach('start');
 				ui.start();
+				
+				updateData.pid = _player.pid;
+				updateData.id = net.id;
+				
+				timerID = window.setInterval(function() {
+					updateData.x = _player.ball.x;
+					updateData.y = _player.ball.y;
+					
+					net.send('update:'+JSON.stringify(updateData));
+				}, self.updateInterval);
 			});
 			
 			obj.runEach('init', settings);
@@ -73,6 +92,9 @@ state.add('game', (function() {
 		release: function() {
 			ui.stop();
 			obj.clear();
+			
+			timerID && window.clearInterval(timerID);
+			
 			obj.runEach('stop');
 		}
 	};

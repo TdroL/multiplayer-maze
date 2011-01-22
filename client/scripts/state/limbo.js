@@ -141,7 +141,7 @@ state.add('limbo', (function() {
 					$ul.find('.opponent:last').after(
 						$ul.find('.opponent:first').clone()
 							.removeClass('hide')
-							.addClass(data.status ? 'ready' : 'not-ready')
+							.addClass('not-ready') // data.state should be false
 							.attr('data-id', data.id)
 					);
 				}
@@ -160,13 +160,10 @@ state.add('limbo', (function() {
 					);
 				}
 				
-				for (var i in players)
-				{
-					var el = players[i];
-					
+				players.forEach(function(el) {
 					if (el.id == net.id)
 					{
-						continue;
+						return true;
 					}
 					
 					var $li = $ul.find('.opponent:first').clone();
@@ -176,7 +173,7 @@ state.add('limbo', (function() {
 						.addClass(el.status ? 'ready' : 'not-ready');
 					
 					$ul.find('.opponent:last').after($li);
-				}
+				});
 			});
 		},
 		release: function() {

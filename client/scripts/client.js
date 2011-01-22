@@ -11,17 +11,8 @@
 		contra.currentTime = 0;
 	});
 	
-	var docready = false;
 	// main
 	$(function() {
-		if (docready)
-		{
-			/* --debug-begin-- */
-			io.log('warning: double DOM load');
-			/* --debug-end-- */
-			return false; // 1.4.3 bug - http://bugs.jquery.com/ticket/7247
-		}
-		docready = true;
 		
 		var $container = $('#container'),
 			first = $container.find(':first'),
@@ -52,7 +43,7 @@
 		
 		$container.switchTo(first);
 		
-		$.each(['1', '2', '3', '4'], function(i, key) {
+		['1', '2', '3', '4'].forEach(function(key, i) {
 			io.bind(key, function() {
 				$container.find('.tab:not(.hide)').find('a:eq('+i+')').click();
 			});

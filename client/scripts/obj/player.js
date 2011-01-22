@@ -1,8 +1,8 @@
-//(function($) {
-	obj.add('player', {
+
+obj.add('player', (function() {
+	return {
 		id: 0,
 		pid: 1,
-		$$: null,
 		canvas: null,
 		settings: {},
 		data: [],
@@ -11,22 +11,13 @@
 		in_channel: false,
 		channel_id: null,
 		opponents: {},
-		updateInterval: 50,
-		_updateData: {
-			id: 0,
-			pid: 0,
-			x: 0,
-			y: 0
-		},
-		_timerID: null,
 		init: function(settings) {
 			var self = this,
 				keys;
 			
 			self.reset();
 			
-			self.$$ = $('#game canvas.screen').clone(); //$('#game canvas.players')
-			self.canvas = ui.canvas(self.$$);
+			this.canvas = ui.screen.clone();
 			self.settings = settings;
 			
 			self.data = obj.get('maze').data;
@@ -39,7 +30,7 @@
 				{k: 'right', a: 'x', m: +1}
 			];
 			
-			$.each(keys, function(i, v) {
+			keys.forEach(function(v) {
 				io.bind(v.k, {
 					down: function() {
 						self.ball['f'+v.a] += v.m;
@@ -59,16 +50,6 @@
 			});
 			
 			self.status(true);
-			
-			self._updateData.pid = self.pid;
-			self._updateData.id = net.id;
-			
-			self._timerID = window.setInterval(function() {
-				self._updateData.x = self.ball.x;
-				self._updateData.y = self.ball.y;
-				
-				net.send('update:'+JSON.stringify(self._updateData));
-			}, self.updateInterval);
 		},
 		reset: function() {			
 			this.ball = {
@@ -150,5 +131,5 @@
 			pro.end('render-ball');
 			/* --debug-end-- */
 		}
-	});
-//})(jQuery);
+	};
+})());

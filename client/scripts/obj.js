@@ -53,8 +53,11 @@
 					var el = obj.list[i];
 					method.apply(el, args);
 				}
+				
+				return;
 			}
-			else if ($.type(method) === 'string')
+			
+			if ($.type(method) === 'string')
 			{
 				for (var i in obj.list)
 				{

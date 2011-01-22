@@ -117,7 +117,7 @@
 				up: callbacks.up
 			};
 			
-			$.each(list, function(i, v) {
+			list.forEach(function(v, i) {
 				io.binds_cache[v] = io.binds_cache[v] || {};
 				io.binds_cache[v][id] = io.binds[id];
 			});
@@ -182,7 +182,7 @@
 				delete io.binds[id];
 			}
 			
-			$.each(list, function(i, v) {
+			list.forEach(function(v) {
 				delete io.binds_cache[v][id];
 			});
 			return true;
@@ -295,7 +295,7 @@
 		},
 		_parseKeys: function(keys) {
 			var list = [];
-			$.each(keys, function(i, k) {
+			keys.forEach(function(k) {
 				if (k in io.key)
 				{
 					list.push(parseInt(io.key[k].code, 10));
