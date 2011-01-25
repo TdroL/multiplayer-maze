@@ -5,8 +5,8 @@
 		error: false,
 		_data: {},
 		binds: {},
-		host: ('ws://'+window.location.host+':8000'),
-		base_url: window.location.pathname.replace(/\/[^\/]*$/, '/'),
+		hostUrl: 'ws://'+window.location.host+':8000',
+		baseUrl: window.location.pathname.replace(/\/[^\/]*$/, '/'),
 		init: function() {
 			var self = this;
 			
@@ -73,7 +73,7 @@
 			if ('WebSocket' in window
 			 && ( ! net.ws || net.ws.readyState >= WebSocket.CLOSING))
 			{
-				net.ws = new WebSocket(net.host);
+				net.ws = new WebSocket(net.hostUrl);
 			}
 			
 			return net.ws;
@@ -208,7 +208,7 @@
 			}
 		},
 		url: function(url) {
-			return net.base_url + url;
+			return net.baseUrl + url;
 		}
 	};
 	

@@ -12,7 +12,7 @@ var server = ws.createServer().on('listening', function() {
 	log.info('Listening for connections.');
 });
 
-channels['channel-1'] = channel.create('channel-1', 'channel #1', 4);
+channels['channel-1'] = channel.create('channel-1', 'channel #1', 4, 'test.txt');
 channels['channel-2'] = channel.create('channel-2', 'channel #2', 2);
 
 // Handle WebSocket Requests
@@ -21,7 +21,6 @@ server.on('connection', function(conn) {
 	conn.send('response[id]:'+conn.id);
 	
 	var self = player.create(conn, server, channels);
-	
 	
 	conn.on('message', function(message) {
 		if ( ! player.exists(conn.id))
@@ -37,6 +36,11 @@ server.on('connection', function(conn) {
 			{
 				case 'get-channels':
 				{
+					if (self.channel)
+					{
+						break;
+					}
+					
 					conn.send('response[get-channels]:'+JSON.stringify(channel.getList()));
 					break;
 				}
@@ -61,6 +65,11 @@ server.on('connection', function(conn) {
 				}
 				case 'join-channel':
 				{
+					if (self.channel)
+					{
+						break;
+					}
+					
 					conn.send('response[join-channel]:'+JSON.stringify(self.join(result[2])));
 					
 					if (self.channel)
@@ -69,13 +78,24 @@ server.on('connection', function(conn) {
 					}
 					break;
 				}
+				case 'silent-leave-channel':
 				case 'leave-channel':
 				{
-					self.leave();
+					if ( ! self.channel)
+					{
+						break;
+					}
+					
+					self.leave(result[1] == 'silent-leave-channel');
 					break;
 				}
 				case 'get-channel-info':
 				{
+					if ( ! self.channel)
+					{
+						break;
+					}
+					
 					if (result[2] in channels)
 					{
 						var ch = channels[result[2]],
@@ -84,6 +104,7 @@ server.on('connection', function(conn) {
 								limit: ch.limit,
 								status: ch.status,
 								count: ch.count,
+								map: ch.map,
 								players: []
 							};
 						
@@ -99,13 +120,16 @@ server.on('connection', function(conn) {
 					}
 					break;
 				}
+				case 'finished':
 				case 'clear':
 				case 'update':
 				{
-					if (self.channel)
+					if ( ! self.channel)
 					{
-						self.channel.broadcast(message, conn.id);
+						break;
 					}
+					
+					self.channel.broadcast(message, conn.id);
 					break;
 				}
 				default:

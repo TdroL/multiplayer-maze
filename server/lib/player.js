@@ -29,14 +29,15 @@ function Player(conn, server, channels)
 		
 	};
 	
-	this.leave = function() {
+	this.leave = function(silent) {
 		
 		this.status = false;
 		
 		if (this.channel)
 		{
+			silent = silent || false;
 			this.pid = this.channel.releasePid(this.pid);
-			this.channel.remove(this);
+			this.channel.remove(this, false, silent);
 		}
 	};
 	

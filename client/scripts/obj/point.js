@@ -4,15 +4,94 @@ obj.add('point', (function() {
 		canvas: null,
 		settings: {},
 		points: {},
-		colors: ['#e5e5e5', '#3953A4', '#E52225', '#F6EB14', '#60BB46'],
+		colorSets: {
+			prot: [
+				['#ba0003', // ball
+				 '#b20003', '#b30003', '#b40003', '#b60003', '#b80003',
+				 '#bc0003', '#be0003', '#c00003', '#c10003', '#c20003'],
+				['#006001',
+				 '#005a01', '#005b01', '#005c01', '#005d01', '#005e01',
+				 '#006201', '#006301', '#006401', '#006501', '#006601'],
+				'#fff' // text color
+			],
+			deut: [
+				['#fa5507',
+				 '#f25507', '#f35507', '#f45507', '#f65507', '#f85507',
+				 '#fb5507', '#fc5507', '#fd5507', '#fe5507', '#ff5507'],
+				['#006c02',
+				 '#006602', '#006702', '#006802', '#006a02', '#006b02',
+				 '#006d02', '#006e02', '#006f02', '#007102', '#007202'],
+				'#fff'
+			],
+			trit: [
+				['#18f0df',
+				 '#18f0cc', '#18f0ce', '#18f0d1', '#18f0d6', '#18f0d9',
+				 '#18f0e3', '#18f0e6', '#18f0e8', '#18f0ea', '#18f0ef'],
+				['#0dff35',
+				 '#0dff0d', '#0dff11', '#0dff20', '#0dff27', '#0dff2c',
+				 '#0dff3f', '#0dff4b', '#0dff52', '#0dff58', '#0dff5d'],
+				'#000'
+			]
+		},
+		colorClear: '#e5e5e5',
+		useSet: null,
+		playerSubset: 0,
+		oponentSubset: 1,
+		colors: null,
 		queue: [],
 		init: function(settings) {
-			this.canvas = ui.screen.clone();
+			io.log('init point');
+			this.canvas = this.canvas || ui.screen.clone();
 			this.settings = settings;
 			
 			this.status(true);
 		},
-		dataReady: function() {
+		rollSet: function() {
+			var sets = [];
+			for (var i in this.colorSets)
+			{
+				sets.push(i);
+			}
+			
+			return sets[Math.round(Math.random() * (sets.length - 1))];
+		},
+		dataReady: function(settings) {
+			this.points = {};
+			
+			for (var i in settings.points)
+			{
+				for (var j in settings.points[i])
+				{
+					point = settings.points[i][j][0];
+					value = settings.points[i][j][1];
+					
+					this.points[i] = this.points[i] || {};
+					this.points[i][j] = {
+						type: parseInt(point[0], 10),
+						owner: parseInt(point[1], 10),
+						val: parseInt(value, 10) || null
+					};
+				}
+			}
+		},
+		start: function() {
+			io.log('start point');
+			
+			this.useSet = this.rollSet();
+			this.colors = this.colorSets[this.useSet];
+			
+			if (Math.random() >= 0.5)
+			{
+				this.playerSubset = 0;
+				this.oponentSubset = 1;
+			}
+			else
+			{
+				this.playerSubset = 1;
+				this.oponentSubset = 0;
+			}
+			
+			io.log('drawPoints');
 			this.drawPoints();
 		},
 		update: function(dt) {
@@ -30,49 +109,36 @@ obj.add('point', (function() {
 			/* --debug-end-- */
 		},
 		drawPoints: function() {
-			var settings = this.settings,
-				point, value, t = pro.now();
+			var points = this.points,
+				point, value, t = pro.now(),
+				player = obj.get('player'),
+				set = this.colorSets[this.useSet],
+				color;
 			
 			this.canvas.clearRect();
 			
-			/*
-			for (var i = 0; i < settings.rows; i++)
-			{
-				for (var j = 0; j < settings.cols; j++)
-				{
-					this.clearPoint(j, i);
-				}
-			}
-			*/
+			var ct = 0;
 			
-			for (var i in settings.points)
+			for (var i in points)
 			{
-				if (/^\d+$/.test(i))
+				for (var j in points[i])
 				{
-					for (var j in settings.points[i])
+					point = points[i][j];
+					
+					if (point.type === 2)
 					{
-						if (/^\d+$/.test(j))
-						{
-							point = settings.points[i][j][0];
-							value = settings.points[i][j][1];
-							
-							this.points[i] = this.points[i] || {};
-							this.points[i][j] = {
-								type: parseInt(point[0], 10),
-								owner: parseInt(point[1], 10),
-								val: parseInt(value, 10) || null
-							};
-							
-							point = this.points[i][j];
-							
-							if (point.type === 2)
-							{
-								this.drawPoint(j, i, this.colors[point.owner], point.val);
-							}
-						}
+						ct++;
+						
+						color = (player.pid == point.owner)
+								? this.playerSubset
+								: this.oponentSubset;
+						
+						this.drawPoint(j, i, set[color][point.val], point.val, set[2]);
 					}
 				}
 			}
+			
+			io.log('drawn '+ct+' points');
 		},
 		drawPoint: function(ix, iy, color, num, num_color)
 		{
@@ -99,7 +165,7 @@ obj.add('point', (function() {
 			}
 		},
 		clearPoint: function(i, j) {
-			this.drawPoint(i, j, this.colors[0]);
+			this.drawPoint(i, j, this.colorClear);
 		},
 		pointCache:{},
 		getPointCache: function(color) {

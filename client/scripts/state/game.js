@@ -3,18 +3,6 @@ state.add('game', (function() {
 	var canvas,
 		data = [],
 		timerID,
-		settings = {
-			width: null,
-			height: null,
-			outerWidth: null,
-			outerHeight: null,
-			block: 30,
-			margin: 20,
-			cols: 25,
-			rows: 15,
-			points: {}, // points (including start points)
-			starts: {} // start points
-		},
 		updateData = {
 			id: 0,
 			pid: 0,
@@ -24,17 +12,28 @@ state.add('game', (function() {
 	
 	return {
 		updateInterval: 50,
+		settings: {
+			width: null,
+			height: null,
+			block: 30,
+			margin: 20,
+			cols: 25,
+			rows: 15,
+			points: {}, // points (including start points)
+			starts: {} // start points
+		},
 		init: function() {
 			var self = this,
 				_net = net,
 				_point = obj.get('point'),
-				_player = obj.get('player');
+				_player = obj.get('player'),
+				_maze = obj.get('maze');
 			
 			/* --debug-begin-- */
 			if ( ! window.debug)
 			{
 			/* --debug-end-- */
-				if ( ! _player.in_channel)
+				if ( ! _player.inChannel)
 				{
 					$('#container').switchTo('servers');
 					return;
@@ -59,20 +58,34 @@ state.add('game', (function() {
 				_point.queue.push(JSON.parse(data));
 			});
 			
+			net.action('finished', function(pid) {
+				pid = parseInt(pid, 10);
+				
+				_net.removeAction('quit');
+				_net.send('silent-leave-channel');
+				
+				_player.finished(false, pid);
+			});
+			
 			net.action('quit', function(id) {
 				if (id in _player.opponents)
 				{
 					delete _player.opponents[id];
 				}
 				
-				ui.info('Jeden z graczy wyszedł', {'Ok': null});
-				_net.send('leave-channel');
-				
-				$('#container').switchTo('servers');
+				ui.info('Jeden z graczy wyszedł. Gra zostaje przerwana.', {
+					'Wróć do listy serwerów': function() {
+						_net.send('silent-leave-channel');
+						
+						$('#container').switchTo('servers');
+					}
+				});
 			});
 			
 			obj.ready(function() {
-				phy.init(settings);
+				phy.init(self.settings);
+				
+				io.log('runEach start');
 				obj.runEach('start');
 				ui.start();
 				
@@ -87,13 +100,16 @@ state.add('game', (function() {
 				}, self.updateInterval);
 			});
 			
-			obj.runEach('init', settings);
+			io.log('runEach init');
+			obj.runEach('init', self.settings);
 		},
 		release: function() {
 			ui.stop();
 			obj.clear();
 			
 			timerID && window.clearInterval(timerID);
+			
+			net.removeAction('update', 'clear', 'finished', 'quit');
 			
 			obj.runEach('stop');
 		}

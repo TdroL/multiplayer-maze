@@ -62,6 +62,7 @@
 				for (var i in obj.list)
 				{
 					var el = obj.list[i];
+					
 					if (method in el)
 					{
 						el[method].apply(el, args);

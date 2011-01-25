@@ -1,19 +1,30 @@
 
 obj.add('maze', (function() {
+	var loader;
+	
 	return {
 		canvas: null,
 		settings: {},
 		data: [],
 		init: function(settings) {
-			this.canvas = ui.screen.clone();
+			io.log('init maze');
+			
+			this.canvas = this.canvas || ui.screen.clone();
 			this.settings = settings;
 			
-			this.loadData('test.txt');
+			this.status(true);
 		},
 		loadData: function(url) {
 			var self = this;
 			
-			$.getJSON(url, function(response) {
+			if (loader && 'abort' in loader)
+			{
+				loader.abort();
+			}
+			
+			self.settings = state.get('game').settings;
+			
+			loader = $.getJSON(url, function(response) {
 				var settings = self.settings,
 					data = self.data,
 					current, point;
@@ -23,10 +34,9 @@ obj.add('maze', (function() {
 				settings.width = settings.cols * settings.block;
 				settings.height = settings.rows * settings.block;
 				
-				settings.outerWidth = settings.width + 2*settings.margin;
-				settings.outerHeight = settings.height + 2*settings.margin;
-				
 				self.data.empty().merge(response.data);
+				
+				settings.points = {};
 				
 				for (var i = 0; i < settings.rows; i++)
 				{
@@ -56,7 +66,7 @@ obj.add('maze', (function() {
 								}
 							}
 						}
-						
+					
 						data[i][j] = [
 							(i) ? data[i-1][j][2] : 1,
 							(settings.cols - j - 1) ? (current[0] || 0) : 1,
@@ -66,10 +76,12 @@ obj.add('maze', (function() {
 					}
 				}
 				
-				obj.runEach('dataReady');
+				obj.runEach('dataReady', settings);
 			});
 		},
-		dataReady: function() {
+		start: function() {
+			io.log('start maze');
+			
 			this.drawMaze();
 		},
 		drawMaze: function() {
@@ -80,15 +92,15 @@ obj.add('maze', (function() {
 				dy = settings.margin,
 				d = settings.block,
 				px, py, cell, pp;
-			
+
 			c.clearRect();
 			// clear and draw border
-			c.strokeStyle('#000');
-			c.fillStyle('#fff');
-			c.lineWidth(1);
-			c.fillRect(dx, dy, settings.width, settings.height);
-			c.beginPath();
-			
+			c.strokeStyle('#000')
+			 .fillStyle('#fff')
+			 .lineWidth(1)
+			 .fillRect(dx, dy, settings.width, settings.height)
+			 .beginPath();
+
 			for (var i = 0; i < settings.rows; i++)
 			{
 				for (var j = 0; j < settings.cols; j++)
@@ -115,10 +127,8 @@ obj.add('maze', (function() {
 					}
 				}
 			}
-			
+
 			c.stroke();
-			
-			this.status(true);
 		}
 	};
 	// update: function(dt) {},

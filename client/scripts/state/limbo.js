@@ -1,7 +1,8 @@
 
 state.add('limbo', (function() {
 	var ping = new Audio(net.url('audios/ping.ogg')),
-		countdown = 5000;
+		countdown = 1000,
+		loader; // map loader
 	
 	return {
 		init: function() {
@@ -147,11 +148,15 @@ state.add('limbo', (function() {
 				}
 			});
 			
-			net.bindOnce('get-channel-info:'+player.channel_id, true, function(data) {
+			net.bindOnce('get-channel-info:'+player.channelId, true, function(data) {
 				data = JSON.parse(data);
 				
 				var players = data.players,
 					$ul = $limbo.find('ul');
+				
+				setTimeout(function() {
+					obj.get('maze').loadData(net.url(data.map));
+				}, 100); // add fallback time
 				
 				for (var i = 0, c = (data.limit - data.count); i < c; i++)
 				{

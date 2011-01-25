@@ -35,7 +35,7 @@ module.exports = {
 	}
 };
 
-function Channel(id, name, limit)
+function Channel(id, name, limit, map)
 {
 	//this.id = id;
 	this.name = name;
@@ -43,6 +43,7 @@ function Channel(id, name, limit)
 	this.in_progress = false;
 	this.players = {};
 	this.count = 0;
+	this.map = map || 'test.txt';
 	this.pids = [];
 	
 	// generate pids
@@ -61,7 +62,7 @@ function Channel(id, name, limit)
 		this.count++;
 	};
 	
-	this.remove = function(player, send) {
+	this.remove = function(player, send, silent) {
 		if (player.id in this.players)
 		{
 			log.info('<'+player.id+'> left channel <'+this.name+'>');
@@ -73,7 +74,10 @@ function Channel(id, name, limit)
 			
 			this.in_progress = false;
 			
-			this.broadcast('quit:'+player.id);
+			if (silent)
+			{
+				this.broadcast('quit:'+player.id);
+			}
 		}
 	};
 	

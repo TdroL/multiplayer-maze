@@ -1,9 +1,9 @@
 //(function($) {
 	io = {
 		inited: false,
-		binds: {}, binds_cache: {},
-		sequences: {}, sequences_cache: {}, sequences_active: {},
-		sequence_delay: 1000,
+		binds: {}, bindsCache: {},
+		sequences: {}, sequencesCache: {}, sequencesActive: {},
+		sequenceDelay: 1000,
 		key: { // acceptable keys
 			8: 'backspace', 9: 'tab', 13: 'enter', 16: 'shift', 17: 'ctrl', 18: 'alt', 19: 'pause', 27: 'escape', 32: 'space', 33: 'page-up', 34: 'page-down', 35: 'end', 36: 'home', 37: 'left', 38: 'up', 39: 'right', 40: 'down', 45: 'insert', 46: 'delete', 48: '0', 49: '1', 50: '2', 51: '3', 52: '4', 53: '5', 54: '6', 55: '7', 56: '8', 57: '9', 65: 'a', 66: 'b', 67: 'c', 68: 'd', 69: 'e', 70: 'f', 71: 'g', 72: 'h', 73: 'i', 74: 'j', 75: 'k', 76: 'l', 77: 'm', 78: 'n', 79: 'o', 80: 'p', 81: 'q', 82: 'r', 83: 's', 84: 't', 85: 'u', 86: 'v', 87: 'w', 88: 'x', 89: 'y', 90: 'z'
 			/* Numpad:
@@ -118,8 +118,8 @@
 			};
 			
 			list.forEach(function(v, i) {
-				io.binds_cache[v] = io.binds_cache[v] || {};
-				io.binds_cache[v][id] = io.binds[id];
+				io.bindsCache[v] = io.bindsCache[v] || {};
+				io.bindsCache[v][id] = io.binds[id];
 			});
 		},
 		sequence: function(keys, fn) {
@@ -132,7 +132,7 @@
 				io.error('io.sequence - ', 'second param is not a function', fn);
 			}
 			
-			var delay = parseInt(arguments[2] || io.sequence_delay, 10);
+			var delay = parseInt(arguments[2] || io.sequenceDelay, 10);
 			
 			var list = io._parseKeys(keys),
 				v = list[0],
@@ -141,7 +141,7 @@
 			if (id in io.sequences)
 			{
 				delete io.sequences[id];
-				delete io.sequences_cache[v][id];
+				delete io.sequencesCache[v][id];
 			}
 			
 			io.sequences[id] = {
@@ -152,8 +152,8 @@
 				fn: fn
 			};
 			
-			io.sequences_cache[v] = io.sequences_cache[v] || {};
-			io.sequences_cache[v][id] = io.sequences[id];
+			io.sequencesCache[v] = io.sequencesCache[v] || {};
+			io.sequencesCache[v][id] = io.sequences[id];
 		},
 		removeBind: function(keys) {
 			if ( ! $.isArray(keys))
@@ -183,20 +183,20 @@
 			}
 			
 			list.forEach(function(v) {
-				delete io.binds_cache[v][id];
+				delete io.bindsCache[v][id];
 			});
 			return true;
 		},
 		_runBind: function(event, method, key) {
 			event.preventDefault = event.preventDefault || $.noop;
 			
-			if (key in io.binds_cache)
+			if (key in io.bindsCache)
 			{
 				switch(method)
 				{
 					case 'down':
 					{
-						$.each(io.binds_cache[key], function(i, v) {
+						$.each(io.bindsCache[key], function(i, v) {
 							if (io.pressed.apply(io, v.list) && $.isFunction(v.down))
 							{
 								event.preventDefault();
@@ -209,16 +209,16 @@
 					case 'press':
 					{
 						/*
-						$.each(io.binds_cache[key], function(i, v) {
+						$.each(io.bindsCache[key], function(i, v) {
 							if (io.pressed.apply(io, v.list) && $.isFunction(v.press))
 							{
 								event.preventDefault();
 								v.press();
 							}
 						});*/
-						for (var i in io.binds_cache[key])
+						for (var i in io.bindsCache[key])
 						{
-							var v = io.binds_cache[key][i];
+							var v = io.bindsCache[key][i];
 							if (io.pressed.apply(io, v.list) && $.isFunction(v.press))
 							{
 								event.preventDefault();
@@ -229,7 +229,7 @@
 					}
 					case 'up':
 					{
-						$.each(io.binds_cache[key], function(i, v) {
+						$.each(io.bindsCache[key], function(i, v) {
 							if (v.status && $.isFunction(v.up))
 							{
 								event.preventDefault();
@@ -245,23 +245,23 @@
 		_runSequence: function(event, key) {
 			event.preventDefault = event.preventDefault || $.noop;
 			
-			$.each(io.sequences_active, function(i, v) {
+			$.each(io.sequencesActive, function(i, v) {
 				v(key);
 			});
 			
-			if (key in io.sequences_cache)
+			if (key in io.sequencesCache)
 			{
 				function release(i, v) {
 					v.index = 0;
-					delete io.sequences_active[i];
+					delete io.sequencesActive[i];
 				};
 				
-				$.each(io.sequences_cache[key], function(i, v) {
-					if ( ! (i in io.sequences_active))
+				$.each(io.sequencesCache[key], function(i, v) {
+					if ( ! (i in io.sequencesActive))
 					{
 						v.index = 1; // skip first key - it's valid
 						
-						io.sequences_active[i] = (function(i, v) {
+						io.sequencesActive[i] = (function(i, v) {
 							var timer;
 							
 							return function(key) {

@@ -1,5 +1,9 @@
 
 obj.add('player', (function() {
+	var lastPos = {x: 0, y: 0},
+		rangeColor = [3, 10], // error range
+		rangeOrder = [3, 7];
+	
 	return {
 		id: 0,
 		pid: 1,
@@ -8,20 +12,26 @@ obj.add('player', (function() {
 		data: [],
 		point: null,
 		ball: null,
-		in_channel: false,
-		channel_id: null,
+		inChannel: false,
+		channelId: null,
 		opponents: {},
+		errors: {
+			order: 0,
+			colors: 0
+		},
+		currentBlock: 0,
+		blocksCount: 0,
 		init: function(settings) {
 			var self = this,
 				keys;
 			
-			self.reset();
+			this.reset();
 			
-			this.canvas = ui.screen.clone();
-			self.settings = settings;
+			this.canvas = this.canvas || ui.screen.clone();
+			this.settings = settings;
 			
-			self.data = obj.get('maze').data;
-			self.point = obj.get('point');
+			this.data = obj.get('maze').data;
+			this.point = obj.get('point');
 			
 			keys = [
 				{k: 'up',    a: 'y', m: -1},
@@ -49,7 +59,33 @@ obj.add('player', (function() {
 				press: $.noop
 			});
 			
-			self.status(true);
+			this.analyseMaze();
+			
+			this.status(true);
+		},
+		analyseMaze: function() {
+			var points = obj.get('point'),
+				s = this.settings,
+				b = this.ball;
+			
+			for (var i in points.points)
+			{
+				for (var j in points.points[i])
+				{
+					var point = points.points[i][j];
+					if (point.type == 1 && this.pid == point.owner)
+					{
+						b.x = b.px = s.block * parseInt(j, 10) + s.margin - b.r/2;
+						b.y = b.py = s.block * parseInt(i, 10) + s.margin - b.r/2;
+						
+						io.log('found start!');
+					}
+					else if (point.type == 2 && this.pid == point.owner)
+					{
+						this.blocksCount++;
+					}
+				}
+			}
 		},
 		reset: function() {			
 			this.ball = {
@@ -63,6 +99,10 @@ obj.add('player', (function() {
 				r:  7  // radius
 			};
 			this.opponents = {};
+			
+			this.errors.order = this.errors.colors = 0;
+			this.currentBlock = 0;
+			this.blocksCount = 0;
 		},
 		_p: [],
 		capture: function() {
@@ -80,11 +120,136 @@ obj.add('player', (function() {
 				
 				if (p.owner === this.pid)
 				{
-					point.queue.push(_p);
-					net.send('clear:'+JSON.stringify(_p));
+					if ((this.currentBlock + 1) == p.val)
+					{
+						point.queue.push(_p);
+						net.send('clear:'+JSON.stringify(_p));
+						this.currentBlock = p.val;
+						
+						io.log('current: '+p.val, this.blocksCount);
+						
+						if (this.blocksCount == this.currentBlock)
+						{
+							net.send('finished:'+this.pid); // don't hack, please :)
+							net.send('silent-leave-channel');
+							this.finished(true);
+						}
+					}
+					else
+					{
+						if (Math.dist(lastPos, ball) >= settings.block/2)
+						{
+							this.errors.order++;
+							lastPos.x = ball.x;
+							lastPos.y = ball.y;
+						}
+					}
+				}
+				else
+				{
+					if (Math.dist(lastPos, ball) >= settings.block/2)
+					{
+						this.errors.colors++;
+						
+						if (p.val && (this.currentBlock + 1) == p.val)
+						{
+							this.errors.order++;
+						}
+						
+						lastPos.x = ball.x;
+						lastPos.y = ball.y;
+					}
 				}
 			}
 			
+		},
+		finished: function(won, pid) {
+			var self = this;
+			
+			if (won)
+			{
+				if (self.errors.colors >= rangeColor[0] && self.errors.colors <= rangeColor[1])
+				{
+					ui.info('Wygrałeś! Przejdź dalej zobaczyć komunikat.', {
+						'Dalej': function() {
+							var $a = $('#info-myopia').find('a[href]'),
+								href = $a.attr('href');
+							
+							href = href.replace(/^([^\?]+).*$/, '$1?flaw='+obj.get('point').useSet+'&amp;value='+self.errors.colors);
+							$a.attr('href', href);
+							
+							$('#container').switchTo('info-colorblind');
+						}
+					});
+				}
+				else if(self.errors.order >= rangeOrder[0] && self.errors.order <= rangeOrder[1])
+				{
+					ui.info('Wygrałeś! Przejdź dalej zobaczyć komunikat.', {
+						'Dalej': function() {
+							var $a = $('#info-myopia').find('a[href]'),
+								href = $a.attr('href');
+							
+							href = href.replace(/^([^\?]+).*$/, '$1?flaw=myopia&amp;value='+self.errors.order);
+							$a.attr('href', href);
+							
+							$('#container').switchTo('info-myopia');
+						}
+					});
+				}
+				else
+				{
+					ui.info('Wygrałeś!', {
+						'Wróć do listy serwerów': function() {
+							$('#container').switchTo('servers');
+						}
+					});
+				}
+			}
+			else
+			{
+				if (self.errors.colors >= rangeColor[0] && self.errors.colors <= rangeColor[1])
+				{
+					ui.info('Gracz '+pid+' wygrał! Przejdź dalej zobaczyć komunikat.', {
+						'Dalej': function() {
+							net.send('silent-leave-channel');
+							
+							var $a = $('#info-myopia').find('a[href]'),
+								href = $a.attr('href');
+							
+							href = href.replace(/^([^\?]+).*$/, '$1?flaw='+obj.get('point').useSet+'&amp;value='+self.errors.colors);
+							$a.attr('href', href);
+							
+							$('#container').switchTo('info-colorblind');
+						}
+					});
+				}
+				else if(self.errors.order >= rangeOrder[0] && self.errors.order <= rangeOrder[1])
+				{
+					ui.info('Gracz '+pid+' wygrał! Przejdź dalej zobaczyć komunikat.', {
+						'Dalej': function() {
+							net.send('silent-leave-channel');
+							
+							var $a = $('#info-myopia').find('a[href]'),
+								href = $a.attr('href');
+							
+							href = href.replace(/^([^\?]+).*$/, '$1?flaw=myopia&amp;value='+self.errors.order);
+							$a.attr('href', href);
+							
+							$('#container').switchTo('info-myopia');
+						}
+					});
+				}
+				else
+				{
+					ui.info('Gracz '+pid+' wygrał!', {
+						'Wróć do listy serwerów': function() {
+							net.send('silent-leave-channel');
+							
+							$('#container').switchTo('servers');
+						}
+					});
+				}
+			}
 		},
 		update: function(dt) {
 			/* --debug-start-- */
@@ -101,10 +266,11 @@ obj.add('player', (function() {
 			var settings = this.settings,
 				point = this.point,
 				ball = this.ball,
-				c = this.canvas;
+				c = this.canvas, 
+				set = point.colorSets[point.useSet];
 			
-			c.clearRect();
-			c.lineWidth(1);
+			c.clearRect()
+			 .lineWidth(1);
 			
 			/* --debug-start-- */
 			pro.start('render-opps');
@@ -112,9 +278,10 @@ obj.add('player', (function() {
 			
 			$.each(this.opponents, function(i, v) {
 				c.beginPath()
-				 .fillStyle(point.colors[v.pid] || '#000')
-				 .arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true)
-				 .fill().closePath();
+					.fillStyle(set[point.oponentSubset][0])
+					.arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true)
+					.fill()
+				.closePath();
 			});
 			/* --debug-start-- */
 			pro.end('render-opps');
@@ -123,10 +290,13 @@ obj.add('player', (function() {
 			/* --debug-start-- */
 			pro.start('render-ball');
 			/* --debug-end-- */
-			c.beginPath();
-			c.fillStyle('#00f' || point.colors[self.pid]);
-			c.arc(settings.margin + ball.x, settings.margin + ball.y, ball.r - 0.5, 0, Math.PI*2, true);
-			c.fill().closePath();
+			c.beginPath()
+				.fillStyle(set[point.playerSubset][0])
+				.arc(settings.margin + ball.x, settings.margin + ball.y, ball.r - 0.5, 0, Math.PI*2, true)
+				.fill()
+				.strokeStyle('#000')
+				.stroke()
+			.closePath();
 			/* --debug-start-- */
 			pro.end('render-ball');
 			/* --debug-end-- */

@@ -64,9 +64,10 @@ state.add('servers', (function() {
 					{
 						case 1:
 						{
-							player.in_channel = true;
+							player.inChannel = true;
 							player.pid = pid;
-							player.channel_id = id;
+							player.channelId = id;
+							
 							$('#container').switchTo('limbo');
 							break;
 						}

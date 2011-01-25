@@ -1,6 +1,6 @@
 //(function($) {
 	ui = {
-		font: '11px "Trebuchet MS", Helvetica, Jamrul, sans-serif',
+		font: '10px "Trebuchet MS", Helvetica, Jamrul, sans-serif',
 		screen: null,
 		sizes: { width: 0, height: 0 },
 		timer: {
@@ -135,7 +135,7 @@
 								}
 								catch(e)
 								{
-									io.log('ui.canvas<method>: '+m+' - '+e);
+									io.log('ui.canvas<method>: '+m+'('+[].slice.call(arguments)+') - '+e);
 									return this;
 								}
 							}
@@ -164,7 +164,7 @@
 								}
 								catch(e)
 								{
-									io.log('ui.canvas<method>: '+m+' - '+e);
+									io.log('ui.canvas<method>: '+m+'('+[].slice.call(arguments)+') - '+e);
 									return null;
 								}
 							}
