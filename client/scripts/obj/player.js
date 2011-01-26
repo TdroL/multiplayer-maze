@@ -77,8 +77,6 @@ obj.add('player', (function() {
 					{
 						b.x = b.px = s.block * parseInt(j, 10) + s.margin - b.r/2;
 						b.y = b.py = s.block * parseInt(i, 10) + s.margin - b.r/2;
-						
-						io.log('found start!');
 					}
 					else if (point.type == 2 && this.pid == point.owner)
 					{
@@ -126,8 +124,6 @@ obj.add('player', (function() {
 						net.send('clear:'+JSON.stringify(_p));
 						this.currentBlock = p.val;
 						
-						io.log('current: '+p.val, this.blocksCount);
-						
 						if (this.blocksCount == this.currentBlock)
 						{
 							net.send('finished:'+this.pid); // don't hack, please :)
@@ -172,11 +168,13 @@ obj.add('player', (function() {
 				{
 					ui.info('Wygrałeś! Przejdź dalej zobaczyć komunikat.', {
 						'Dalej': function() {
-							var $a = $('#info-myopia').find('a[href]'),
+							var $a = $('#info-colorblind').find('a[href]'),
 								href = $a.attr('href');
 							
-							href = href.replace(/^([^\?]+).*$/, '$1?flaw='+obj.get('point').useSet+'&amp;value='+self.errors.colors);
+							href = href.replace(/^([^\?]+).*$/, '$1?flaw='+obj.get('point').useSet+'&value='+self.errors.colors);
 							$a.attr('href', href);
+							
+							io.log(href);
 							
 							$('#container').switchTo('info-colorblind');
 						}
@@ -189,8 +187,10 @@ obj.add('player', (function() {
 							var $a = $('#info-myopia').find('a[href]'),
 								href = $a.attr('href');
 							
-							href = href.replace(/^([^\?]+).*$/, '$1?flaw=myopia&amp;value='+self.errors.order);
+							href = href.replace(/^([^\?]+).*$/, '$1?flaw=myopia&value='+self.errors.order);
 							$a.attr('href', href);
+							
+							io.log(href);
 							
 							$('#container').switchTo('info-myopia');
 						}
@@ -213,11 +213,13 @@ obj.add('player', (function() {
 						'Dalej': function() {
 							net.send('silent-leave-channel');
 							
-							var $a = $('#info-myopia').find('a[href]'),
+							var $a = $('#info-colorblind').find('a[href]'),
 								href = $a.attr('href');
 							
-							href = href.replace(/^([^\?]+).*$/, '$1?flaw='+obj.get('point').useSet+'&amp;value='+self.errors.colors);
+							href = href.replace(/^([^\?]+).*$/, '$1?flaw='+obj.get('point').useSet+'&value='+self.errors.colors);
 							$a.attr('href', href);
+							
+							io.log(href);
 							
 							$('#container').switchTo('info-colorblind');
 						}
@@ -232,8 +234,10 @@ obj.add('player', (function() {
 							var $a = $('#info-myopia').find('a[href]'),
 								href = $a.attr('href');
 							
-							href = href.replace(/^([^\?]+).*$/, '$1?flaw=myopia&amp;value='+self.errors.order);
+							href = href.replace(/^([^\?]+).*$/, '$1?flaw=myopia&value='+self.errors.order);
 							$a.attr('href', href);
+							
+							io.log(href);
 							
 							$('#container').switchTo('info-myopia');
 						}
@@ -270,18 +274,30 @@ obj.add('player', (function() {
 				set = point.colorSets[point.useSet];
 			
 			c.clearRect()
-			 .lineWidth(1);
+			 .lineWidth(1)
+			 .strokeStyle('#000');
 			
 			/* --debug-start-- */
 			pro.start('render-opps');
 			/* --debug-end-- */
 			
 			$.each(this.opponents, function(i, v) {
+				var m = settings.margin,
+					r = ball.r;
+				
 				c.beginPath()
 					.fillStyle(set[point.oponentSubset][0])
-					.arc(settings.margin + v.x, settings.margin + v.y, ball.r - 0.5, 0, Math.PI*2, true)
+					.arc(m + v.x, m + v.y, r, 0, Math.PI*2, true)
 					.fill()
+					.stroke()
 				.closePath();
+				
+				// pid
+				var metric = c.measureText(v.pid);
+				
+				c.font(ui.font)
+				 .fillStyle(set[2])
+				 .fillText(v.pid, m + v.x - metric.width/2, m + v.y + parseInt(ui.font, 10)*0.35);
 			});
 			/* --debug-start-- */
 			pro.end('render-opps');
@@ -294,7 +310,6 @@ obj.add('player', (function() {
 				.fillStyle(set[point.playerSubset][0])
 				.arc(settings.margin + ball.x, settings.margin + ball.y, ball.r - 0.5, 0, Math.PI*2, true)
 				.fill()
-				.strokeStyle('#000')
 				.stroke()
 			.closePath();
 			/* --debug-start-- */

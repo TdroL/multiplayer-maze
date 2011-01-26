@@ -85,7 +85,6 @@ state.add('game', (function() {
 			obj.ready(function() {
 				phy.init(self.settings);
 				
-				io.log('runEach start');
 				obj.runEach('start');
 				ui.start();
 				
@@ -100,7 +99,6 @@ state.add('game', (function() {
 				}, self.updateInterval);
 			});
 			
-			io.log('runEach init');
 			obj.runEach('init', self.settings);
 		},
 		release: function() {

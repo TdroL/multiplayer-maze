@@ -23,11 +23,16 @@ html, body {
 }
 
 body {
+	/*
 	background-color: #4AC0F2;
+	*/
 	font-family: 'Cuprum', arial, serif;
 	font-size: 20px;
 	letter-spacing: 0.6px;
+	/*
 	color: #FF5B00;
+	*/
+	color: #444;
 }
 
 hr {
@@ -65,17 +70,21 @@ a:hover {
 .clearfix { zoom: 1; }
 
 #container {
+	/*
 	background-color: #F2F5ED;
 	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border-radius: 10px;
+	   -moz-border-radius: 10px;
+	        border-radius: 10px;
+	*/
 	padding: 10px;
 	margin: 10px auto;
 	width: 800px;
 	height: 480px;
+	/*
 	-webkit-box-shadow: 0 0 5px #84002E;
-	-moz-box-shadow: 0 0 5px #84002E;
-	box-shadow: 0 0 5px #84002E;
+	   -moz-box-shadow: 0 0 5px #84002E;
+	        box-shadow: 0 0 5px #84002E;
+	*/
 	position: relative;
 }
 
@@ -108,19 +117,19 @@ a:hover {
 	min-height: 60px;
 	padding: 20px 70px;
 	text-align: center;
-	
+
 	color: #FFF;
 	background: rgba(255, 91, 0, 0.8) no-repeat 20px 20px;
 	background-image: none;
 
 	border: 2px solid rgba(255, 91, 0, 1);
 	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border-radius: 10px;
-	
+	   -moz-border-radius: 10px;
+	        border-radius: 10px;
+
 	-webkit-box-shadow: 0 0 5px rgba(255, 91, 0, 0.5);
-	-moz-box-shadow: 0 0 5px rgba(255, 91, 0, 0.5);
-	box-shadow: 0 0 5px rgba(255, 91, 0, 0.5);
+	   -moz-box-shadow: 0 0 5px rgba(255, 91, 0, 0.5);
+	        box-shadow: 0 0 5px rgba(255, 91, 0, 0.5);
 }
 
 .popup a {
@@ -134,7 +143,7 @@ a:hover {
 	/*
 	background-color: rgba(132, 0, 46, 0.5);
 	border-color: #84002E;
-	
+
 	-webkit-box-shadow: 0 0 5px rgba(132, 0, 46, 0.5);
 	-moz-box-shadow: 0 0 5px rgba(132, 0, 46, 0.5);
 	box-shadow: 0 0 5px rgba(132, 0, 46, 0.5);
@@ -164,7 +173,9 @@ a:hover {
 #servers ul {
 	list-style: none;
 	text-align: left;
-	padding: 20px;
+	padding: 20px 100px;
+	margin: 0;
+	width: auto;
 }
 
 #servers li {
@@ -258,7 +269,7 @@ a:hover {
 	-webkit-border-radius: 10px;
 	   -moz-border-radius: 10px;
 	        border-radius: 10px;
-	
+
 	font: bold 1.5em/1 'Droid Sans Mono', 'Monaco', 'Courier New', Courier, monospace;
 }
 
@@ -271,6 +282,7 @@ a:hover {
 /* style ogólne */
 .popup.hide,
 .tab.hide,
+.no-servers.hide,
 #game.hide {
 	display: none;
 }

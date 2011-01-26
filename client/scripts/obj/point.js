@@ -40,7 +40,6 @@ obj.add('point', (function() {
 		colors: null,
 		queue: [],
 		init: function(settings) {
-			io.log('init point');
 			this.canvas = this.canvas || ui.screen.clone();
 			this.settings = settings;
 			
@@ -75,8 +74,6 @@ obj.add('point', (function() {
 			}
 		},
 		start: function() {
-			io.log('start point');
-			
 			this.useSet = this.rollSet();
 			this.colors = this.colorSets[this.useSet];
 			
@@ -90,8 +87,6 @@ obj.add('point', (function() {
 				this.playerSubset = 1;
 				this.oponentSubset = 0;
 			}
-			
-			io.log('drawPoints');
 			this.drawPoints();
 		},
 		update: function(dt) {
@@ -137,8 +132,6 @@ obj.add('point', (function() {
 					}
 				}
 			}
-			
-			io.log('drawn '+ct+' points');
 		},
 		drawPoint: function(ix, iy, color, num, num_color)
 		{

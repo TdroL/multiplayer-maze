@@ -7,8 +7,6 @@ obj.add('maze', (function() {
 		settings: {},
 		data: [],
 		init: function(settings) {
-			io.log('init maze');
-			
 			this.canvas = this.canvas || ui.screen.clone();
 			this.settings = settings;
 			
@@ -80,8 +78,6 @@ obj.add('maze', (function() {
 			});
 		},
 		start: function() {
-			io.log('start maze');
-			
 			this.drawMaze();
 		},
 		drawMaze: function() {
