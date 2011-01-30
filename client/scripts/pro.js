@@ -65,7 +65,7 @@
 		},
 		/* --debug-end-- */
 		now: function() {
-			return (new Date()).getTime();
+			return +new Date();
 		}
 	};
 	

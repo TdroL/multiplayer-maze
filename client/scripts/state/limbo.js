@@ -67,7 +67,7 @@ state.add('limbo', (function() {
 				
 				$ul.find('a[data-change-status]').addClass('unclickable');
 				
-				window.setTimeout(function() {
+				setTimeout(function() {
 					var time = Math.round2(count/1000),
 						lastTime = Math.ceil(time);
 					

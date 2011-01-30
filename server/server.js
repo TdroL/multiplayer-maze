@@ -12,8 +12,8 @@ var server = ws.createServer().on('listening', function() {
 	log.info('Listening for connections.');
 });
 
-channels['channel-1'] = channel.create('channel-1', 'channel #1', 4, 'test.txt');
-channels['channel-2'] = channel.create('channel-2', 'channel #2', 2);
+channel.create('channel-1', 'channel #1', 2, 'test.txt');
+channel.create('channel-2', 'channel #2', 2, 'test.txt');
 
 // Handle WebSocket Requests
 server.on('connection', function(conn) {

@@ -8,7 +8,7 @@
 			last: 0,
 			current: 0,
 			delta: 0,
-			interval: 20, // 1000/50,
+			interval: 20, // 1000ms/50fps,
 			running: false
 		},
 		init: function() {
@@ -20,7 +20,6 @@
 			ui.stop();
 			ui.timer.running = true;
 			ui.loop();
-			//ui.timer.id = setInterval(ui.loop, ui.timer.interval);
 		},
 		stop: function() {
 			clearTimeout(ui.timer.id);

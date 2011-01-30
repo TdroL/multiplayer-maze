@@ -33,20 +33,20 @@
 	<div id="container">
 		<section class="tab hide" id="intro">
 			<h1>Labirynt</h1>
-			
+
 			<div class="testing">
 				<h3>Testowanie przeglądarki</h3>
 			</div>
 			<div class="ready">
 				<h3>Zbierz swoje znaczniki</h3>
-				
+
 				<p><a data-switch-to="connect">Połącz z serwerem</a></p>
 				<p>Tip: Używaj strzałek do poruszania się. Spacją łapiesz znaczniki.</p>
 				<p><img src="images/keyboard-arrows.png" alt="Spacja, Strzałki" title="Spacja ← ↓ ↑ →" /></p>
 			</div>
 			<div class="fail">
 				<h3>Wystąpił błąd</h3>
-				
+
 				<p class="align-left">Twoja przeglądarka nie obsługuje znacznika <code>&lt;canvas&gt;</code> lub protokołu <code>WebSocket</code>.</p>
 				<p class="align-left">Zalecane przeglądarki: Firefox 4*, Safari 5, Chrome 8, Opera 11*.</p>
 				<p class="align-left"><small>* Jeżeli posiadasz tę przeglądarkę i nadal widzisz ten komunikat, to może oznaczać, że masz wyłączoną obsługę WebSocket. <a data-switch-to="enable-websocket">Poradnik: jak włączyć WebSocket</a></small></p>
@@ -78,33 +78,35 @@
 		</section>
 		<section class="tab hide" id="limbo">
 			<h2>Oczekiwanie na graczy<span class="dots">...</span></h2>
-			
+
 			<p class="align-left"><a data-switch-to="servers">Wróć do listy serwerów</a></p>
 			<ul class="status clearfix">
 				<li class="you not-ready">Ty: <a class="link-ready" data-change-status="not-ready">Gotowy</a><a class="link-not-ready" data-change-status="ready">Niegotowy</a></li>
 				<li class="opponent hide" data-id="0">Przeciwnik: <span class="link-ready">Gotowy</span><span class="link-not-ready">Nie gotowy</span></li>
 				<li class="waiting hide">Oczekiwanie na przeciwnika</li>
 			</ul>
-			
+
 			<p class="countdown"></p>
 		</section>
 		<section class="tab hide" id="game">
 			<canvas class="screen" width="800" height="480"></canvas>
 			<div class="info"></div>
 		</section>
-		
+
 		<section class="tab hide" id="info-colorblind">
 			<h1>Przecztaj koniecznie!</h1>
 			<p class="align-left">Wykrylismy, że możesz mieć problemy z rozróżnianiem barw. Jeśli nie jesteś świadomy posiadania tej choroby, powinieneś się skontaktować z lekarzem okulistą.</p>
 			<p class="align-left">Możesz również wpisać się do bazy danych, byśmy w przyszłości mogli się z tobą skontaktować &mdash; do celów badawczych potrzebujemy ludzi takich jak Ty. <a href="form.php">Wystarczy wypełnić formularz.</a></p>
+			<p><a data-switch-to="servers">Wróć do listy pokoi</a></p>
 		</section>
-		
+
 		<section class="tab hide" id="info-myopia">
 			<h1>Przecztaj koniecznie!</h1>
 			<p class="align-left">Wykrylismy, że możesz mieć problemy z krótkowzrocznością. Jeśli nie jesteś świadomy posiadania tej choroby, powinieneś się skontaktować z lekarzem okulistą.</p>
 			<p class="align-left">Możesz również wpisać się do bazy danych, byśmy w przyszłości mogli się z tobą skontaktować &mdash; do celów badawczych potrzebujemy ludzi takich jak Ty. <a href="form.php">Wystarczy wypełnić formularz.</a></p>
+			<p><a data-switch-to="servers">Wróć do listy pokoi</a></p>
 		</section>
-		
+
 		<div class="popup hide" id="errors">
 			<p></p>
 			<p class="links"><a>Ok</a></p>

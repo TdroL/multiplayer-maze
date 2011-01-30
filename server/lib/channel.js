@@ -31,7 +31,7 @@ module.exports = {
 		return list;
 	},
 	create: function(id, name, limit) {
-		return new Channel(id, name, limit);
+		channels[name] = new Channel(id, name, limit);
 	}
 };
 

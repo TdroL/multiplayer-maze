@@ -2,7 +2,10 @@
 obj.add('player', (function() {
 	var lastPos = {x: 0, y: 0},
 		rangeColor = [3, 10], // error range
-		rangeOrder = [3, 7];
+		rangeOrder = [3, 7],
+		$window = $(window),
+		aspect_default = ($window.width()/$window.height()),
+		aspect_epsilon = 0.2;
 	
 	return {
 		id: 0,
@@ -16,6 +19,7 @@ obj.add('player', (function() {
 		channelId: null,
 		opponents: {},
 		errors: {
+			zoomed: false,
 			order: 0,
 			colors: 0
 		},
@@ -62,6 +66,16 @@ obj.add('player', (function() {
 			this.analyseMaze();
 			
 			this.status(true);
+			
+			$window.one('resize', function() {
+				var $this = $(this),
+					aspect = $this.width()/$this.height();
+				
+				if (Math.abs(aspect_default - aspect) <= aspect_epsilon)
+				{
+					self.errors.zoomed = true;
+				}
+			});
 		},
 		analyseMaze: function() {
 			var points = obj.get('point'),
@@ -99,6 +113,7 @@ obj.add('player', (function() {
 			this.opponents = {};
 			
 			this.errors.order = this.errors.colors = 0;
+			this.errors.zoomed = false;
 			this.currentBlock = 0;
 			this.blocksCount = 0;
 		},
@@ -180,7 +195,7 @@ obj.add('player', (function() {
 						}
 					});
 				}
-				else if(self.errors.order >= rangeOrder[0] && self.errors.order <= rangeOrder[1])
+				else if(self.errors.order >= rangeOrder[0] && self.errors.order <= rangeOrder[1] || self.errors.zoomed)
 				{
 					ui.info('Wygrałeś! Przejdź dalej zobaczyć komunikat.', {
 						'Dalej': function() {
@@ -225,7 +240,7 @@ obj.add('player', (function() {
 						}
 					});
 				}
-				else if(self.errors.order >= rangeOrder[0] && self.errors.order <= rangeOrder[1])
+				else if(self.errors.order >= rangeOrder[0] && self.errors.order <= rangeOrder[1] || self.errors.zoomed)
 				{
 					ui.info('Gracz '+pid+' wygrał! Przejdź dalej zobaczyć komunikat.', {
 						'Dalej': function() {
@@ -293,10 +308,10 @@ obj.add('player', (function() {
 				.closePath();
 				
 				// pid
-				var metric = c.measureText(v.pid);
+				var metric = c.font(ui.font)
+							  .measureText(v.pid);
 				
-				c.font(ui.font)
-				 .fillStyle(set[2])
+				c.fillStyle(set[2])
 				 .fillText(v.pid, m + v.x - metric.width/2, m + v.y + parseInt(ui.font, 10)*0.35);
 			});
 			/* --debug-start-- */
