@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `results` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(255) NOT NULL,
   `name` varchar(128) DEFAULT NULL,
-  `flaw` enum('prot','deut','trit') NOT NULL,
+  `flaw` enum('prot','deut','trit', 'myopia') NOT NULL,
   `value` mediumint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `email` (`email`)
